@@ -15,7 +15,7 @@ const Sidebar = ({ closeSidebar, sidebarOpen }) => {
             </ul>
         </div>
         <div id="cover" className={`fixed left-0 h-full w-full bg-indigo-950/50 z-30 ${sidebarOpen ? 'block' : 'hidden'}`} onClick={closeSidebar}></div>
-        </>
+    </>
     )
 }
 
@@ -36,6 +36,8 @@ const Navbar = () => {
                         <Link href="/" className="font-bold text-xl">My App</Link>
                     </div>
                     <div className="flex justify-end gap-2">
+                        <Link className="cursor-pointer hover:text-indigo-950 transition-all" href="/login">Login</Link>
+                        <Link className="cursor-pointer hover:text-indigo-950 transition-all" href="/register">Register</Link>
                         <div className="cursor-pointer hover:text-indigo-950 transition-all">Heart</div>
                         <div className="cursor-pointer hover:text-indigo-950 transition-all">Cart</div>
                     </div>
