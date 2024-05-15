@@ -28,12 +28,16 @@ const CategoryShow = () => {
         // Set the initial value based on the window's width
         setIsSmallScreen(window.innerWidth < 1280);
 
+        const handleResize = debounce(() => {
+            setIsSmallScreen(window.innerWidth < 1280);
+        }, 250);
+
         window.addEventListener('resize', handleResize);
 
         return () => {
             window.removeEventListener('resize', handleResize);
         };
-    }, []);
+    }, [handleResize]);
 
     useEffect(() => {
         const handleWheel = (event) => {
@@ -68,7 +72,7 @@ const CategoryShow = () => {
                 <ProductCard />
                 <ProductCard />
             </div>
-            <Link href="/categories/1">
+            <Link href="/search?cat=1">
                 <p className="text-blue-500 hover:underline hover:text-blue-700">View all products in this category</p>
             </Link>
         </div>
