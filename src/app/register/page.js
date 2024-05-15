@@ -16,22 +16,22 @@ const loginPage = () => {
                 </div>
                 <form className='flex flex-col gap-4'>
                     <div className='flex flex-col'>
-                        <label htmlFor='email' className="text-gray-800">E-mail</label>
+                        <label htmlFor='email' className="text-gray-800 text-sm">E-mail</label>
                         <input type='email' id='email' name='email'
                             className='border rounded h-8' />
                     </div>
                     <div className='flex flex-col'>
-                        <label htmlFor='username' className="text-gray-800">Username</label>
+                        <label htmlFor='username' className="text-gray-800 text-sm">Username</label>
                         <input type='text' id='username' name='username'
                             className='border rounded h-8' />
                     </div>
                     <div className='flex flex-col'>
-                        <label htmlFor='password' className="text-gray-800">Password</label>
+                        <label htmlFor='password' className="text-gray-800 text-sm">Password</label>
                         <input type='password' id='password' name='password'
                             className='border rounded h-8' />
                     </div>
                     <div className='flex flex-col'>
-                        <label htmlFor='password2' className="text-gray-800">Repeat Password</label>
+                        <label htmlFor='password2' className="text-gray-800 text-sm">Repeat Password</label>
                         <input type='password' id='password2' name='password2'
                             className='border rounded h-8' />
                     </div>

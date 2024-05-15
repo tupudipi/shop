@@ -7,12 +7,12 @@ const loginPage = () => {
                 <h1 className='text-4xl font-bold mb-8 text-center text-gray-800'>Login</h1>
                 <form className='flex flex-col gap-4'>
                     <div className='flex flex-col'>
-                        <label htmlFor='username' className="text-gray-800">Username</label>
+                        <label htmlFor='username' className="text-gray-800 text-sm">Username</label>
                         <input type='text' id='username' name='username'
                             className='border rounded h-8' />
                     </div>
                     <div className='flex flex-col'>
-                        <label htmlFor='password' className="text-gray-800">Password</label>
+                        <label htmlFor='password' className="text-gray-800 text-sm">Password</label>
                         <input type='password' id='password' name='password'
                             className='border rounded h-8' />
                     </div>

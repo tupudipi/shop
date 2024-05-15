@@ -9,9 +9,9 @@ const Sidebar = ({ closeSidebar, sidebarOpen }) => {
             <Link href='/account' className='hover:text-indigo-950 transition-all'>Account</Link>
             <hr className='border-2 text-slate-600 rounded-full'></hr>
             <ul className='flex flex-col gap-2 mt-2'>
-                <li className='flex hover:text-indigo-950 transition-all'><Link href='/category-1' className='w-full'>Category 1</Link></li>
-                <li className='flex hover:text-indigo-950 transition-all'><Link href='/category-2' className='w-full'>Category 2</Link></li>
-                <li className='flex hover:text-indigo-950 transition-all'><Link href='/category-3' className='w-full'>Category 3</Link></li>
+                <li className='flex hover:text-indigo-950 transition-all'><Link href='/categories/1' className='w-full'>Category 1</Link></li>
+                <li className='flex hover:text-indigo-950 transition-all'><Link href='/categories/2' className='w-full'>Category 2</Link></li>
+                <li className='flex hover:text-indigo-950 transition-all'><Link href='/categories/3' className='w-full'>Category 3</Link></li>
             </ul>
         </div>
         <div id="cover" className={`fixed left-0 h-full w-full bg-indigo-950/50 z-30 ${sidebarOpen ? 'block' : 'hidden'}`} onClick={closeSidebar}></div>
