@@ -15,7 +15,7 @@ const debounce = (func, delay) => {
     };
 };
 
-const CategoryShow = () => {
+const CategoryShow = ({ page }) => {
     const scrollContainer = useRef(null);
     const [isSmallScreen, setIsSmallScreen] = useState(false);
 
@@ -63,7 +63,9 @@ const CategoryShow = () => {
 
     return (
         <div className="my-6">
-            <h2 className="text-2xl mb-4">Category 1</h2>
+            <h2 className="text-2xl mb-4">
+                {page === 'home' ? 'Category Name' : 'Related Products'}
+                </h2>
             <div ref={scrollContainer} className="flex gap-6 max-w-sm
             md:max-w-3xl overflow-auto pb-6 lg:max-w-5xl xl:max-w-7xl mb-2" style={{ scrollBehavior: 'smooth' }}>
                 <ProductCard />

@@ -1,5 +1,7 @@
 import Navbar from "@/app/components/Navbar"
-import ProductCard from "@/app/components/ProductCard";
+import CategoryShow from "@/app/components/CategoryShow";
+import ProductDetails from "@/app/components/ProductDetails";
+
 
 const productPage = ({ params }) => {
     const productId = params.id;
@@ -49,13 +51,12 @@ const productPage = ({ params }) => {
                     </div>
                 </div>
 
-                <div id="recommended" className="flex gap-4 p-8 mt-4">
-                    <ProductCard />
-                    <ProductCard />
-                    <ProductCard />
-                    <ProductCard />
-                    <ProductCard />
+                <div className="w-full flex justify-center">
+                    <CategoryShow page={"prod"} />
                 </div>
+
+                <ProductDetails />
+
             </main>
         </>
     )
