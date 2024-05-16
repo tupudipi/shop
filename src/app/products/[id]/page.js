@@ -1,6 +1,7 @@
 import Navbar from "@/app/components/Navbar"
 import CategoryShow from "@/app/components/CategoryShow";
 import ProductDetails from "@/app/components/ProductDetails";
+import ProductQuantity from "@/app/components/ProductQuantity";
 
 
 const productPage = ({ params }) => {
@@ -9,7 +10,7 @@ const productPage = ({ params }) => {
         <>
             <Navbar />
             <main className="container mx-auto px-4 md:px-8">
-                <div id="product" className="flex flex-col md:grid md:grid-cols-2 gap-4 bg-white/30 border shadow rounded-lg p-8">
+                <div id="product" className="flex flex-col md:grid md:grid-cols-2 gap-4 bg-white/50 border shadow rounded-lg p-8">
                     <div className="grid place-content-center">
                         <div className="w-80 h-80 bg-gray-200 rounded-lg"></div>
                     </div>
@@ -37,11 +38,7 @@ const productPage = ({ params }) => {
                                     <p className="text-green-700">In stock</p>
 
                                     <div className="md:w-3/4 lg:w-2/3 flex flex-col gap-2">
-                                        <div className="flex gap-2">
-                                            <button className="bg-gray-200 text-gray-800 px-4 py-1 rounded-lg hover:bg-gray-300 transition-colors">-</button>
-                                            <input className="flex-grow min-w-0 text-center" type="number" defaultValue="1" />
-                                            <button className="bg-gray-200 text-gray-800 px-4 py-1 rounded-lg hover:bg-gray-300 transition-colors">+</button>
-                                        </div>
+                                        <ProductQuantity />
                                         <button className="bg-blue-500 text-white px-4 py-1 rounded-lg hover:bg-blue-700 transition-colors">Add to Cart</button>
                                         <button className="bg-gray-200 text-gray-800 px-4 py-1 rounded-lg hover:bg-gray-300 transition-colors">Add to favourites</button>
                                     </div>
