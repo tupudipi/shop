@@ -39,7 +39,7 @@ const productPage = ({ params }) => {
                                     <div className="md:w-3/4 lg:w-2/3 flex flex-col gap-2">
                                         <div className="flex gap-2">
                                             <button className="bg-gray-200 text-gray-800 px-4 py-1 rounded-lg hover:bg-gray-300 transition-colors">-</button>
-                                            <input className="flex-grow min-w-0 text-center" type="number" value="1" />
+                                            <input className="flex-grow min-w-0 text-center" type="number" defaultValue="1" />
                                             <button className="bg-gray-200 text-gray-800 px-4 py-1 rounded-lg hover:bg-gray-300 transition-colors">+</button>
                                         </div>
                                         <button className="bg-blue-500 text-white px-4 py-1 rounded-lg hover:bg-blue-700 transition-colors">Add to Cart</button>
