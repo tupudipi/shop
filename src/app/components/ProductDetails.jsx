@@ -57,7 +57,7 @@ const ProductDetails = () => {
           Maxime sint ullam ducimus aliquam numquam. Omnis vel quos doloremque beatae aspernatur ad praesentium illo pariatur temporibus. Nam consectetur repudiandae recusandae eaque ipsum perferendis aliquid ad, vero error itaque sit.
           Ea maxime soluta magnam nostrum quam minima maiores saepe praesentium molestiae impedit exercitationem sequi temporibus autem, totam qui aliquid est quas non libero voluptatem quaerat? Molestias quaerat reprehenderit soluta dolorum!</p>
       </div>
-      <div id="reviews" className='bg-white/50 py-4 px-8 rounded-lg shadow'>
+      <div id="reviews" className='bg-white/70 py-4 px-8 rounded-lg shadow'>
         <h2 className='text-2xl my-4'>Reviews</h2>
         <ProductComments />
       </div>
