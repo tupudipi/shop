@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-const AdressCard = ({ isDelivery, isMain }) => {
+const AddressCard = ({ isDelivery, isMain, isInfo }) => {
     return (
         <div className="bg-white rounded-lg shadow p-4">
             <div className="mb-4">
@@ -30,19 +30,21 @@ const AdressCard = ({ isDelivery, isMain }) => {
                 </p>
             </div>
 
-            <div className="flex gap-3">
-                <Link href="/account/delivery-billing/edit/1" className="text-blue-500 underline">
-                    Edit
-                </Link>
-                {!isMain && (
-                    <button className="text-red-500 underline">
-                        Remove
-                    </button>
-                )}
-            </div>
+            {!isInfo && (
+                <div className="flex gap-3">
+                    <Link href="/account/delivery-billing/edit/1" className="text-blue-500 underline">
+                        Edit
+                    </Link>
+                    {!isMain && (
+                        <button className="text-red-500 underline">
+                            Remove
+                        </button>
+                    )}
+                </div>
+            )}
         </div>
     );
 }
 
-export default AdressCard;
+export default AddressCard;
 

@@ -1,7 +1,13 @@
+import Link from "next/link"
 
-const editAdressPage = () => {
+const editAdressPage = ({ params }) => {
+    const addressId = params.addressId;
+
     return (
         <div>
+            <Link href="/account/delivery-billing">
+                <p className="text-blue-500 hover:underline hover:text-blue-700 my-1">{"<"} Back to Delivery and Billing</p>
+            </Link>
             <h1 className="text-4xl font-medium">Edit Address</h1>
 
             <form className="lg:grid lg:grid-cols-2">

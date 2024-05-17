@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation';
 
 const AccountSidebar = () => {
     const pathname = usePathname();
-    console.log(pathname);
 
     const links = [
         { href: '/account', text: 'Account Overview' },

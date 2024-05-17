@@ -17,7 +17,7 @@ const deliveryBillingPage = () => {
       </div>
 
       <div className="mt-6">
-        <h2 className="text-2xl font-semibold mb-4">Billing Addresses</h2>
+        <h2 className="text-2xl font-medium mb-4">Billing Addresses</h2>
         <div className="flex flex-col md:flex-row gap-4 flex-wrap">
           <AddressCard isMain />
           <AddressCard />
