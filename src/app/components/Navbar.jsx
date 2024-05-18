@@ -24,7 +24,7 @@ const Navbar = () => {
 
     return (
         <nav className="text-indigo-800">
-            <div className="p-4">
+            <div className="p-4 container mx-auto">
                 <div className="flex justify-between align-middle">
                     <div className="flex items-center gap-2">
                         <div
