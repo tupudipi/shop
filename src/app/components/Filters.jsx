@@ -1,20 +1,69 @@
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 
 const Filters = () => {
-  return (
-    <div className="bg-white rounded-lg p-2 shadow">
-        <p>Filters</p>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eveniet porro dolorum rerum, autem praesentium officiis voluptatum non adipisci. Sint placeat blanditiis tempore voluptas corrupti quos inventore et consequatur provident recusandae.
-        Exercitationem doloribus totam aspernatur hic repellat animi commodi deserunt quae labore, nam voluptas vel. Cupiditate, in molestiae praesentium repellat debitis rem ad consequuntur at libero ipsum numquam, assumenda impedit doloremque!
-        Possimus commodi ab quas aspernatur perferendis minus excepturi animi, molestias tenetur soluta quis! Nobis perferendis facere exercitationem odit optio rem ducimus error laborum. Ab ipsum illo nostrum? Repellat, illum praesentium.
-        Totam deleniti doloribus corrupti nemo ipsam dignissimos! Veniam deleniti, ad dolores consequuntur maxime magni voluptatibus. Blanditiis laborum sunt nulla enim tempore ut vel, sit odit porro. Non excepturi natus quasi.
-        Perferendis, accusantium ipsum deleniti quo quisquam dignissimos alias consequuntur tempora quos aut ipsam adipisci, velit eligendi ratione, iste eveniet aliquid nesciunt dolorem? Quos temporibus impedit culpa molestias qui ipsum rerum.
-        Sint cupiditate aliquam, dicta similique consectetur veritatis qui explicabo quas ducimus iusto facere modi voluptatum velit vel earum fugiat libero commodi sit ex nisi! Commodi quidem cupiditate velit fugiat omnis?
-        Tempore totam harum debitis distinctio aliquid maiores eligendi quaerat sint dicta recusandae voluptatem architecto doloribus dignissimos fugiat corporis velit quos explicabo, ipsa omnis rerum repellat quasi perferendis eius ab! Ipsum!
-        Voluptatem officiis sit commodi illum exercitationem voluptates quod iusto possimus. Tempore blanditiis animi eius soluta, cumque, voluptatum facere neque quidem obcaecati repudiandae deleniti commodi nisi amet eum quisquam aut voluptates!
-        Assumenda quasi possimus omnis qui est quibusdam iusto quae eligendi impedit, eum porro, numquam nulla nemo eveniet fuga animi sequi. Quam libero vitae, quasi dignissimos nemo corporis sit fugit ratione.
-        Autem recusandae facere eius distinctio nulla vero excepturi quas. Doloribus corporis consequuntur nulla, officia nobis totam placeat corrupti exercitationem eius voluptate repudiandae eos dicta incidunt ab illo consectetur laborum illum?</p>
-    </div>
-  )
-}
+  const categories = ['shirts', 'hoodies', 'jackets', 'bags', 'stickers', 'others'];
+  const [active, setActive] = useState(categories[0]);
+  const [openSelect, setOpenSelect] = useState(false);
+  const ref = useRef(null);
 
-export default Filters
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (ref.current && !ref.current.contains(event.target)) {
+        setOpenSelect(false);
+      }
+    };
+
+    window.addEventListener('click', handleClickOutside);
+    return () => window.removeEventListener('click', handleClickOutside);
+  }, []);
+
+  return (
+    <>
+      {/* Mobile view */}
+      <div className="md:hidden relative border rounded bg-white shadow-sm focus:shadow-md" ref={ref}>
+        <div
+          onClick={() => {
+            setOpenSelect(!openSelect);
+          }}
+          className="flex w-full items-center justify-between rounded border border-black/30 px-4 py-2 dark:border-white/30"
+        >
+          <div>{active}</div>
+        </div>
+        {openSelect && (
+          <div
+            onClick={() => {
+              setOpenSelect(false);
+            }}
+            className="absolute z-40 w-full rounded-b-md bg-white/95 p-4 shadow-md transition-all"
+          >
+            {categories.map((category, i) => (
+              <Link key={i} href={`/search/${category}`}>
+                <p onClick={() => setActive(category)} className="block p-2 hover:bg-indigo-200/75 cursor-pointer rounded-md transition-all hover:shadow text-start">
+                  {category}
+                </p>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Desktop view */}
+      <div className="hidden md:block">
+        <ul className="bg-white p-2 rounded-lg border-2 self-start">
+          {categories.map((category) => (
+            <Link key={category} href={`/search/${category}`}>
+              <li className={`my-1 p-2 hover:bg-indigo-200/75 cursor-pointer rounded-md transition-all hover:shadow text-start`}>
+                {category}
+              </li>
+            </Link>
+          ))}
+        </ul>
+      </div>
+    </>
+  );
+};
+
+export default Filters;
