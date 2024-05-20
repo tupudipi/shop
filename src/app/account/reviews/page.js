@@ -24,7 +24,7 @@ const reviewsPage = () => {
       <h1 className="text-4xl font-medium">My Reviews</h1>
       <div className="mt-6 flex items-center gap-2 md:gap-4 flex-wrap">
       </div>
-      <ul className="mt-6 space-y-4">
+      <ul className="mt-6 space-y-4 md:w-2/3">
         {reviews.map((review) => (
           <li key={review.id} className="border border-gray-200 rounded-lg bg-white shadow-sm p-4">
             <div className="flex gap-2">

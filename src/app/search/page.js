@@ -1,16 +1,18 @@
-import Navbar from "../components/Navbar"
-import Filters from "../components/Filters"
-import Results from "../components/Results"
+import ProductCard from "../components/ProductCard"
 
 const searchPage = () => {
     return (
-        <>
-            <Navbar />
-            <main className="flex flex-col md:flex-row w-full container mx-auto">
-                <div className="text-center md:w-1/5 border border-green-600 p-4"><Filters></Filters></div>
-                <div className="flex-grow text-center border-red-600 border p-4"><Results></Results></div>
-            </main>
-        </>
+
+        <div id="results" className="flex  flex-col md:flex-row md:flex-wrap gap-3 mt-2">
+            <ProductCard />
+            <ProductCard />
+            <ProductCard />
+            <ProductCard />
+            <ProductCard />
+            <ProductCard />
+            <ProductCard />
+        </div>
+
     )
 }
 
