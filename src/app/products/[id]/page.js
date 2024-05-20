@@ -7,7 +7,7 @@ import ProductQuantity from "@/app/components/ProductQuantity";
 const productPage = ({ params }) => {
     const productId = params.id;
     return (
-        <div className="overflow-x-hidden">
+        <div className="overflow-x-clip">
             <Navbar />
             <main className="container mx-auto px-4 md:px-8">
                 <div id="product" className="flex flex-col md:grid md:grid-cols-2 gap-4 bg-white/80 border shadow rounded-lg p-8">
