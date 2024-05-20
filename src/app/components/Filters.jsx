@@ -52,7 +52,7 @@ const Filters = () => {
 
       {/* Desktop view */}
       <div className="hidden md:block">
-        <ul className="bg-white p-2 rounded-lg border-2 self-start">
+        <ul className="bg-white p-2 rounded-lg border-2 self-start min-w-32">
           {categories.map((category) => (
             <Link key={category} href={`/search/${category}`}>
               <li className={`my-1 p-2 hover:bg-indigo-200/75 cursor-pointer rounded-md transition-all hover:shadow text-start`}>
