@@ -26,14 +26,15 @@ export default function WishlistDropdown(props) {
             {props.navbar &&
                 <div className="hidden relative select-none md:block" ref={wishlistRef}>
                     {
-                        <div className="group cursor-pointer hover:text-indigo-950 transition-all"
+                        <div className="group cursor-pointer hover:text-indigo-950 transition-all flex items-center gap-1"
                             onClick={() => setWishlistOpen(!wishlistOpen)}
                         >
-                            <FontAwesomeIcon icon={faHeart} />
+                            <FontAwesomeIcon icon={faHeart} className="max-h-4" />
                             {wishlistItems.length > 0 &&
                                 <span className="absolute -top-2 -left-2 p-0.5 bg-red-500/75 group-hover:bg-red-500 text-white text-xs font-bold rounded-full">{wishlistItems.length}</span>
                             }
-                            Wishlist <FontAwesomeIcon icon={faAngleDown} />
+                            Wishlist
+                            <FontAwesomeIcon icon={faAngleDown} className="max-h-4" />
                         </div>
                     }
                     {

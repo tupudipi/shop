@@ -26,13 +26,14 @@ export default function CartDropdown(props) {
             {props.navbar &&
                 <div className="hidden md:block relative select-none" ref={cartRef}>
                     <div
-                        className="cursor-pointer hover:text-indigo-950 transition-all"
+                        className="cursor-pointer hover:text-indigo-950 transition-all flex items-center gap-1"
                         onClick={() => setCartOpen(!cartOpen)}
                     >
-                        <FontAwesomeIcon icon={faShoppingCart} /> {cartItems.length > 0 &&
+                        <FontAwesomeIcon icon={faShoppingCart} className="max-h-4" /> {cartItems.length > 0 &&
                             <span className="absolute -top-2 -left-2 p-0.5 bg-emerald-500/75 group-hover:bg-emerald-500 text-white text-xs font-bold rounded-full">{cartItems.length}</span>
                         }
-                        Cart <FontAwesomeIcon icon={faAngleDown} />
+                        Cart
+                        <FontAwesomeIcon icon={faAngleDown} className="max-h-4" />
                     </div>
                     {
                         <div className={`rounded-md flex flex-col items-center transition-all overflow-hidden absolute top-8 right-0 bg-white shadow-md w-content z-50 ${cartOpen ? 'max-h-96 p-4 pb-2' : 'max-h-0 p-0'}`}>
