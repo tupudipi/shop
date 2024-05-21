@@ -2,6 +2,12 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { faHeart } from '@fortawesome/free-regular-svg-icons';
+import { faShoppingCart } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBars } from '@fortawesome/free-solid-svg-icons';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
 const Sidebar = ({ closeSidebar, sidebarOpen }) => {
     return (<>
@@ -31,15 +37,16 @@ const Navbar = () => {
                             className="cursor-pointer hover:text-indigo-950 transition-all"
                             onClick={() => setSidebarOpen(!sidebarOpen)}
                         >
-                            {sidebarOpen ? 'Close' : 'Menu'}
+                            {sidebarOpen ? <FontAwesomeIcon icon={faTimes} /> : <FontAwesomeIcon icon={faBars} />}
                         </div>
                         <Link href="/" className="font-bold text-xl">My App</Link>
                     </div>
                     <div className="flex justify-end gap-2">
                         <Link className="cursor-pointer hover:text-indigo-950 transition-all" href="/login">Login</Link>
                         <Link className="cursor-pointer hover:text-indigo-950 transition-all" href="/register">Register</Link>
-                        <div className="cursor-pointer hover:text-indigo-950 transition-all">Heart</div>
-                        <div className="cursor-pointer hover:text-indigo-950 transition-all">Cart</div>
+                        <div className="cursor-pointer hover:text-indigo-950 transition-all"><FontAwesomeIcon icon={faHeart} /> Wishlist</div>
+                        <div className="cursor-pointer hover:text-indigo-950 transition-all"><FontAwesomeIcon icon={faShoppingCart} /> Cart</div>
+                        
                     </div>
                 </div>
                 <div className="mt-2 relative">
@@ -48,7 +55,7 @@ const Navbar = () => {
                     <div
                         className="absolute top-1/2 transform -translate-y-1/2 right-0 h-5 w-5 text-gray-500 flex items-center justify-center cursor-pointer hover:bg-sky-100 p-5 rounded-r-full hover:text-indigo-900 transition-all"
                     >
-                        icon
+                        <FontAwesomeIcon icon={faSearch} />
                     </div>
                 </div>
             </div>

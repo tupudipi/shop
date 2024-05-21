@@ -1,6 +1,10 @@
 
 'use client'
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faFlag } from '@fortawesome/free-regular-svg-icons'
+import { faThumbsUp } from '@fortawesome/free-regular-svg-icons'
+import { faReply } from '@fortawesome/free-solid-svg-icons'
 import { useState } from "react"
 
 const ReviewCard = () => {
@@ -42,13 +46,13 @@ const ReviewCard = () => {
                 <div id="reviewFooter" className="mt-2 flex gap-4">
                     <div className="flex gap-2">
                         <p className="pr-2 border-r">4</p>
-                        <button className="transition-all ease-in-out hover:-translate-y-1">Helpful</button>
+                        <button><FontAwesomeIcon icon={faThumbsUp}  className="transition-all ease-in-out hover:text-indigo-700 active:translate-y-1"/></button>
                     </div>
-                    <button className="transition-all ease-in-out hover:-translate-y-1"
+                    <button 
                         onClick={() => setShowResponseForm(!showResponseForm)}>
-                        Respond
+                        <FontAwesomeIcon icon={faReply}  className="transition-all ease-in-out hover:text-indigo-700 active:translate-y-1"/>
                     </button>
-                    <button className="transition-all ease-in-out hover:-translate-y-1">Report</button>
+                    <button><FontAwesomeIcon icon={faFlag}  className="transition-all ease-in-out hover:text-indigo-700 active:translate-y-1"/></button>
                 </div>
                 <div
                     className={`transition-all duration-500 ease-in-out ${showResponseForm ? 'max-h-screen' : 'max-h-0'
