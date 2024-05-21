@@ -33,7 +33,7 @@ export default function CartDropdown(props) {
                             <span className="absolute -top-2 -left-2 p-0.5 bg-emerald-500/75 group-hover:bg-emerald-500 text-white text-xs font-bold rounded-full">{cartItems.length}</span>
                         }
                         Cart
-                        <FontAwesomeIcon icon={faAngleDown} className="max-h-4" />
+                        <FontAwesomeIcon icon={faAngleDown} className={`max-h-4 transition-transform ${cartOpen ? 'rotate-180' : ''}`} />
                     </div>
                     {
                         <div className={`rounded-md flex flex-col items-center transition-all overflow-hidden absolute top-8 right-0 bg-white shadow-md w-content z-50 ${cartOpen ? 'max-h-96 p-4 pb-2' : 'max-h-0 p-0'}`}>
@@ -72,7 +72,7 @@ export default function CartDropdown(props) {
                         <FontAwesomeIcon icon={faShoppingCart} /> {cartItems.length > 0 &&
                             <span className="absolute -top-2 -left-2 p-0.5 bg-emerald-500/75 group-hover:bg-emerald-500 text-white text-xs font-bold rounded-full">{cartItems.length}</span>
                         }
-                        Cart <FontAwesomeIcon icon={faAngleRight} />
+                        Cart <FontAwesomeIcon icon={faAngleRight} className={`max-h-4 transition-transform ${cartOpen ? 'rotate-180' : ''}`}/>
                     </div>
                     {
                         <div className={`rounded-md flex flex-col items-center transition-all overflow-hidden absolute top-0 left-28 bg-white shadow-md w-content z-50 ${cartOpen ? 'border max-h-96 p-4 pb-2 opacity-100' : 'max-h-0 p-0 opacity-0'}`}>
@@ -83,7 +83,7 @@ export default function CartDropdown(props) {
                                         <Link href={`/products/${item.id}`}>
                                             <div className="flex items-center">
                                                 <Image src={item.image} alt={item.name} className="object-cover mr-2" width={'40'} height={'40'} />
-                                                <p className="hover:underline hover:text-indigo-900 w-24">{item.name}</p>
+                                                <p className="hover:underline hover:text-indigo-900 w-20">{item.name}</p>
                                             </div>
                                         </Link>
                                         <p>{item.price}</p>

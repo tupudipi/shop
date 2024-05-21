@@ -34,7 +34,7 @@ export default function WishlistDropdown(props) {
                                 <span className="absolute -top-2 -left-2 p-0.5 bg-red-500/75 group-hover:bg-red-500 text-white text-xs font-bold rounded-full">{wishlistItems.length}</span>
                             }
                             Wishlist
-                            <FontAwesomeIcon icon={faAngleDown} className="max-h-4" />
+                            <FontAwesomeIcon icon={faAngleDown} className={`max-h-4 transition-transform ${wishlistOpen ? 'rotate-180' : ''}`} />
                         </div>
                     }
                     {
@@ -74,7 +74,7 @@ export default function WishlistDropdown(props) {
                             {wishlistItems.length > 0 &&
                                 <span className="absolute -top-2 -left-2 p-0.5 bg-red-500/75 group-hover:bg-red-500 text-white text-xs font-bold rounded-full">{wishlistItems.length}</span>
                             }
-                            Wishlist <FontAwesomeIcon icon={faAngleRight} />
+                            Wishlist <FontAwesomeIcon icon={faAngleRight} className={`max-h-4 transition-transform ${wishlistOpen ? 'rotate-180' : ''}`}/>
                         </div>
                     }
                     {
@@ -86,7 +86,7 @@ export default function WishlistDropdown(props) {
                                         <Link href={`/products/${item.id}`}>
                                             <div className="flex items-center">
                                                 <Image src={item.image} alt={item.name} className="object-cover mr-2" width={'40'} height={'40'} />
-                                                <p className="hover:underline hover:text-indigo-900 w-24">{item.name}</p>
+                                                <p className="hover:underline hover:text-indigo-900 w-20">{item.name}</p>
                                             </div>
                                         </Link>
                                         <p>{item.price}</p>
