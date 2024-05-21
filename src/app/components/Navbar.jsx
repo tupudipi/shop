@@ -2,17 +2,19 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { faHeart } from '@fortawesome/free-regular-svg-icons';
-import { faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faUser } from '@fortawesome/free-solid-svg-icons';
+import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
+import WishListDrowpdown from './WishListDropdown';
+import CartDropdown from './CartDropdown';
 
 const Sidebar = ({ closeSidebar, sidebarOpen }) => {
     return (<>
         <div className={`fixed left-0 h-full w-64 bg-white p-4 flex flex-col z-40 transition-transform duration-200 ease-in-out ${sidebarOpen ? 'transform translate-x-0' : 'transform -translate-x-full'}`}>
-            <Link href='/account' className='hover:text-indigo-950 transition-all'>Account</Link>
+            <Link href='/account' className='hover:text-indigo-950 transition-all flex gap-2 items-center'><FontAwesomeIcon icon={faUser} /> Account</Link>
             <hr className='border-2 text-slate-600 rounded-full'></hr>
             <ul className='flex flex-col gap-2 mt-2'>
                 <li className='flex hover:text-indigo-950 transition-all'><Link href='/search?cat=1' className='w-full'>Category 1</Link></li>
@@ -39,14 +41,13 @@ const Navbar = () => {
                         >
                             {sidebarOpen ? <FontAwesomeIcon icon={faTimes} /> : <FontAwesomeIcon icon={faBars} />}
                         </div>
-                        <Link href="/" className="font-bold text-xl">My App</Link>
+                        <Link href="/" className="font-bold text-xl">Cico Shop</Link>
                     </div>
-                    <div className="flex justify-end gap-2">
+                    <div className="flex justify-end gap-5">
+                        <WishListDrowpdown />
+                        <CartDropdown />
                         <Link className="cursor-pointer hover:text-indigo-950 transition-all" href="/login">Login</Link>
                         <Link className="cursor-pointer hover:text-indigo-950 transition-all" href="/register">Register</Link>
-                        <div className="cursor-pointer hover:text-indigo-950 transition-all"><FontAwesomeIcon icon={faHeart} /> Wishlist</div>
-                        <div className="cursor-pointer hover:text-indigo-950 transition-all"><FontAwesomeIcon icon={faShoppingCart} /> Cart</div>
-                        
                     </div>
                 </div>
                 <div className="mt-2 relative">
