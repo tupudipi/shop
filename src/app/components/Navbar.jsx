@@ -7,7 +7,6 @@ import { faBars } from '@fortawesome/free-solid-svg-icons';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
-import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
 import WishListDrowpdown from './WishListDropdown';
 import CartDropdown from './CartDropdown';
 
@@ -21,6 +20,11 @@ const Sidebar = ({ closeSidebar, sidebarOpen }) => {
                 <li className='flex hover:text-indigo-950 transition-all'><Link href='/search?cat=2' className='w-full'>Category 2</Link></li>
                 <li className='flex hover:text-indigo-950 transition-all'><Link href='/search?cat=3' className='w-full'>Category 3</Link></li>
             </ul>
+            <hr className='border-2 text-slate-600 rounded-full my-2'></hr>
+            <div className='flex flex-col gap-2 mt-2'>
+                <WishListDrowpdown sidebar />
+                <CartDropdown sidebar />
+            </div>
         </div>
         <div id="cover" className={`fixed left-0 h-full w-full bg-indigo-950/50 z-30 ${sidebarOpen ? 'block' : 'hidden'}`} onClick={closeSidebar}></div>
     </>
@@ -44,8 +48,8 @@ const Navbar = () => {
                         <Link href="/" className="font-bold text-xl">Cico Shop</Link>
                     </div>
                     <div className="flex justify-end gap-5">
-                        <WishListDrowpdown />
-                        <CartDropdown />
+                        <WishListDrowpdown navbar />
+                        <CartDropdown navbar />
                         <Link className="cursor-pointer hover:text-indigo-950 transition-all" href="/login">Login</Link>
                         <Link className="cursor-pointer hover:text-indigo-950 transition-all" href="/register">Register</Link>
                     </div>
