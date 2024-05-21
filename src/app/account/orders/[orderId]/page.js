@@ -18,34 +18,45 @@ const viewOrderPage = ({ params }) => {
             <h1 className="text-4xl font-medium">Order Details</h1>
 
             <div className="flex flex-col gap-4">
+                <div className="divide-y divide-gray-200 mt-6 shadow md:table min-w-full">
+                    <div className="bg-gray-50 hidden md:table-header-group">
+                        <div className="md:table-row">
+                            <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider md:table-cell">Product</div>
+                            <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider md:table-cell">Product Code</div>
+                            <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider md:table-cell">Quantity</div>
+                            <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider md:table-cell">Price</div>
+                        </div>
+                    </div>
 
-                <table className="min-w-full divide-y divide-gray-200 mt-6 shadow">
-                    <thead className="bg-gray-50">
-                        <tr>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Code</th>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200 font-light">
+                    <div className="bg-white divide-y divide-gray-200 font-light md:table-row-group rounded-lg">
                         {products.map((product, index) => (
-                            <tr key={index}>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <Link href={product.link} className="text-blue-500 hover:text-blue-700 hover:underline">{product.name}
-                                    </Link>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">{product.code}</td>
-                                <td className="px-6 py-4 whitespace-nowrap">{product.quantity}</td>
-                                <td className="px-6 py-4 whitespace-nowrap">{product.subtotal}</td>
-                            </tr>
+                            <div key={index} className="md:table-row">
+                                <div className="px-6 py-4 whitespace-nowrap md:table-cell">
+                                    <div className="font-medium text-gray-500 uppercase tracking-wider block md:hidden">Product</div>
+                                    <Link href={product.link} className="text-blue-500 hover:text-blue-700 hover:underline">{product.name}</Link>
+                                </div>
+                                <div className="px-6 py-4 whitespace-nowrap md:table-cell">
+                                    <div className="font-medium text-gray-500 uppercase tracking-wider block md:hidden">Product Code</div>
+                                    {product.code}
+                                </div>
+                                <div className="px-6 py-4 whitespace-nowrap md:table-cell">
+                                    <div className="font-medium text-gray-500 uppercase tracking-wider block md:hidden">Quantity</div>
+                                    {product.quantity}
+                                </div>
+                                <div className="px-6 py-4 whitespace-nowrap md:table-cell">
+                                    <div className="font-medium text-gray-500 uppercase tracking-wider block md:hidden">Price</div>
+                                    {product.subtotal}
+                                </div>
+                            </div>
                         ))}
-                        <tr>
-                            <td colSpan="3" className="py-4 text-right font-medium">Total:</td>
-                            <td>$60.00</td>
-                        </tr>
-                    </tbody>
-                </table>
+                        <div className="md:table-row">
+                            <div className="px-6 py-4 whitespace-nowrap text-right font-medium md:table-cell md:col-span-3">
+                                <div className="font-medium text-gray-500 uppercase tracking-wider text-left">Total:</div>
+                            </div>
+                            <div className="px-6 py-4 whitespace-nowrap md:table-cell text-lg font-medium">$60.00</div>
+                        </div>
+                    </div>
+                </div>
 
                 <AddressCard isDelivery isInfo/>
                 <AddressCard isInfo/>
