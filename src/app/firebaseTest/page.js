@@ -1,11 +1,11 @@
 'use client' 
 
 import React, { useEffect } from 'react';
-import { testFirestoreConnection } from '../components/firebaseTest';
+import { seedProducts } from '../components/firebaseTest';
 
 const TestComponent = () => {
   useEffect(() => {
-    testFirestoreConnection();
+    seedProducts();
   }, []);
 
   return <div>Check the console for Firestore connection status.</div>;
