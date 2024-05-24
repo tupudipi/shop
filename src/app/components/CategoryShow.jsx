@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { useRef, useState, useEffect } from 'react';
 import ProductCard from "./ProductCard";
@@ -15,9 +15,11 @@ const debounce = (func, delay) => {
     };
 };
 
-const CategoryShow = ({ page }) => {
+const CategoryShow = ({ page, categoryID, currentProductSlug }) => {
     const scrollContainer = useRef(null);
     const [isSmallScreen, setIsSmallScreen] = useState(false);
+    const [products, setProducts] = useState([]);
+    const [category, setCategory] = useState(null);
 
     // Event handler for resizing
     const handleResize = debounce(() => {
@@ -27,10 +29,6 @@ const CategoryShow = ({ page }) => {
     useEffect(() => {
         // Set the initial value based on the window's width
         setIsSmallScreen(window.innerWidth < 1280);
-
-        const handleResize = debounce(() => {
-            setIsSmallScreen(window.innerWidth < 1280);
-        }, 250);
 
         window.addEventListener('resize', handleResize);
 
@@ -61,27 +59,82 @@ const CategoryShow = ({ page }) => {
         };
     }, [isSmallScreen]);
 
+    // Fetch products based on the categoryID
+useEffect(() => {
+    const fetchProducts = async () => {
+        try {
+            let url = '/api/products';
+            let params = new URLSearchParams();
+
+            if (categoryID) {
+                params.append('categoryID', categoryID);
+            }
+
+            if (currentProductSlug) {
+                params.append('currentProductSlug', currentProductSlug);
+            }
+
+            if (params.toString()) {
+                url += `?${params.toString()}`;
+            }
+
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('Failed to fetch products');
+            let data = await res.json();
+
+            if (currentProductSlug) {
+                data = data.filter(product => product.slug !== currentProductSlug);
+            }
+
+            setProducts(data.slice(0, 5)); // Only take the first 5 products
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    fetchProducts();
+}, [categoryID, currentProductSlug]);
+
+useEffect(() => {
+    const fetchCategory = async () => {
+        try {
+            const res = await fetch(`/api/categories/${categoryID}`);
+            if (!res.ok) throw new Error('Failed to fetch category');
+            const data = await res.json();
+            setCategory(data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    if (categoryID) {
+        fetchCategory();
+    }
+}, [categoryID]);
+
+console.log(category?.category_name);
+
     return (
         <div className="my-6">
-            <h2 className="text-2xl mb-4">
-                {page === 'home' ? 'Category Name' : 'Related Products'}
-                </h2>
-            <div ref={scrollContainer} className="flex gap-6 max-w-sm
-            md:max-w-3xl overflow-auto pb-6 lg:max-w-5xl xl:max-w-7xl mb-2" style={{ scrollBehavior: 'smooth' }}>
-                <ProductCard />
-                <ProductCard />
-                <ProductCard />
-                <ProductCard />
-                <ProductCard />
+            <h2 className="text-2xl mb-4 font-medium capitalize">
+                {page === 'home' ? category?.category_name : 'Related Products'}
+            </h2>
+            <div
+                ref={scrollContainer}
+                className="flex gap-6 max-w-sm md:max-w-3xl overflow-auto pb-6 lg:max-w-5xl xl:max-w-7xl mb-2"
+                style={{ scrollBehavior: 'smooth' }}
+            >
+                {products.map((product) => (
+                    <ProductCard key={product.slug} product={product} />
+                ))}
             </div>
-            <Link href="/search?cat=1">
-                <p className="text-blue-500 hover:underline hover:text-blue-700">View all products in this category</p>
+            <Link href={`/search/${category?.category_name}`}>
+                <p className="text-blue-500 hover:underline hover:text-blue-700">
+                    View all products in this category
+                </p>
             </Link>
         </div>
     );
 };
 
 export default CategoryShow;
-
-
-

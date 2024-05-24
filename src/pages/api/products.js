@@ -1,22 +1,33 @@
 import { db } from "@/firebaseInit";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, query, where, getDocs } from "firebase/firestore";
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
     if (req.method === 'GET') {
-        const getProducts = async () => {
-            try {
-                // const { slug } = req.query
-                const querySnapshot = await getDocs(collection(db, "Products"));
-                const products = [];
-                querySnapshot.forEach((doc) => {
-                    products.push(doc.data());
-                });
-                return products;
-            } catch (e) {
-                console.error("Error getting products: ", e);
-            }
-        };
+        try {
+            const { categoryID } = req.query;
 
-        getProducts().then((products) => res.status(200).json(products));
+            let q;
+            if (categoryID) {
+                // If categoryID is provided, fetch products by category ID
+                q = query(collection(db, "Products"), where("category_id", "==", Number(categoryID)));
+            } else {
+                // Otherwise, fetch all products
+                q = query(collection(db, "Products"));
+            }
+
+            const querySnapshot = await getDocs(q);
+            const products = [];
+            querySnapshot.forEach((doc) => {
+                products.push({ id: doc.id, ...doc.data() });
+            });
+
+            res.status(200).json(products);
+        } catch (e) {
+            console.error("Error getting products: ", e);
+            res.status(500).json({ error: "Internal Server Error" });
+        }
+    } else {
+        res.setHeader('Allow', ['GET']);
+        res.status(405).json({ error: `Method ${req.method} Not Allowed` });
     }
 }

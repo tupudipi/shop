@@ -1,7 +1,8 @@
 
-const page = () => {
+const page = ( {params} ) => {
+  const thing = params.thing;
   return (
-    <div>page</div>
+    <div>{thing}</div>
   )
 }
 

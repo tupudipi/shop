@@ -1,41 +1,65 @@
-import Navbar from "@/app/components/Navbar"
+// products/[slug]/page.js
+import Navbar from "@/app/components/Navbar";
 import CategoryShow from "@/app/components/CategoryShow";
 import ProductDetails from "@/app/components/ProductDetails";
 import ProductQuantity from "@/app/components/ProductQuantity";
+import Image from "next/image";
 
+async function fetchProductData(slug) {
+    const res = await fetch(`http://localhost:3000/api/products/${slug}`, { cache: 'no-store' });
+    if (!res.ok) {
+        throw new Error('Failed to fetch product data');
+    }
+    const product = await res.json();
+    return product;
+}
 
-const productPage = ({ params }) => {
-    const productId = params.id;
+export async function generateStaticParams() {
+    // Fetch all product slugs to generate static paths
+    // You might want to fetch this from your database
+    const res = await fetch('http://localhost:3000/api/products', { cache: 'no-store' }); // Adjust URL as needed
+    const products = await res.json();
+
+    return products.map(product => ({ slug: product.slug }));
+}
+
+const ProductPage = async ({ params }) => {
+    const product = await fetchProductData(params.id);
     return (
         <div className="overflow-x-clip">
             <Navbar />
             <main className="container mx-auto px-4 md:px-8">
                 <div id="product" className="flex flex-col md:grid md:grid-cols-2 gap-4 bg-white/80 border shadow rounded-lg p-8">
                     <div className="grid place-content-center">
-                        <div className="w-80 h-80 bg-gray-200 rounded-lg"></div>
+                        <Image src={product.image} alt={product.name} objectFit="cover" className="rounded-lg shadow-lg"
+                            width={320}
+                            height={320} />
                     </div>
 
                     <div className="max-w-2xl flex flex-col justify-between">
                         <div>
-                            <h1 className="text-3xl mb-2">Product {productId}</h1>
+                            <h1 className="text-3xl mb-2">{product.name}</h1>
                             <div className="flex gap-4 align-middle">
-                                <div className="flex gap-1 align-middle">
-                                    <div className="w-4 h-4 bg-yellow-500 rounded-full"></div>
-                                    <div className="w-4 h-4 bg-yellow-500 rounded-full"></div>
-                                    <div className="w-4 h-4 bg-yellow-500 rounded-full"></div>
-                                    <div className="w-4 h-4 bg-yellow-500 rounded-full"></div>
-                                    <div className="w-4 h-4 bg-gray-300 rounded-full"></div>
+                                <div className="flex gap-1 items-middle">
+                                    {Array.from({ length: product.reviewValue }, (_, index) => (
+                                        <div key={index} className="w-4 h-4 bg-yellow-500 rounded-full"></div>
+                                    ))}
+                                    {Array.from({ length: 5 - product.reviewValue }, (_, index) => (
+                                        <div key={index} className="w-4 h-4 bg-gray-300 rounded-full"></div>
+                                    ))}
                                 </div>
-                                <p className="text-sm">4.0 <span className="text-gray-500">(98)</span></p>
+                                <p className="text-sm">{product.reviewValue} <span className="text-gray-500">({product.reviewCount})</span></p>
                             </div>
                         </div>
 
-                        <p className="font-bold text-2xl">$10.00</p>
+                        <p className="font-bold text-2xl">${product.price}</p>
 
                         <div>
                             <div className="flex flex-col mt-4 gap-4">
                                 <div className="flex flex-col gap-2">
-                                    <p className="text-green-700">In stock</p>
+                                    <p className={`text-green-700 ${product.stock > 0 ? 'block' : 'hidden'}`}>In stock</p>
+                                    <p className={`text-red-700 ${product.stock === 0 ? 'block' : 'hidden'}`}>Out of stock</p>
+                                    <p className={`text-yellow-500 ${product.stock > 0 && product.stock <= 10 ? 'block' : 'hidden'}`}>Only {product.stock} left!</p>
 
                                     <div className="md:w-3/4 lg:w-2/3 flex flex-col gap-2">
                                         <ProductQuantity />
@@ -49,14 +73,14 @@ const productPage = ({ params }) => {
                 </div>
 
                 <div className="w-full flex justify-center">
-                    <CategoryShow page={"prod"} />
+                    <CategoryShow page={"prod"} categoryID={product.category_id} currentProductSlug={params.id} />
                 </div>
 
-                <ProductDetails />
+                <ProductDetails description={product.description} />
 
             </main>
         </div>
-    )
+    );
 }
 
-export default productPage
+export default ProductPage;
