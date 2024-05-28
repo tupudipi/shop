@@ -17,7 +17,7 @@ const ProductLoading = () => {
                         <div className="h-4 w-4 bg-gray-300 rounded-full animate-pulse"></div>
                         <div className="h-4 w-4 bg-gray-300 rounded-full animate-pulse"></div>
                     </div>
-                    <div className="text-sm" animate-bounce>
+                    <div className="text-sm animate-bounce">
                         <div className="h-4 w-12 bg-gray-300 rounded animate-pulse"></div>
                     </div>
                 </div>
