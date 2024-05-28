@@ -23,7 +23,7 @@ const ProductLoading = () => {
                 </div>
                 <div className="flex flex-col gap-2 animate-bounce">
                     <div className="h-4 w-16 bg-gray-300 rounded animate-pulse"></div>
-                    <div className="h-8 w-24 bg-blue-500 rounded-lg animate-pulse"></div>
+                    <div className="h-8 w-full bg-blue-500 rounded-lg animate-pulse"></div>
                 </div>
             </div>
         </div>
