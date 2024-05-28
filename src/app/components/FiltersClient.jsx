@@ -2,11 +2,14 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 const FiltersClient = ({ categories }) => {
   const [active, setActive] = useState(categories[0]?.category_name || '');
   const [openSelect, setOpenSelect] = useState(false);
   const ref = useRef(null);
+  const pathname = usePathname();
+  const currentCategory = pathname.split('/')[2] || '';
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -54,7 +57,7 @@ const FiltersClient = ({ categories }) => {
         <ul className="bg-white p-2 rounded-lg border-2 self-start min-w-32">
           {categories.map((category) => (
             <Link key={category.category_name} href={`/search/${category.category_name}`}>
-              <li className={`my-1 p-2 hover:bg-indigo-200/75 cursor-pointer rounded-md transition-all hover:shadow text-start`}>
+              <li className={`my-1 p-2 hover:bg-indigo-200/75 cursor-pointer rounded-md transition-all hover:shadow text-start ${currentCategory === category.category_name ? 'bg-indigo-200' : ''}`}>
                 {category.category_name}
               </li>
             </Link>

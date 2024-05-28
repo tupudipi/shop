@@ -1,3 +1,5 @@
+// /api/products/[slug].js
+
 import { db } from "@/firebaseInit";  // Ensure the path to your firebaseInit is correct
 import { doc, getDoc } from "firebase/firestore";
 

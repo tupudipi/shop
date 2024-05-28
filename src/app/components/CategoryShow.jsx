@@ -112,7 +112,7 @@ useEffect(() => {
     }
 }, [categoryID]);
 
-console.log(category?.category_name);
+// console.log(category?.category_name);
 
     return (
         <div className="my-6">
