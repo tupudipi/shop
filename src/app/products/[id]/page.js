@@ -3,6 +3,7 @@ import Navbar from "@/app/components/Navbar";
 import CategoryShow from "@/app/components/CategoryShow";
 import ProductDetails from "@/app/components/ProductDetails";
 import ProductQuantity from "@/app/components/ProductQuantity";
+import ProductLoading from "@/app/components/ProductLoading";
 import Image from "next/image";
 
 async function fetchProductData(slug) {

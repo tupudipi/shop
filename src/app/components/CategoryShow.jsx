@@ -1,8 +1,9 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, Suspense } from 'react';
 import ProductCard from "./ProductCard";
 import Link from "next/link";
+import ProductLoading from './ProductLoading';
 
 // Debounce function to limit the rate at which a function can fire.
 const debounce = (func, delay) => {
@@ -20,6 +21,7 @@ const CategoryShow = ({ page, categoryID, currentProductSlug }) => {
     const [isSmallScreen, setIsSmallScreen] = useState(false);
     const [products, setProducts] = useState([]);
     const [category, setCategory] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     // Event handler for resizing
     const handleResize = debounce(() => {
@@ -60,59 +62,61 @@ const CategoryShow = ({ page, categoryID, currentProductSlug }) => {
     }, [isSmallScreen]);
 
     // Fetch products based on the categoryID
-useEffect(() => {
-    const fetchProducts = async () => {
-        try {
-            let url = '/api/products';
-            let params = new URLSearchParams();
+    useEffect(() => {
+        const fetchProducts = async () => {
+            setIsLoading(true); // Set loading to true
+            try {
+                let url = '/api/products';
+                let params = new URLSearchParams();
 
-            if (categoryID) {
-                params.append('categoryID', categoryID);
+                if (categoryID) {
+                    params.append('categoryID', categoryID);
+                }
+
+                if (currentProductSlug) {
+                    params.append('currentProductSlug', currentProductSlug);
+                }
+
+                if (params.toString()) {
+                    url += `?${params.toString()}`;
+                }
+
+                const res = await fetch(url);
+                if (!res.ok) throw new Error('Failed to fetch products');
+                let data = await res.json();
+
+                if (currentProductSlug) {
+                    data = data.filter(product => product.slug !== currentProductSlug);
+                }
+
+                setProducts(data.slice(0, 5)); // Only take the first 5 products
+            } catch (error) {
+                console.error(error);
             }
+            setIsLoading(false); // Set loading to false
+        };
 
-            if (currentProductSlug) {
-                params.append('currentProductSlug', currentProductSlug);
+        fetchProducts();
+    }, [categoryID, currentProductSlug]);
+
+    useEffect(() => {
+        const fetchCategory = async () => {
+            try {
+                const res = await fetch(`/api/categories/${categoryID}`);
+                if (!res.ok) throw new Error('Failed to fetch category');
+                const data = await res.json();
+                setCategory(data);
+            } catch (error) {
+                console.error(error);
             }
+        };
 
-            if (params.toString()) {
-                url += `?${params.toString()}`;
-            }
-
-            const res = await fetch(url);
-            if (!res.ok) throw new Error('Failed to fetch products');
-            let data = await res.json();
-
-            if (currentProductSlug) {
-                data = data.filter(product => product.slug !== currentProductSlug);
-            }
-
-            setProducts(data.slice(0, 5)); // Only take the first 5 products
-        } catch (error) {
-            console.error(error);
+        if (categoryID) {
+            fetchCategory();
         }
-    };
+    }, [categoryID]);
 
-    fetchProducts();
-}, [categoryID, currentProductSlug]);
-
-useEffect(() => {
-    const fetchCategory = async () => {
-        try {
-            const res = await fetch(`/api/categories/${categoryID}`);
-            if (!res.ok) throw new Error('Failed to fetch category');
-            const data = await res.json();
-            setCategory(data);
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    if (categoryID) {
-        fetchCategory();
-    }
-}, [categoryID]);
-
-// console.log(category?.category_name);
+    // console.log(category?.category_name);
 
     return (
         <div className="my-6">
@@ -124,9 +128,15 @@ useEffect(() => {
                 className="flex gap-6 max-w-sm md:max-w-3xl overflow-auto pb-6 lg:max-w-5xl xl:max-w-7xl mb-2"
                 style={{ scrollBehavior: 'smooth' }}
             >
-                {products.map((product) => (
-                    <ProductCard key={product.slug} product={product} />
-                ))}
+                {isLoading ? (
+                    <><ProductLoading /> <ProductLoading /> <ProductLoading /> </>
+                ) : (
+                    <>
+                        {products.map((product) => (
+                            <ProductCard key={product.slug} product={product} />
+                        ))}
+                    </>
+                )}
             </div>
             <Link href={`/search/${category?.category_name}`}>
                 <p className="text-blue-500 hover:underline hover:text-blue-700">
