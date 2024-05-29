@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import ProductComments from './ProductComments';
 import styles from './topBarStyle.module.css';
 
-const ProductDetails = ({ description }) => {
+const ProductDetails = ({ description, slug }) => {
   const [activeSection, setActiveSection] = useState('description');
 
   useEffect(() => {
@@ -50,7 +50,8 @@ const ProductDetails = ({ description }) => {
       </div>
       <div id="reviews" className='bg-white/70 py-4 px-8 rounded-lg shadow'>
         <h2 className='text-2xl my-4'>Reviews</h2>
-        <ProductComments />
+        {console.log('slug: ' + slug)}
+        <ProductComments slug={slug}/>
       </div>
     </div>
   );

@@ -76,7 +76,8 @@ const ProductPage = async ({ params }) => {
                     <CategoryShow page={"prod"} categoryID={product.category_id} currentProductSlug={params.id} />
                 </div>
 
-                <ProductDetails description={product.description} />
+                {console.log('slug: ' + params.id)}
+                <ProductDetails description={product.description} slug={params.id} />
 
             </main>
         </div>
