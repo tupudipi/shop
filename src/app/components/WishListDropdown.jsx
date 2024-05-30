@@ -7,6 +7,15 @@ import useOutsideClick from "./useOutsideClick";
 import Link from "next/link";
 import Image from "next/image";
 
+function getWishlist() {
+    let wishlist = localStorage.getItem('wishlist');
+    if (wishlist) {
+        return JSON.parse(wishlist);
+    } else {
+        return [];
+    }
+}
+
 export default function WishlistDropdown(props) {
     const [wishlistOpen, setWishlistOpen] = useState(false);
     const wishlistRef = useRef(null);
@@ -15,11 +24,7 @@ export default function WishlistDropdown(props) {
         setWishlistOpen(false);
     });
 
-    // Dummy wishlist items
-    const wishlistItems = [
-        { id: 1, image: '/path/to/image1.jpg', name: 'Item A', price: '$100' },
-        { id: 2, image: '/path/to/image2.jpg', name: 'Item B', price: '$200' },
-    ];
+    const wishlistItems = getWishlist();
 
     return (
         <>
@@ -38,12 +43,12 @@ export default function WishlistDropdown(props) {
                         </div>
                     }
                     {
-                        <div className={`rounded-md flex flex-col items-center transition-all overflow-hidden absolute top-8 right-0 bg-white shadow-md w-content z-50 ${wishlistOpen ? 'max-h-96 p-4 pb-2' : 'max-h-0 p-0'}`}>
-                            {/* Add wishlist items here */}
+                        <div className={`rounded-md flex flex-col items-center transition-all overflow-hidden absolute top-8 right-0 bg-white shadow-md w-content min-w-36 z-50 ${wishlistOpen ? 'max-h-96 p-4 pb-2' : 'max-h-0 p-0'}`}>
                             <ul className={`transition-all ${wishlistOpen ? '`text-indigo-500' : ''}`}>
                                 {wishlistItems.map(item => (
-                                    <li key={item.id} className="flex justify-between items-center mb-2 gap-5 border-b-2 pb-1">
-                                        <Link href={`/products/${item.id}`}>
+                                    // console.log(item),
+                                    <li key={item.slug} className="flex justify-between items-center mb-2 gap-5 border-b-2 pb-1">
+                                        <Link href={`/products/${item.slug}`}>
                                             <div className="flex items-center">
                                                 <Image src={item.image} alt={item.name} className="object-cover mr-2" width={'40'} height={'40'} />
                                                 <p className="hover:underline hover:text-indigo-900 w-40">{item.name}</p>
@@ -56,9 +61,13 @@ export default function WishlistDropdown(props) {
                                     </li>
                                 ))}
                             </ul>
-                            <Link href="/account/wishlist">
-                                <p className="mt-2 inline-block bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-all hover:shadow">Go to Wishlist</p>
-                            </Link>
+                            {wishlistItems.length > 0 ? (
+                                <Link href="/account/wishlist">
+                                    <p className="mt-2 inline-block bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-all hover:shadow">Go to Wishlist</p>
+                                </Link>
+                            ) : (
+                                <p className="mt-2 text-center">Your wishlist is empty. Start adding your favourite products!</p>
+                            )}
                         </div>
                     }
                 </div>
@@ -74,7 +83,7 @@ export default function WishlistDropdown(props) {
                             {wishlistItems.length > 0 &&
                                 <span className="absolute -top-2 -left-2 p-0.5 bg-red-500/75 group-hover:bg-red-500 text-white text-xs font-bold rounded-full">{wishlistItems.length}</span>
                             }
-                            Wishlist <FontAwesomeIcon icon={faAngleRight} className={`max-h-4 transition-transform ${wishlistOpen ? 'rotate-180' : ''}`}/>
+                            Wishlist <FontAwesomeIcon icon={faAngleRight} className={`max-h-4 transition-transform ${wishlistOpen ? 'rotate-180' : ''}`} />
                         </div>
                     }
                     {

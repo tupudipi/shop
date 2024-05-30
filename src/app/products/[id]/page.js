@@ -3,8 +3,8 @@ import Navbar from "@/app/components/Navbar";
 import CategoryShow from "@/app/components/CategoryShow";
 import ProductDetails from "@/app/components/ProductDetails";
 import ProductQuantity from "@/app/components/ProductQuantity";
-import ProductLoading from "@/app/components/ProductLoading";
 import Image from "next/image";
+import AddToFavouritesButton from "@/app/components/AddToFavouritesButton";
 
 async function fetchProductData(slug) {
     const res = await fetch(`http://localhost:3000/api/products/${slug}`, { cache: 'no-store' });
@@ -22,6 +22,22 @@ export async function generateStaticParams() {
     const products = await res.json();
 
     return products.map(product => ({ slug: product.slug }));
+}
+
+function addToWishlist(product) {
+    // Get the current wishlist from local storage
+    let wishlist = localStorage.getItem('wishlist');
+    if (wishlist) {
+        wishlist = JSON.parse(wishlist);
+    } else {
+        wishlist = [];
+    }
+
+    // Add the new product to the wishlist
+    wishlist.push(product);
+
+    // Save the updated wishlist back to local storage
+    localStorage.setItem('wishlist', JSON.stringify(wishlist));
 }
 
 const ProductPage = async ({ params }) => {
@@ -65,7 +81,7 @@ const ProductPage = async ({ params }) => {
                                     <div className="md:w-3/4 lg:w-2/3 flex flex-col gap-2">
                                         <ProductQuantity />
                                         <button className="bg-blue-500 text-white px-4 py-1 rounded-lg hover:bg-blue-700 transition-colors">Add to Cart</button>
-                                        <button className="bg-gray-200 text-gray-800 px-4 py-1 rounded-lg hover:bg-gray-300 transition-colors">Add to favourites</button>
+                                        <AddToFavouritesButton product={product} />
                                     </div>
                                 </div>
                             </div>
