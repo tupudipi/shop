@@ -3,6 +3,8 @@ import CategoryShow from "@/app/components/CategoryShow";
 import ProductDetails from "@/app/components/ProductDetails";
 import Image from "next/image";
 import ClientProductSection from "@/app/components/ClientProductSection";
+import { db } from "@/firebaseInit";
+import { collection, query, where, getDocs } from "firebase/firestore";
 
 async function fetchProductData(slug) {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products/${slug}`, { cache: 'no-store' });
@@ -14,8 +16,14 @@ async function fetchProductData(slug) {
 }
 
 export async function generateStaticParams() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products`, { cache: 'no-store' }); 
-    const products = await res.json();
+    // const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products`, { cache: 'no-store' }); 
+   let q = query(collection(db, "Products"));
+    const querySnapshot = await getDocs(q);
+    const products = [];
+    querySnapshot.forEach((doc) => {
+        products.push({ id: doc.id, ...doc.data() });
+    });
+    // const products = await res.json();
 
     return products.map(product => ({ slug: product.slug }));
 }
