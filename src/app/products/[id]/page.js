@@ -5,6 +5,7 @@ import ProductDetails from "@/app/components/ProductDetails";
 import ProductQuantity from "@/app/components/ProductQuantity";
 import Image from "next/image";
 import AddToFavouritesButton from "@/app/components/AddToFavouritesButton";
+import AddToCartButton from "@/app/components/AddToCartButton";
 
 async function fetchProductData(slug) {
     const res = await fetch(`http://localhost:3000/api/products/${slug}`, { cache: 'no-store' });
@@ -80,7 +81,7 @@ const ProductPage = async ({ params }) => {
 
                                     <div className="md:w-3/4 lg:w-2/3 flex flex-col gap-2">
                                         <ProductQuantity />
-                                        <button className="bg-blue-500 text-white px-4 py-1 rounded-lg hover:bg-blue-700 transition-colors">Add to Cart</button>
+                                        <AddToCartButton product={product} />
                                         <AddToFavouritesButton product={product} />
                                     </div>
                                 </div>

@@ -47,7 +47,7 @@ export default function WishlistDropdown(props) {
                                         </div>
                                     </Link>
                                     <p>{item.price}</p>
-                                    <button onClick={() => handleDeleteItem(item.slug)}>
+                                    <button onClick={() => handleDeleteItem(item.slug)} className="hover:text-red-600">
                                         <FontAwesomeIcon icon={faTimes} />
                                     </button>
                                 </li>
@@ -86,7 +86,7 @@ export default function WishlistDropdown(props) {
                                         </div>
                                     </Link>
                                     <p>{item.price}</p>
-                                    <button onClick={() => handleDeleteItem(item.slug)}>
+                                    <button onClick={() => handleDeleteItem(item.slug)} className="hover:text-red-600">
                                         <FontAwesomeIcon icon={faTimes} />
                                     </button>
                                 </li>
