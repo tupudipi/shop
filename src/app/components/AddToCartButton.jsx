@@ -12,7 +12,7 @@ export default function AddToCartButton({ product, quantity }) {
 
     return (
         <button
-            className="bg-gray-200 text-gray-800 px-4 py-1 rounded-lg hover:bg-gray-300 transition-colors"
+            className="bg-blue-500 text-white px-4 py-1 rounded-lg hover:bg-blue-700 transition-colors"
             onClick={handleAddToCart}
         >
             Add to cart
