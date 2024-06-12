@@ -70,7 +70,7 @@ const ProductPage = async ({ params }) => {
                 </div>
 
                 {console.log('slug: ' + params.slug)}
-                <ProductDetails description={product.description} slug={params.slug} />
+                <ProductDetails description={product.description} slug={params.id} />
 
             </main>
         </div>
