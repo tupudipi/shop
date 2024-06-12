@@ -1,7 +1,7 @@
 import ProductCard from "@/app/components/ProductCard";
 
 async function fetchCategoryId(slug) {
-  const res = await fetch(`http://localhost:3000/api/categories?category_name=${slug}`, { cache: 'no-store' });
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/categories?category_name=${slug}`, { cache: 'no-store' });
   if (!res.ok) {
     throw new Error('Failed to fetch category data');
   }
@@ -11,7 +11,7 @@ async function fetchCategoryId(slug) {
 }
 
 async function fetchProductsByCategoryId(categoryId) {
-  const res = await fetch(`http://localhost:3000/api/products/category/${categoryId}`, { cache: 'no-store' });
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products/category/${categoryId}`, { cache: 'no-store' });
   if (!res.ok) {
     console.error("Failed to fetch products, response:", res); // Add logging here
     throw new Error('Failed to fetch products');

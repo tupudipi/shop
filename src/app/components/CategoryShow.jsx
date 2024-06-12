@@ -66,7 +66,7 @@ const CategoryShow = ({ page, categoryID, currentProductSlug }) => {
         const fetchProducts = async () => {
             setIsLoading(true); // Set loading to true
             try {
-                let url = '/api/products';
+                let url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/products`;
                 let params = new URLSearchParams();
 
                 if (categoryID) {
@@ -102,7 +102,7 @@ const CategoryShow = ({ page, categoryID, currentProductSlug }) => {
     useEffect(() => {
         const fetchCategory = async () => {
             try {
-                const res = await fetch(`/api/categories/${categoryID}`);
+                const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/categories/${categoryID}`);
                 if (!res.ok) throw new Error('Failed to fetch category');
                 const data = await res.json();
                 setCategory(data);

@@ -5,7 +5,7 @@ import Image from "next/image";
 import ClientProductSection from "@/app/components/ClientProductSection";
 
 async function fetchProductData(slug) {
-    const res = await fetch(`http://localhost:3000/api/products/${slug}`, { cache: 'no-store' });
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products/${slug}`, { cache: 'no-store' });
     if (!res.ok) {
         throw new Error('Failed to fetch product data');
     }
@@ -14,7 +14,7 @@ async function fetchProductData(slug) {
 }
 
 export async function generateStaticParams() {
-    const res = await fetch('http://localhost:3000/api/products', { cache: 'no-store' }); 
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products`, { cache: 'no-store' }); 
     const products = await res.json();
 
     return products.map(product => ({ slug: product.slug }));
