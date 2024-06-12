@@ -16,16 +16,22 @@ async function fetchProductData(slug) {
 }
 
 export async function generateStaticParams() {
-    // const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products`, { cache: 'no-store' }); 
    let q = query(collection(db, "Products"));
     const querySnapshot = await getDocs(q);
     const products = [];
     querySnapshot.forEach((doc) => {
         products.push({ id: doc.id, ...doc.data() });
     });
-    // const products = await res.json();
 
     return products.map(product => ({ slug: product.slug }));
+}
+
+export async function generateMetadata({ params }) {
+    const product = await fetchProductData(params.id);
+    return {
+        title: product.name,
+        description: product.description,
+    };
 }
 
 const ProductPage = async ({ params }) => {
