@@ -1,11 +1,8 @@
-// products/[slug]/page.js
 import Navbar from "@/app/components/Navbar";
 import CategoryShow from "@/app/components/CategoryShow";
 import ProductDetails from "@/app/components/ProductDetails";
-import ProductQuantity from "@/app/components/ProductQuantity";
 import Image from "next/image";
-import AddToFavouritesButton from "@/app/components/AddToFavouritesButton";
-import AddToCartButton from "@/app/components/AddToCartButton";
+import ClientProductSection from "@/app/components/ClientProductSection";
 
 async function fetchProductData(slug) {
     const res = await fetch(`http://localhost:3000/api/products/${slug}`, { cache: 'no-store' });
@@ -17,28 +14,10 @@ async function fetchProductData(slug) {
 }
 
 export async function generateStaticParams() {
-    // Fetch all product slugs to generate static paths
-    // You might want to fetch this from your database
-    const res = await fetch('http://localhost:3000/api/products', { cache: 'no-store' }); // Adjust URL as needed
+    const res = await fetch('http://localhost:3000/api/products', { cache: 'no-store' }); 
     const products = await res.json();
 
     return products.map(product => ({ slug: product.slug }));
-}
-
-function addToWishlist(product) {
-    // Get the current wishlist from local storage
-    let wishlist = localStorage.getItem('wishlist');
-    if (wishlist) {
-        wishlist = JSON.parse(wishlist);
-    } else {
-        wishlist = [];
-    }
-
-    // Add the new product to the wishlist
-    wishlist.push(product);
-
-    // Save the updated wishlist back to local storage
-    localStorage.setItem('wishlist', JSON.stringify(wishlist));
 }
 
 const ProductPage = async ({ params }) => {
@@ -79,11 +58,7 @@ const ProductPage = async ({ params }) => {
                                     <p className={`text-red-700 ${product.stock === 0 ? 'block' : 'hidden'}`}>Out of stock</p>
                                     <p className={`text-yellow-500 ${product.stock > 0 && product.stock <= 10 ? 'block' : 'hidden'}`}>Only {product.stock} left!</p>
 
-                                    <div className="md:w-3/4 lg:w-2/3 flex flex-col gap-2">
-                                        <ProductQuantity />
-                                        <AddToCartButton product={product} />
-                                        <AddToFavouritesButton product={product} />
-                                    </div>
+                                    <ClientProductSection product={product} />
                                 </div>
                             </div>
                         </div>
@@ -91,11 +66,11 @@ const ProductPage = async ({ params }) => {
                 </div>
 
                 <div className="w-full flex justify-center">
-                    <CategoryShow page={"prod"} categoryID={product.category_id} currentProductSlug={params.id} />
+                    <CategoryShow page={"prod"} categoryID={product.category_id} currentProductSlug={params.slug} />
                 </div>
 
-                {console.log('slug: ' + params.id)}
-                <ProductDetails description={product.description} slug={params.id} />
+                {console.log('slug: ' + params.slug)}
+                <ProductDetails description={product.description} slug={params.slug} />
 
             </main>
         </div>

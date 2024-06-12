@@ -11,7 +11,7 @@ export default function AddToFavouritesButton({ product }) {
             className="bg-gray-200 text-gray-800 px-4 py-1 rounded-lg hover:bg-gray-300 transition-colors"
             onClick={() => addToWishlist(product)}
         >
-            Add to favourites
+            Add to wishlist
         </button>
     );
 }
