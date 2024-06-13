@@ -12,7 +12,6 @@ const ProductComments = ({ slug }) => {
 
   useEffect(() => {
     const fetchReviews = async () => {
-      console.log(`"${slug}" is the slug`)
       try {
         const reviewsCollection = collection(db, 'Reviews');
         const q = query(reviewsCollection, where('product_id', '==', slug));
@@ -85,7 +84,7 @@ const ProductComments = ({ slug }) => {
             <ReviewCard key={review.id} review={review} />
           ))
         ) : (
-          <p>Seems like no one has said anything yet, be the first to let everyone know!</p>
+          <p>Seems like no one has said anything yet, be the first to let everyone know what you think!</p>
         )}
       </div>
     </div>

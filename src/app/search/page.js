@@ -3,11 +3,10 @@ import ProductCard from "@/app/components/ProductCard";
 async function fetchAllProducts() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products/`, { cache: 'no-store' });
   if (!res.ok) {
-    console.error("Failed to fetch products, response:", res); // Add logging here
+    console.error("Failed to fetch products, response:", res); 
     throw new Error('Failed to fetch products');
   }
   const products = await res.json();
-  // console.log("Fetched products:", products); // Add logging here
   return products;
 }
 

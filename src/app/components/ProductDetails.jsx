@@ -48,9 +48,8 @@ const ProductDetails = ({ description, slug }) => {
         <h2 className='text-2xl my-4'>Product Details</h2>
         <p className='text-gray-800 leading-7 text-sm'>{description}</p>
       </div>
-      <div id="reviews" className='bg-white/70 py-4 px-8 rounded-lg shadow'>
+      <div id="reviews" className='bg-white/70 py-4 pb-8 px-8 rounded-lg shadow my-8'>
         <h2 className='text-2xl my-4'>Reviews</h2>
-        {console.log('slug: ' + slug)}
         <ProductComments slug={slug}/>
       </div>
     </div>

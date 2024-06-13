@@ -116,8 +116,6 @@ const CategoryShow = ({ page, categoryID, currentProductSlug }) => {
         }
     }, [categoryID]);
 
-    // console.log(category?.category_name);
-
     return (
         <div className="my-6">
             <h2 className="text-2xl mb-4 font-medium capitalize">

@@ -5,17 +5,14 @@ export default async function handler(req, res) {
   if (req.method === 'GET') {
     try {
       const { id } = req.query;
-      // console.log(`Received category ID: ${id}`); // Log the received category ID
       if (!id) {
         return res.status(400).json({ error: "Category ID is required" });
       }
 
-      // Query products where the category_id field matches the provided ID
       const q = query(collection(db, "Products"), where("category_id", "==", +id));
       const querySnapshot = await getDocs(q);
 
       if (!querySnapshot.empty) {
-        // Return an array of product objects
         const products = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         res.status(200).json(products);
       } else {

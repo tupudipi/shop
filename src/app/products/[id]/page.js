@@ -4,38 +4,24 @@ import ProductDetails from "@/app/components/ProductDetails";
 import Image from "next/image";
 import ClientProductSection from "@/app/components/ClientProductSection";
 import { db } from "@/firebaseInit";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 
 async function fetchProductData(slug) {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products/${slug}`, { cache: 'no-store' });
-    if (!res.ok) {
+    const productRef = doc(db, "Products", slug);
+    const productSnap = await getDoc(productRef);
+
+    if (!productSnap.exists()) {
         throw new Error('Failed to fetch product data');
     }
-    const product = await res.json();
-    return product;
+
+    return { slug: productSnap.slug, ...productSnap.data() };
 }
 
-export async function generateStaticParams() {
-   let q = query(collection(db, "Products"));
-    const querySnapshot = await getDocs(q);
-    const products = [];
-    querySnapshot.forEach((doc) => {
-        products.push({ id: doc.id, ...doc.data() });
-    });
-
-    return products.map(product => ({ slug: product.slug }));
-}
-
-export async function generateMetadata({ params }) {
-    const product = await fetchProductData(params.id);
-    return {
-        title: product.name,
-        description: product.description,
-    };
-}
-
+// Server component
 const ProductPage = async ({ params }) => {
     const product = await fetchProductData(params.id);
+    const lastStarWidth = `${(product.reviewValue % 1) * 100}%`;
+
     return (
         <div className="overflow-x-clip">
             <Navbar />
@@ -51,12 +37,17 @@ const ProductPage = async ({ params }) => {
                         <div>
                             <h1 className="text-3xl mb-2">{product.name}</h1>
                             <div className="flex gap-4 align-middle">
-                                <div className="flex gap-1 items-middle">
-                                    {Array.from({ length: product.reviewValue }, (_, index) => (
-                                        <div key={index} className="w-4 h-4 bg-yellow-500 rounded-full"></div>
+                                <div className="flex gap-1">
+                                    {[...Array(Math.floor(product.reviewValue))].map((_, i) => (
+                                        <div key={i} className="w-4 h-4 bg-yellow-500 rounded-full"></div>
                                     ))}
-                                    {Array.from({ length: 5 - product.reviewValue }, (_, index) => (
-                                        <div key={index} className="w-4 h-4 bg-gray-300 rounded-full"></div>
+                                    {product.reviewValue % 1 !== 0 && (
+                                        <div className="relative w-4 h-4 bg-gray-300 rounded-full overflow-hidden">
+                                            <div className="absolute top-0 left-0 h-full bg-yellow-500" style={{ width: lastStarWidth }}></div>
+                                        </div>
+                                    )}
+                                    {[...Array(5 - Math.ceil(product.reviewValue))].map((_, i) => (
+                                        <div key={i} className="w-4 h-4 bg-gray-300 rounded-full"></div>
                                     ))}
                                 </div>
                                 <p className="text-sm">{product.reviewValue} <span className="text-gray-500">({product.reviewCount})</span></p>
@@ -80,12 +71,10 @@ const ProductPage = async ({ params }) => {
                 </div>
 
                 <div className="w-full flex justify-center">
-                    <CategoryShow page={"prod"} categoryID={product.category_id} currentProductSlug={params.slug} />
+                    <CategoryShow page={"prod"} categoryID={product.category_id} currentProductSlug={params.id} />
                 </div>
 
-                {console.log('slug: ' + params.slug)}
                 <ProductDetails description={product.description} slug={params.id} />
-
             </main>
         </div>
     );

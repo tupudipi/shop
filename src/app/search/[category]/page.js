@@ -6,18 +6,16 @@ async function fetchCategoryId(slug) {
     throw new Error('Failed to fetch category data');
   }
   const category = await res.json();
-  // console.log("Fetched category ID:", category.id); // Add logging here
-  return category.id; // return the category id
+  return category.id; 
 }
 
 async function fetchProductsByCategoryId(categoryId) {
   const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products/category/${categoryId}`, { cache: 'no-store' });
   if (!res.ok) {
-    console.error("Failed to fetch products, response:", res); // Add logging here
+    console.error("Failed to fetch products, response:", res); 
     throw new Error('Failed to fetch products');
   }
   const products = await res.json();
-  // console.log("Fetched products:", products); // Add logging here
   return products;
 }
 
