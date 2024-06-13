@@ -19,16 +19,16 @@ export const CartProvider = ({ children }) => {
         let updatedCart;
         if (existingProduct) {
             updatedCart = cart.map(item =>
-                item.slug === product.slug ? { ...item, quantity: item.quantity + 1 } : item
+                item.slug === product.slug ? { ...item, quantity: item.quantity + product.quantity } : item
             );
         } else {
-            updatedCart = [...cart, { ...product, quantity: 1 }];
+            updatedCart = [...cart, product];
         }
         setCart(updatedCart);
         localStorage.setItem('cart', JSON.stringify(updatedCart));
     };
 
-    const removeFromCart = (slug) => {
+    const decrementCartItem = (slug) => {
         const updatedCart = cart
             .map(item =>
                 item.slug === slug ? { ...item, quantity: item.quantity - 1 } : item
@@ -39,8 +39,14 @@ export const CartProvider = ({ children }) => {
         localStorage.setItem('cart', JSON.stringify(updatedCart));
     };
 
+    const removeFromCart = (slug) => {
+        const updatedCart = cart.filter(item => item.slug !== slug);
+        setCart(updatedCart);
+        localStorage.setItem('cart', JSON.stringify(updatedCart));
+    };
+
     return (
-        <CartContext.Provider value={{ cart, addToCart, removeFromCart }}>
+        <CartContext.Provider value={{ cart, addToCart, removeFromCart, decrementCartItem }}>
             {children}
         </CartContext.Provider>
     );

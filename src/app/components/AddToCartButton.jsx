@@ -3,11 +3,12 @@
 import { useContext } from 'react';
 import { CartContext } from '@/context/CartContext';
 
-export default function AddToCartButton({ product, quantity }) {
+export default function AddToCartButton({ product, quantity, setQuantity }) {
     const { addToCart } = useContext(CartContext);
 
     const handleAddToCart = () => {
         addToCart({ ...product, quantity });
+        setQuantity(1);
     };
 
     return (

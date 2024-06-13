@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useContext } from "react";
-import { faShoppingCart, faAngleDown, faTimes, faAngleRight } from "@fortawesome/free-solid-svg-icons";
+import { faShoppingCart, faAngleDown, faTimes, faAngleRight, faMinus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import useOutsideClick from "./useOutsideClick";
 import Link from "next/link";
@@ -9,7 +9,7 @@ import Image from "next/image";
 import { CartContext } from '@/context/CartContext';
 
 export default function CartDropdown(props) {
-    const { cart, removeFromCart } = useContext(CartContext);
+    const { cart, removeFromCart, decrementCartItem } = useContext(CartContext);
     const [cartOpen, setCartOpen] = useState(false);
     const cartRef = useRef(null);
 
@@ -48,9 +48,14 @@ export default function CartDropdown(props) {
                                                     </div>
                                                 </Link>
                                                 <p>${item.price} x {item.quantity}</p>
-                                                <button onClick={() => removeFromCart(item.slug)}>
-                                                    <FontAwesomeIcon icon={faTimes} className="hover:text-red-600" />
-                                                </button>
+                                                <div className="flex gap-4">
+                                                    <button onClick={() => decrementCartItem(item.slug)}>
+                                                        <FontAwesomeIcon icon={faMinus} className="hover:text-red-600" />
+                                                    </button>
+                                                    <button onClick={() => removeFromCart(item.slug)}>
+                                                        <FontAwesomeIcon icon={faTimes} className="hover:text-red-600" />
+                                                    </button>
+                                                </div>
                                             </li>
                                         ))}
                                     </ul>
@@ -92,9 +97,14 @@ export default function CartDropdown(props) {
                                                     </div>
                                                 </Link>
                                                 <p>${item.price} x {item.quantity}</p>
-                                                <button onClick={() => removeFromCart(item.slug)}>
-                                                    <FontAwesomeIcon icon={faTimes} className="hover:text-red-600" />
-                                                </button>
+                                                <div className="flex gap-4">
+                                                    <button onClick={() => decrementCartItem(item.slug)}>
+                                                        <FontAwesomeIcon icon={faMinus} className="hover:text-red-600" />
+                                                    </button>
+                                                    <button onClick={() => removeFromCart(item.slug)}>
+                                                        <FontAwesomeIcon icon={faTimes} className="hover:text-red-600" />
+                                                    </button>
+                                                </div>
                                             </li>
                                         ))}
                                     </ul>

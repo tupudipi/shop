@@ -11,7 +11,7 @@ export default function ClientProductSection({ product }) {
     return (
         <div className="md:w-3/4 lg:w-2/3 flex flex-col gap-2">
             <ProductQuantity quantity={quantity} setQuantity={setQuantity} />
-            <AddToCartButton product={product} quantity={quantity} />
+            <AddToCartButton product={product} quantity={quantity} setQuantity={setQuantity}/>
             <AddToFavouritesButton product={product} />
         </div>
     );
