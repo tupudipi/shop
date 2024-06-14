@@ -1,6 +1,7 @@
-
+'use client'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { useSession, signIn } from 'next-auth/react';
 
 const LoginModal = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
@@ -14,7 +15,7 @@ const LoginModal = ({ isOpen, onClose }) => {
                 <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">Cico Shop</h2>
                 <div className="flex flex-col gap-4">
                     <p>Sign in to access exclusive features, and the most purrfect seamless shopping experience.</p>
-                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full">
+                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full" onClick={() => signIn()}>
                         Login with Google
                     </button>
                 </div>

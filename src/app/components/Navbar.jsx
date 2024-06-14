@@ -10,6 +10,7 @@ import { faUser } from '@fortawesome/free-solid-svg-icons';
 import WishListDrowpdown from './WishListDropdown';
 import CartDropdown from './CartDropdown';
 import LoginButton from './LoginButton';
+import { useSession } from 'next-auth/react';
 
 async function getCategories() {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/categories`, {
@@ -22,10 +23,15 @@ async function getCategories() {
 }
 
 const Sidebar = ({ closeSidebar, sidebarOpen, categories }) => {
+    const { data: session } = useSession();
     return (<>
         <div className={`fixed left-0 h-full w-64 bg-white p-4 flex flex-col z-40 transition-transform duration-200 ease-in-out ${sidebarOpen ? 'transform translate-x-0' : 'transform -translate-x-full'}`}>
-            <Link href='/account' className='hover:text-indigo-950 transition-all flex gap-2 items-center'><FontAwesomeIcon icon={faUser} /> Account</Link>
-            <hr className='border-2 text-slate-600 rounded-full'></hr>
+            {session && (
+                <span>
+                    <Link href='/account' className='hover:text-indigo-950 transition-all flex gap-2 items-center'><FontAwesomeIcon icon={faUser} /> Account</Link>
+                    <hr className='border-2 text-slate-600 rounded-full'></hr>
+                </span>
+            )}
             <ul className='flex flex-col gap-2 mt-2'>
                 {categories.map((category) => (
                     <li className='flex hover:text-indigo-950 transition-all' key={category.category_name}>
