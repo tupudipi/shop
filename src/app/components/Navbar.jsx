@@ -9,6 +9,7 @@ import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 import WishListDrowpdown from './WishListDropdown';
 import CartDropdown from './CartDropdown';
+import LoginButton from './LoginButton';
 
 async function getCategories() {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/categories`, {
@@ -59,7 +60,7 @@ const Navbar = () => {
 
     return (
         <nav className="text-indigo-800">
-            <div className="p-4 container mx-auto">
+            <div className="px-4 py-2 container mx-auto">
                 <div className="flex justify-between align-middle">
                     <div className="flex items-center gap-2">
                         <div
@@ -70,11 +71,10 @@ const Navbar = () => {
                         </div>
                         <Link href="/" className="font-bold text-xl">Cico Shop</Link>
                     </div>
-                    <div className="flex justify-end gap-5">
+                    <div className="flex justify-end gap-5 items-center">
                         <WishListDrowpdown navbar />
                         <CartDropdown navbar />
-                        <Link className="cursor-pointer hover:text-indigo-950 transition-all" href="/login">Login</Link>
-                        <Link className="cursor-pointer hover:text-indigo-950 transition-all" href="/register">Register</Link>
+                        <LoginButton />
                     </div>
                 </div>
                 <div className="mt-2 relative">

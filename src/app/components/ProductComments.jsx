@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from "@/firebaseInit";  // Adjust the path to your firebaseInit
 import ReviewCard from './ReviewCard';
+import ReviewForm from './ReviewForm';
 
 const ProductComments = ({ slug }) => {
   const [showReviewForm, setShowReviewForm] = useState(false);
@@ -54,7 +55,7 @@ const ProductComments = ({ slug }) => {
             className='bg-blue-500 text-white px-4 py-1 rounded-lg hover:bg-blue-700 transition-colors'
             onClick={() => setShowReviewForm(!showReviewForm)}
           >
-            Add review
+            {showReviewForm ? 'Close review form' : 'Write a review'}
           </button>
         </div>
         <div
@@ -62,17 +63,7 @@ const ProductComments = ({ slug }) => {
             } overflow-hidden`}
         >
           {showReviewForm && (
-            <div className='flex justify-center mt-4 gap-4 items-center'>
-              <textarea
-                placeholder='Write a review'
-                className="w-2/3 h-32 p-6 rounded-lg bg-white shadow focus:outline-none focus:ring-1 focus:ring-blue-600 focus:ring-opacity-30 mb-2 transition-all"
-              ></textarea>
-              <button
-                className='bg-blue-500 text-white px-4 py-1 rounded-lg hover:bg-blue-700 transition-colors h-10'
-              >
-                Submit
-              </button>
-            </div>
+            <ReviewForm setShowReviewForm={setShowReviewForm}/>
           )}
         </div>
         <hr className="my-4 border rounded-full"></hr>
