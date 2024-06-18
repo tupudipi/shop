@@ -6,13 +6,13 @@ async function fetchCategoryId(slug) {
     throw new Error('Failed to fetch category data');
   }
   const category = await res.json();
-  return category.id; 
+  return category.id;
 }
 
 async function fetchProductsByCategoryId(categoryId) {
   const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products/category/${categoryId}`, { cache: 'no-store' });
   if (!res.ok) {
-    console.error("Failed to fetch products, response:", res); 
+    console.error("Failed to fetch products, response:", res);
     throw new Error('Failed to fetch products');
   }
   const products = await res.json();
@@ -34,12 +34,10 @@ export default async function Page({ params }) {
   const products = await fetchProductsByCategoryId(categoryId);
 
   return (
-    <div>
-      <div className="flex flex-wrap gap-4 mt-2">
-        {products.map((product) => (
-          <ProductCard key={product.slug} product={product} />
-        ))}
-      </div>
+    <div className="flex flex-wrap gap-4 mt-2 justify-center md:justify-normal">
+      {products.map((product) => (
+        <ProductCard key={product.slug} product={product} />
+      ))}
     </div>
   );
 }
