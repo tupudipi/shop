@@ -32,10 +32,10 @@ const ReviewForm = ({setShowReviewForm}) => {
                 </div>
             </div>
             <form onSubmit={handleFormSubmit}>
-                <div className='flex justify-center gap-4 items-center'>
+                <div className='flex flex-col md:flex-row justify-center gap-2 md:gap-4 items-center'>
                     <textarea
-                        placeholder='Write a review'
-                        className="w-2/3 h-32 p-6 rounded-lg bg-white shadow focus:outline-none focus:ring-1 focus:ring-blue-600 focus:ring-opacity-30 mb-2 transition-all"
+                        placeholder='Share your thoughts'
+                        className="w-full md:w-2/3 h-32 p-6 rounded-lg bg-white shadow focus:outline-none focus:ring-1 focus:ring-blue-600 focus:ring-opacity-30 mb-2 transition-all"
                     ></textarea>
                     <button
                         type="submit"

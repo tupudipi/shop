@@ -2,11 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from "@/firebaseInit";  // Adjust the path to your firebaseInit
+import { db } from "@/firebaseInit";
 import ReviewCard from './ReviewCard';
 import ReviewForm from './ReviewForm';
+import { useSession } from 'next-auth/react';
 
 const ProductComments = ({ slug }) => {
+  const { data: session } = useSession();
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -35,7 +37,7 @@ const ProductComments = ({ slug }) => {
 
   return (
     <div>
-      <div className='flex items-center justify-center gap-48'>
+      <div className='flex items-center justify-center gap-24 md:gap-48'>
         <div className='flex flex-col items-center'>
           <p className='text-gray-800 mb-1 text-xl font-semibold'>{reviews.length}</p>
           <div className="flex gap-1 align-middle">
@@ -51,19 +53,22 @@ const ProductComments = ({ slug }) => {
 
       <div>
         <div className='flex justify-center mt-4'>
-          <button
-            className='bg-blue-500 text-white px-4 py-1 rounded-lg hover:bg-blue-700 transition-colors'
-            onClick={() => setShowReviewForm(!showReviewForm)}
-          >
-            {showReviewForm ? 'Close review form' : 'Write a review'}
-          </button>
+          {session ? (
+            <button
+              className='bg-blue-500 text-white px-4 py-1 rounded-lg hover:bg-blue-700 transition-colors'
+              onClick={() => setShowReviewForm(!showReviewForm)}
+            >
+              {showReviewForm ? 'Close review form' : 'Write a review'}
+            </button>
+          ) : 
+            <p className='text-center text-gray-700'>You must be logged in to write a review</p>}
         </div>
         <div
           className={`transition-all duration-500 ease-in-out ${showReviewForm ? 'max-h-screen' : 'max-h-0'
             } overflow-hidden`}
         >
           {showReviewForm && (
-            <ReviewForm setShowReviewForm={setShowReviewForm}/>
+            <ReviewForm setShowReviewForm={setShowReviewForm} />
           )}
         </div>
         <hr className="my-4 border rounded-full"></hr>
