@@ -97,7 +97,7 @@ export default function CartDropdown(props) {
                                                     </div>
                                                 </Link>
                                                 <p>${item.price} x {item.quantity}</p>
-                                                <div className="flex gap-4">
+                                                <div>
                                                     <button onClick={() => decrementCartItem(item.slug)}>
                                                         <FontAwesomeIcon icon={faMinus} className="hover:text-red-600" />
                                                     </button>

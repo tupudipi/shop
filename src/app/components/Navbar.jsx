@@ -27,10 +27,16 @@ const Sidebar = ({ closeSidebar, sidebarOpen, categories }) => {
     return (<>
         <div className={`fixed left-0 h-full w-64 bg-white p-4 flex flex-col z-40 transition-transform duration-200 ease-in-out ${sidebarOpen ? 'transform translate-x-0' : 'transform -translate-x-full'}`}>
             {session && (
-                <span>
-                    <Link href='/account' className='hover:text-indigo-950 transition-all flex gap-2 items-center'><FontAwesomeIcon icon={faUser} /> Account</Link>
+                <div>
+                    <Link href='/account' >
+                        <div className='hover:text-indigo-950 transition-all mb-2'>
+                            <p className='text-gray-400 select-none pointer-events-nones mb-1'>{session.user.email}</p>
+                            <div className='flex gap-2 items-center'><FontAwesomeIcon icon={faUser} />
+                                <p>Account</p></div>
+                        </div>
+                    </Link>
                     <hr className='border-2 text-slate-600 rounded-full'></hr>
-                </span>
+                </div>
             )}
             <ul className='flex flex-col gap-2 mt-2'>
                 {categories.map((category) => (
