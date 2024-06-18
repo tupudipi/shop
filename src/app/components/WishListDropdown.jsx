@@ -37,7 +37,7 @@ export default function WishlistDropdown(props) {
                         <FontAwesomeIcon icon={faAngleDown} className={`max-h-4 transition-transform ${wishlistOpen ? 'rotate-180' : ''}`} />
                     </div>
                     <div className={`rounded-md flex flex-col items-center transition-all overflow-hidden absolute top-8 right-0 bg-white shadow-md w-content min-w-36 z-50 ${wishlistOpen ? 'max-h-96 p-4 pb-2' : 'max-h-0 p-0'}`}>
-                        <ul className={`transition-all ${wishlistOpen ? 'text-indigo-500' : ''}`}>
+                        <ul className={`transition-all ${wishlistOpen ? 'text-indigo-500 opacity-100' : 'opacity-0'}`}>
                             {wishlist.map(item => (
                                 <li key={item.slug} className="flex justify-between items-center mb-2 gap-5 border-b-2 pb-1">
                                     <Link href={`/products/${item.slug}`}>
@@ -58,7 +58,7 @@ export default function WishlistDropdown(props) {
                                 <p className="mt-2 inline-block bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-all hover:shadow">Go to Wishlist</p>
                             </Link>
                         ) : (
-                            <p className="mt-2 text-center">Your wishlist is empty. Start adding your favourite products!</p>
+                            <p className={`mt-2 text-center transition-all ${wishlistOpen ? ('opacity-100') : ('opacity-0')}`}>Your wishlist is empty. Start adding your favourite products!</p>
                         )}
                     </div>
                 </div>
@@ -97,7 +97,7 @@ export default function WishlistDropdown(props) {
                                 <p className="mt-2 inline-block bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-all hover:shadow">Go to Wishlist</p>
                             </Link>
                         ) : (
-                            <p className="mt-2 text-center">Your wishlist is empty. Start adding your favourite products!</p>
+                            <p className={`mt-2 text-center transition-all ${wishlistOpen ? ('opacity-100') : ('opacity-0')}`}>Your wishlist is empty. Start adding your favourite products!</p>
                         )}
                     </div>
                 </div>

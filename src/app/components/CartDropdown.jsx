@@ -65,7 +65,7 @@ export default function CartDropdown(props) {
                                     </Link>
                                 </>
                             ) : (
-                                <p className="p-4">Your cart is empty.</p>
+                                <p className={`p-2 text-center transition-all ${cartOpen ? ('opacity-100') : ('opacity-0')}`}>Your cart is empty.</p>
                             )}
                         </div>
                     }
