@@ -1,20 +1,41 @@
-import { useState } from 'react';
+'use client'
 
-const ReviewForm = ({setShowReviewForm}) => {
+import { useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { db } from '@/firebaseInit';
+import { doc, setDoc } from 'firebase/firestore';
+
+const ReviewForm = ({ setShowReviewForm }) => {
+    const { data: session } = useSession();
     const [rating, setRating] = useState(0);
 
     const handleRatingChange = (value) => {
         setRating(value);
     };
 
-    const handleFormSubmit = (event) => {
+    const handleFormSubmit = async (event) => {
         event.preventDefault();
-        console.log(`Rating: ${rating}`);
-        console.log(`Review: ${event.target[0].value}`);
-        console.log(`Date: ${new Date().toLocaleDateString()}`);
-        console.log(`User: nimic momentan`)
+        const product_id = window.location.pathname.split('/').pop();
+        console.log(`Product ID: ${product_id}
+            Rating: ${rating}
+            Content: ${event.target[0].value}
+            Author: ${session.user.email}`);
+
+        const reviewData = {
+            author: session.user.email,
+            content: event.target[0].value,
+            date: new Date().toLocaleDateString(),
+            grade: rating,
+            likes: 0,
+            product_id: product_id
+        };
+        console.log(reviewData);
+        const docRef = doc(db, 'Reviews', `${session.user.email}-${product_id}`);
+        await setDoc(docRef, reviewData);
+        console.log('Review added to Firestore');
         setShowReviewForm(false);
     };
+    
 
     return (
         <div className='flex flex-col mt-6 gap-4'>

@@ -3,23 +3,48 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFlag, faThumbsUp } from '@fortawesome/free-regular-svg-icons';
 import { faReply } from '@fortawesome/free-solid-svg-icons'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from "@/firebaseInit";
+import Image from 'next/image';
+
+const fetchAuthorName = async (author) => {
+  const usersCollection = collection(db, 'Users');
+  const q = query(usersCollection, where('email', '==', author));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs[0].data().name;
+};
+const fetchAuthorImg = async (author) => {
+  const usersCollection = collection(db, 'Users');
+  const q = query(usersCollection, where('email', '==', author));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs[0].data().image;
+};
+
 
 const ReviewCard = ({ review }) => {
   const [showResponseForm, setShowResponseForm] = useState(false);
+  const [authorName, setAuthorName] = useState('');
+  const [authorImg, setAuthorImg] = useState('');
+  useEffect(() => {
+    fetchAuthorName(review.author).then(name => setAuthorName(name));
+    fetchAuthorImg(review.author).then(img => setAuthorImg(img));
+  });
 
   return (
     <div className="mb-6 md:flex md:gap-6 border-b pb-4">
-      <div id="reviewHeader" className="flex flex-col gap-1">
+      <div id="reviewHeader" className="flex flex-col gap-1 md:max-w-36 text-center">
         <div id="userData" className="flex gap-2 items-center md:flex-col">
-          <div id="userImg" className="bg-gray-300 rounded-full w-8 h-8"></div>
+          <div id="userImg" className="bg-gray-300 rounded-full w-8 h-8">
+            <Image src={authorImg} alt="User" className="rounded-full" width={32} height={32}/>
+          </div>
 
           <div id="userName">
-            <p>{review.author}</p>
+            <p className='truncate'>{authorName}</p>
           </div>
         </div>
         <div id="date" className="text-gray-700">
-          <p>{new Date(review.date.seconds * 1000).toLocaleDateString()}</p>
+          <p>{review.date.toLocaleString()}</p>
         </div>
       </div>
 
@@ -37,7 +62,7 @@ const ReviewCard = ({ review }) => {
         </div>
 
         <div id='reviewText' className="leading-7 text-gray-900">
-          <p>{review.content}</p>
+          <p className="truncate">{review.content}</p>
         </div>
 
         <div id="reviewFooter" className="mt-2 flex gap-4">

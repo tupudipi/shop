@@ -12,6 +12,7 @@ const ProductComments = ({ slug }) => {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
+  const reviewValue = reviews.reduce((acc, review) => acc + review.grade, 0) / reviews.length;
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -39,13 +40,19 @@ const ProductComments = ({ slug }) => {
     <div>
       <div className='flex items-center justify-center gap-24 md:gap-48'>
         <div className='flex flex-col items-center'>
-          <p className='text-gray-800 mb-1 text-xl font-semibold'>{reviews.length}</p>
+          <p className='text-gray-800 mb-1 text-xl font-semibold'>{reviewValue}</p>
           <div className="flex gap-1 align-middle">
-            <div className="w-4 h-4 bg-yellow-500 rounded-full"></div>
-            <div className="w-4 h-4 bg-yellow-500 rounded-full"></div>
-            <div className="w-4 h-4 bg-yellow-500 rounded-full"></div>
-            <div className="w-4 h-4 bg-yellow-500 rounded-full"></div>
-            <div className="w-4 h-4 bg-gray-300 rounded-full"></div>
+            {[...Array(Math.floor(reviewValue))].map((_, i) => (
+              <div key={i} className="w-4 h-4 bg-yellow-500 rounded-full"></div>
+            ))}
+            {reviewValue % 1 !== 0 && (
+              <div className="relative w-4 h-4 bg-gray-300 rounded-full overflow-hidden">
+                <div className="absolute top-0 left-0 h-full bg-yellow-500" style={{ width: `${(reviewValue % 1) * 100}%` }}></div>
+              </div>
+            )}
+            {[...Array(5 - Math.ceil(reviewValue))].map((_, i) => (
+              <div key={i} className="w-4 h-4 bg-gray-300 rounded-full"></div>
+            ))}
           </div>
         </div>
         <p className='text-gray-800 text-center'>{reviews.length} reviews</p>

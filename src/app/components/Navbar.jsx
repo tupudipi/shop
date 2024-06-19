@@ -30,7 +30,7 @@ const Sidebar = ({ closeSidebar, sidebarOpen, categories }) => {
                 <div>
                     <Link href='/account' >
                         <div className='hover:text-indigo-950 transition-all mb-2'>
-                            <p className='text-gray-400 select-none pointer-events-nones mb-1'>{session.user.email}</p>
+                            <p className='text-gray-400 select-none pointer-events-nones mb-1'>{session.user.name}</p>
                             <div className='flex gap-2 items-center'><FontAwesomeIcon icon={faUser} />
                                 <p>Account</p></div>
                         </div>
