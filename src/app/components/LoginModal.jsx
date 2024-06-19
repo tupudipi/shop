@@ -2,7 +2,17 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { faGoogle } from '@fortawesome/free-brands-svg-icons';
-import { useSession, signIn } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
+
+
+const handleSignIn = async () => {
+    const result = await signIn('google');
+    if (result?.ok) {
+      console.log('Signed in successfully');
+    } else {
+      console.error('Failed to sign in');
+    }
+  };
 
 const LoginModal = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
@@ -17,7 +27,7 @@ const LoginModal = ({ isOpen, onClose }) => {
                 <div className="flex flex-col gap-4 text-justify
                 ">
                     <p>Sign in to access exclusive features, and the most purrfect seamless shopping experience.</p>
-                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full" onClick={() => signIn('google')}>
+                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full" onClick={() => handleSignIn()}>
                         <FontAwesomeIcon icon={faGoogle} className="mr-2" />
                         Login with Google
                     </button>
