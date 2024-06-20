@@ -7,8 +7,10 @@ import useOutsideClick from "./useOutsideClick";
 import Link from "next/link";
 import Image from "next/image";
 import { WishlistContext } from "@/context/WishlistContext";
+import { useSession } from "next-auth/react";
 
 export default function WishlistDropdown(props) {
+    const { data: session } = useSession();
     const [wishlistOpen, setWishlistOpen] = useState(false);
     const wishlistRef = useRef(null);
 
