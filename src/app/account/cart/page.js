@@ -1,5 +1,5 @@
-import ProductCard from "@/app/components/ProductCard"
-import { collection, query, where, getDocs, addDoc, updateDoc, doc, deleteDoc } from 'firebase/firestore';
+import ProductCard from "@/app/components/ProductCard";
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from "@/firebaseInit";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
@@ -11,14 +11,15 @@ async function fetchCartData(user_email) {
     return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 }
 
-
-async function cartPage () {
+async function cartPage() {
   const session = await getServerSession(authOptions);
-  const products = await fetchCartData(session.user.email)
-  console.log(products)
+
+  const products = await fetchCartData(session.user.email);
+  console.log(products);
+
   return (
     <div>
-      <h1 className="text-4xl font-medium">Shopping cart</h1>
+      <h1 className="text-4xl font-medium">Shopping Cart</h1>
       <div className="mt-6 flex flex-col gap-3 px-8 md:flex-row md:p-0 md:flex-wrap">
         {products.length > 0 ? products.map(product => (
           <ProductCard key={product.id} product={product} />
@@ -26,7 +27,7 @@ async function cartPage () {
           <p className="text-gray-500 italic">*Tumbleweeds rustling*</p>}
       </div>
     </div>
-  )
+  );
 }
 
-export default cartPage
+export default cartPage;
