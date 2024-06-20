@@ -20,9 +20,10 @@ async function cartPage () {
     <div>
       <h1 className="text-4xl font-medium">Shopping cart</h1>
       <div className="mt-6 flex flex-col gap-3 px-8 md:flex-row md:p-0 md:flex-wrap">
-        {products.map(product => (
+        {products.length > 0 ? products.map(product => (
           <ProductCard key={product.id} product={product} />
-        ))}
+        )) : 
+          <p className="text-gray-500 italic">*Tumbleweeds rustling*</p>}
       </div>
     </div>
   )
