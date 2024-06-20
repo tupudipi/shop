@@ -6,11 +6,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
-import { faUser } from '@fortawesome/free-solid-svg-icons';
 import WishListDrowpdown from './WishListDropdown';
 import CartDropdown from './CartDropdown';
 import LoginButton from './LoginButton';
 import { useSession } from 'next-auth/react';
+import Image from 'next/image';
 
 async function getCategories() {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/categories`, {
@@ -30,9 +30,10 @@ const Sidebar = ({ closeSidebar, sidebarOpen, categories }) => {
                 <div>
                     <Link href='/account' >
                         <div className='hover:text-indigo-950 transition-all mb-2'>
-                            <p className='text-gray-400 select-none pointer-events-nones mb-1'>{session.user.name}</p>
-                            <div className='flex gap-2 items-center'><FontAwesomeIcon icon={faUser} />
-                                <p>Account</p></div>
+                            <div className='flex gap-1'>
+                                 <Image width={24} height={24} alt='User' src={session.user.image}/>
+                                <p className='mb-1'>{session.user.name}</p>
+                            </div>
                         </div>
                     </Link>
                     <hr className='border-2 text-slate-600 rounded-full'></hr>

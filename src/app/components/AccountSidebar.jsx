@@ -12,6 +12,7 @@ const AccountSidebar = () => {
         { href: '/account/orders', text: 'Order History' },
         { href: '/account/wishlist', text: 'Wishlist' },
         { href: '/account/reviews', text: 'Reviews' },
+        { href: '/account/cart', text: 'Shopping Cart' },
     ];
 
     return (

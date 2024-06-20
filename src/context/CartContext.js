@@ -18,7 +18,7 @@ export const CartProvider = ({ children }) => {
                 const querySnapshot = await getDocs(q);
                 const cartData = [];
                 querySnapshot.forEach((doc) => {
-                    cartData.push(doc.data());
+                    cartData.push({ id: doc.id, ...doc.data() });
                 });
                 setCart(cartData);
             } else {
@@ -65,19 +65,20 @@ export const CartProvider = ({ children }) => {
 
     const decrementCartItem = async (slug) => {
         if (session) {
-            const productIndex = cart.findIndex(item => item.slug === slug);
-            if (productIndex !== -1) {
-                const product = cart[productIndex];
-                if (product.quantity > 1) {
-                    const updatedProduct = { ...product, quantity: product.quantity - 1 };
-                    const docRef = doc(db, 'Carts', product.id);
+            const existingProductIndex = cart.findIndex(item => item.slug === slug);
+            if (existingProductIndex !== -1) {
+                const existingProduct = cart[existingProductIndex];
+                if (existingProduct.quantity > 1) {
+                    const updatedProduct = { ...existingProduct, quantity: existingProduct.quantity - 1 };
+                    const docRef = doc(db, 'Carts', existingProduct.id);
                     await updateDoc(docRef, updatedProduct);
                     const updatedCart = [...cart];
-                    updatedCart[productIndex] = updatedProduct;
+                    updatedCart[existingProductIndex] = updatedProduct;
                     setCart(updatedCart);
                 } else {
-                    await deleteDoc(doc(db, 'Carts', product.id));
-                    const updatedCart = cart.filter((_, index) => index !== productIndex);
+                    const docRef = doc(db, 'Carts', existingProduct.id);
+                    await deleteDoc(docRef);
+                    const updatedCart = cart.filter(item => item.id !== existingProduct.id);
                     setCart(updatedCart);
                 }
             }
@@ -95,11 +96,11 @@ export const CartProvider = ({ children }) => {
 
     const removeFromCart = async (slug) => {
         if (session) {
-            const productIndex = cart.findIndex(item => item.slug === slug);
-            if (productIndex !== -1) {
-                const product = cart[productIndex];
-                await deleteDoc(doc(db, 'Carts', product.id));
-                const updatedCart = cart.filter((_, index) => index !== productIndex);
+            const existingProduct = cart.find(item => item.slug === slug);
+            if (existingProduct) {
+                const docRef = doc(db, 'Carts', existingProduct.id);
+                await deleteDoc(docRef);
+                const updatedCart = cart.filter(item => item.slug !== slug);
                 setCart(updatedCart);
             }
         } else {
