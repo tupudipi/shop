@@ -40,9 +40,9 @@ const ProductComments = ({ slug }) => {
     <div>
       <div className='flex items-center justify-center gap-24 md:gap-48'>
         <div className='flex flex-col items-center'>
-          <p className='text-gray-800 mb-1 text-xl font-semibold'>{reviewValue}</p>
+          <p className='text-gray-800 mb-1 text-xl font-semibold'>{reviewValue || ' '}</p>
           <div className="flex gap-1 align-middle">
-            {[...Array(Math.floor(reviewValue))].map((_, i) => (
+            {[...Array(Math.floor(Math.max(0, Math.min(5, Number.isNaN(reviewValue) ? 0 : reviewValue))))].map((_, i) => (
               <div key={i} className="w-4 h-4 bg-yellow-500 rounded-full"></div>
             ))}
             {reviewValue % 1 !== 0 && (
@@ -50,7 +50,7 @@ const ProductComments = ({ slug }) => {
                 <div className="absolute top-0 left-0 h-full bg-yellow-500" style={{ width: `${(reviewValue % 1) * 100}%` }}></div>
               </div>
             )}
-            {[...Array(5 - Math.ceil(reviewValue))].map((_, i) => (
+            {[...Array(5 - Math.ceil(Math.max(0, Math.min(5, Number.isNaN(reviewValue) ? 0 : reviewValue))))].map((_, i) => (
               <div key={i} className="w-4 h-4 bg-gray-300 rounded-full"></div>
             ))}
           </div>
@@ -67,7 +67,7 @@ const ProductComments = ({ slug }) => {
             >
               {showReviewForm ? 'Close review form' : 'Write a review'}
             </button>
-          ) : 
+          ) :
             <p className='text-center text-gray-700'>You must be logged in to write a review</p>}
         </div>
         <div
