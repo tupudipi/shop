@@ -60,7 +60,7 @@ export default function CartDropdown(props) {
                                         ))}
                                     </ul>
                                     <p className="mt-2">Total: ${total.toFixed(2)}</p>
-                                    <Link href="/cart">
+                                    <Link href="/account/cart">
                                         <p className="mt-2 inline-block bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-all hover:shadow">Go to Cart</p>
                                     </Link>
                                 </>

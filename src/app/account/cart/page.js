@@ -22,7 +22,9 @@ function CartPage() {
             <button className="bg-blue-500 text-white px-4 py-1 rounded-lg hover:bg-blue-700 transition-colors">Checkout</button>
           </div>
         ) : (
-          <p className="text-gray-500 italic">*Tumbleweeds rustling*</p>
+          <div className="mt-6 flex flex-col gap-3 px-8 md:flex-row md:p-0 md:flex-wrap">
+            <p className="text-gray-500 italic">*Tumbleweeds rustling*</p>
+          </div>
         )
       }
     </div>

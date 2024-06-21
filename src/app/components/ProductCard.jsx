@@ -5,7 +5,6 @@ import ProductCardQuantityClientElement from "./ProductCardQuantityClientElement
 const ProductCard = ({ product, isFav, isCart }) => {
   const reviewValue = Number(product.reviewValue) || 0;
   const reviewCount = product.reviewCount || 0;
-
   const lastStarWidth = `${(reviewValue % 1) * 100}%`;
 
   return (

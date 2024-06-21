@@ -36,9 +36,8 @@ async function reviewsPage() {
   return (
     <div>
       <h1 className="text-4xl font-medium">My Reviews</h1>
-      <div className="mt-6 flex items-center gap-2 md:gap-4 flex-wrap">
         {reviewsWithProductData.length > 0 ?
-          (<ul className="space-y-4 md:w-2/3">
+          (<ul className="mt-6 flex flex-col md:flex-row items-stretch gap-2 md:gap-4 flex-wrap">
             {reviewsWithProductData.map((review) => (
               <li key={review.id} className="border border-gray-200 rounded-lg bg-white shadow-sm p-4">
                 <div className="flex gap-2">
@@ -47,11 +46,24 @@ async function reviewsPage() {
                       <Image width={96} height={96} src={review.product?.image} alt={review.product?.name} className="object-cover w-full h-full rounded-lg" />
                     </div>
                   </Link>
-                  <div>
+                  <div className="space-y-2">
                     <Link href={`/products/${review.product_id}`}>
                       <h2 className="text-lg font-medium hover:underline">{review.product?.name}</h2>
                     </Link>
                     <p className="text-sm text-gray-500">{review.date}</p>
+                    <div className="flex gap-1">
+                      {[...Array(Math.floor(review.grade))].map((_, i) => (
+                        <div key={i} className="w-4 h-4 bg-yellow-500 rounded-full"></div>
+                      ))}
+                      {review.grade % 1 !== 0 && (
+                        <div className="relative w-4 h-4 bg-gray-300 rounded-full overflow-hidden">
+                          <div className="absolute top-0 left-0 h-full bg-yellow-500" style={{ width: `${(review.grade % 1) * 100}%` }}></div>
+                        </div>
+                      )}
+                      {[...Array(5 - Math.ceil(review.grade))].map((_, i) => (
+                        <div key={i} className="w-4 h-4 bg-gray-300 rounded-full"></div>
+                      ))}
+                    </div>
                   </div>
                 </div>
                 <p className="mt-2 text-gray-700 line-clamp-3 italic">&quot;{review.content}&quot;</p>
@@ -60,7 +72,6 @@ async function reviewsPage() {
           </ul>) :
           <p className="text-gray-500 italic">*Crickets chirping*</p>}
       </div>
-    </div>
   );
 }
 
