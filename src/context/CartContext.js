@@ -2,7 +2,7 @@
 
 import { createContext, useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { collection, query, where, getDocs, addDoc, updateDoc, doc, deleteDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc, updateDoc, doc, deleteDoc, increment } from 'firebase/firestore';
 import { db } from "@/firebaseInit";
 
 export const CartContext = createContext();
@@ -94,6 +94,27 @@ export const CartProvider = ({ children }) => {
         }
     };
 
+    const incrementCartItem = async (slug) => {
+        if (session) {
+            const existingProductIndex = cart.findIndex(item => item.slug === slug);
+            if (existingProductIndex !== -1) {
+                const existingProduct = cart[existingProductIndex];
+                const updatedProduct = { ...existingProduct, quantity: existingProduct.quantity + 1 };
+                const docRef = doc(db, 'Carts', existingProduct.id);
+                await updateDoc(docRef, updatedProduct);
+                const updatedCart = [...cart];
+                updatedCart[existingProductIndex] = updatedProduct;
+                setCart(updatedCart);
+            }
+        } else {
+            const updatedCart = cart.map(item =>
+                item.slug === slug ? { ...item, quantity: item.quantity + 1 } : item
+            );
+            setCart(updatedCart);
+            localStorage.setItem('cart', JSON.stringify(updatedCart));
+        }
+    }
+
     const removeFromCart = async (slug) => {
         if (session) {
             const existingProduct = cart.find(item => item.slug === slug);
@@ -111,7 +132,7 @@ export const CartProvider = ({ children }) => {
     };
 
     return (
-        <CartContext.Provider value={{ cart, addToCart, removeFromCart, decrementCartItem }}>
+        <CartContext.Provider value={{ cart, addToCart, removeFromCart, decrementCartItem, incrementCartItem }}>
             {children}
         </CartContext.Provider>
     );

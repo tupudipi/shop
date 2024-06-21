@@ -20,7 +20,7 @@ async function wishlistPage() {
       <h1 className="text-4xl font-medium">Wishlist</h1>
       <div className="mt-6 flex flex-col gap-3 px-8 md:flex-row md:p-0 md:flex-wrap">
         {products.length > 0 ? products.map(product => (
-          <ProductCard key={product.id} product={product} />
+          <ProductCard key={product.id} product={product} isFav={1}/>
         )) :
           <p className="text-gray-500 italic">*Wind&apos;s howling*</p>}
       </div>

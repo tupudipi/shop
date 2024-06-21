@@ -1,11 +1,11 @@
 import Link from "next/link";
 import Image from "next/image";
+import ProductCardQuantityClientElement from "./ProductCardQuantityClientElement";
 
-const ProductCard = ({ product, isFav }) => {
+const ProductCard = ({ product, isFav, isCart }) => {
   const reviewValue = Number(product.reviewValue) || 0;
   const reviewCount = product.reviewCount || 0;
 
-  // Calculate the width of the last star based on the decimal part of the reviewValue
   const lastStarWidth = `${(reviewValue % 1) * 100}%`;
 
   return (
@@ -46,7 +46,11 @@ const ProductCard = ({ product, isFav }) => {
         </div>
         <div className="flex flex-col gap-2">
           <p className="font-bold text-start">${product.price.toFixed(2)}</p>
+          {isCart ? (
+            <ProductCardQuantityClientElement product={product}/>
+          ) : (
           <button className="bg-blue-500 text-white px-4 py-1 rounded-lg hover:bg-blue-700 transition-colors">Add to Cart</button>
+          )}
 
           {isFav ? (
             <button className="text-red-500 hover:text-red-600 hover:underline transition-all">Delete</button>
