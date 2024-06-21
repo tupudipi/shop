@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-const AddressCard = ({ isDelivery, isMain, isInfo }) => {
+const AddressCard = ({ isDelivery, isMain, isInfo, address }) => {
     return (
         <div className="bg-white rounded-lg shadow p-4">
             <div className="mb-4">
@@ -11,22 +11,19 @@ const AddressCard = ({ isDelivery, isMain, isInfo }) => {
 
             <div className="mb-2 font-light">
                 <p className="text-sm">
-                    Full Name: John Doe
+                    Full Name: {address.firstname} {address.surname}
                 </p>
                 <p className="text-sm">
-                    Address: 123 Main St
+                    Address: {address.address}
                 </p>
                 <p className="text-sm">
-                    City: New York
+                    City: {address.city}
                 </p>
                 <p className="text-sm">
-                    County: Manhattan
+                    County: {address.county}
                 </p>
                 <p className="text-sm">
-                    Country: United States
-                </p>
-                <p className="text-sm">
-                    Phone Number: 123-456-7890
+                    Phone Number: {address.phone}
                 </p>
             </div>
 
