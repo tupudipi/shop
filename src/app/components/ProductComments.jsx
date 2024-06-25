@@ -75,7 +75,7 @@ const ProductComments = ({ slug }) => {
         <div className='flex justify-center mt-4'>
           {session ? (
             reviews.some(review => review.author === session.user.email) ? (
-              <p className='text-center text-gray-700'>You have already written a review</p>
+              <p className='text-center text-gray-700'>You have already written a review for this product</p>
             ) : (
             <button
               className='bg-blue-500 text-white px-4 py-1 rounded-lg hover:bg-blue-700 transition-colors'

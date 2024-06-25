@@ -4,11 +4,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFlag, faThumbsUp, faTrashAlt } from '@fortawesome/free-regular-svg-icons';
 import { faReply } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useState } from 'react';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, updateDoc, arrayUnion, arrayRemove, getDoc } from 'firebase/firestore';
 import { db } from "@/firebaseInit";
 import Image from 'next/image';
 import { useSession } from 'next-auth/react';
-import ConfirmationModal from './ConfirmationModal';  
+import ConfirmationModal from './ConfirmationModal';
 
 const fetchAuthorName = async (author) => {
   const usersCollection = collection(db, 'Users');
@@ -27,14 +27,51 @@ const fetchAuthorImg = async (author) => {
 const ReviewCard = ({ review, handleDeleteReview }) => {
   const { data: session } = useSession();
   const [showResponseForm, setShowResponseForm] = useState(false);
-  const [showModal, setShowModal] = useState(false);  
+  const [showModal, setShowModal] = useState(false);
   const [authorName, setAuthorName] = useState('');
   const [authorImg, setAuthorImg] = useState('');
+  const [liked, setLiked] = useState(false);
 
   useEffect(() => {
-    fetchAuthorName(review.author).then(name => setAuthorName(name));
-    fetchAuthorImg(review.author).then(img => setAuthorImg(img));
-  }, [review.author]);
+    const fetchData = async () => {
+      const name = await fetchAuthorName(review.author);
+      setAuthorName(name);
+      const img = await fetchAuthorImg(review.author);
+      setAuthorImg(img);
+
+      if (session) {
+        setLiked(review.likedBy.includes(session.user.email));
+      }
+    };
+
+    fetchData();
+  }, [review.author, review.likedBy, session]);
+
+  const handleLike = async () => {
+    if (!session) return;
+
+    const reviewRef = doc(db, 'Reviews', review.id);
+    const reviewDoc = await getDoc(reviewRef);
+
+    if (reviewDoc.exists()) {
+      const currentLikes = reviewDoc.data().likes;
+      const likedByArray = reviewDoc.data().likedBy || [];
+
+      if (liked) {
+        await updateDoc(reviewRef, {
+          likes: currentLikes - 1,
+          likedBy: arrayRemove(session.user.email)
+        });
+        setLiked(false);
+      } else {
+        await updateDoc(reviewRef, {
+          likes: currentLikes + 1,
+          likedBy: arrayUnion(session.user.email)
+        });
+        setLiked(true);
+      }
+    }
+  };
 
   const confirmDelete = () => {
     handleDeleteReview(review.id);
@@ -77,12 +114,24 @@ const ReviewCard = ({ review, handleDeleteReview }) => {
         <div id="reviewFooter" className="mt-2 flex gap-4">
           <div className="flex gap-2">
             <p className="pr-2 border-r">{review.likes}</p>
-            <button><FontAwesomeIcon icon={faThumbsUp} className="transition-all ease-in-out hover:text-indigo-700 active:translate-y-1" /></button>
+            <button
+              onClick={session ? handleLike : null}
+              className={`${session ? '' : 'text-gray-400'}`}
+              disabled={!session}
+            >
+              <FontAwesomeIcon
+                icon={faThumbsUp}
+                className={`${session ? 'hover:text-indigo-700 active:translate-y-1' : ''} transition-all ease-in-out ${liked ? 'text-blue-400 filter drop-shadow-[0_0_2px_rgba(59,130,246,0.6)] drop-shadow-[0_0_8px_rgba(59,130,246,0.8)] drop-shadow-[0_0_16px_rgba(59,130,246,0.5)]' : ''}`}
+              />
+            </button>
           </div>
-          <button onClick={() => setShowResponseForm(!showResponseForm)}>
-            <FontAwesomeIcon icon={faReply} className="transition-all ease-in-out hover:text-indigo-700 active:translate-y-1" />
+          <button
+            onClick={session ? () => setShowResponseForm(!showResponseForm) : null}
+            className={`${session ? '' : 'text-gray-400'}`}
+            disabled={!session}
+          >
+            <FontAwesomeIcon icon={faReply} className={`transition-all ease-in-out ${session ? 'hover:text-indigo-700 active:translate-y-1' : ''}`} />
           </button>
-          <button><FontAwesomeIcon icon={faFlag} className="transition-all ease-in-out hover:text-indigo-700 active:translate-y-1" /></button>
           {session && session.user.email === review.author && (
             <button onClick={() => setShowModal(true)}>
               <FontAwesomeIcon icon={faTrashAlt} className="transition-all ease-in-out hover:text-indigo-700 active:translate-y-1" />
@@ -107,9 +156,9 @@ const ReviewCard = ({ review, handleDeleteReview }) => {
         </div>
       </div>
 
-      <ConfirmationModal 
-        isOpen={showModal} 
-        onClose={() => setShowModal(false)} 
+      <ConfirmationModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
         onConfirm={confirmDelete}
         message="Are you sure you want to delete this review?"
       />
