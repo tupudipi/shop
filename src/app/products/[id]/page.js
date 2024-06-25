@@ -17,7 +17,7 @@ async function fetchProductData(slug) {
     return { slug: productSnap.slug, ...productSnap.data() };
 }
 
-// Server component
+
 const ProductPage = async ({ params }) => {
     const product = await fetchProductData(params.id);
     const lastStarWidth = `${(product.reviewValue % 1) * 100}%`;

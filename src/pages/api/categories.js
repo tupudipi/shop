@@ -10,7 +10,6 @@ export default async function handler(req, res) {
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
-          // Return the ID of the first matching category
           res.status(200).json({ id: querySnapshot.docs[0].id });
         } else {
           console.error("No category found with the given name");

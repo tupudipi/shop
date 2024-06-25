@@ -5,7 +5,6 @@ export default function handler(req, res) {
     if (req.method === 'GET') {
         const getWishlists = async () => {
             try {
-                // const { slug } = req.query
                 const querySnapshot = await getDocs(collection(db, "Wishlists"));
                 const wishlists = [];
                 querySnapshot.forEach((doc) => {

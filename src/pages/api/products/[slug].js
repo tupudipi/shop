@@ -1,6 +1,4 @@
-// /api/products/[slug].js
-
-import { db } from "@/firebaseInit";  // Ensure the path to your firebaseInit is correct
+import { db } from "@/firebaseInit";  
 import { doc, getDoc } from "firebase/firestore";
 
 export default async function handler(req, res) {

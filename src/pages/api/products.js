@@ -8,10 +8,8 @@ export default async function handler(req, res) {
 
             let q;
             if (categoryID) {
-                // If categoryID is provided, fetch products by category ID
                 q = query(collection(db, "Products"), where("category_id", "==", Number(categoryID)));
             } else {
-                // Otherwise, fetch all products
                 q = query(collection(db, "Products"));
             }
 

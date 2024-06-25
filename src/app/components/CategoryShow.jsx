@@ -5,7 +5,6 @@ import ProductCard from "./ProductCard";
 import Link from "next/link";
 import ProductLoading from './ProductLoading';
 
-// Debounce function to limit the rate at which a function can fire.
 const debounce = (func, delay) => {
     let debounceTimer;
     return function () {
@@ -23,13 +22,11 @@ const CategoryShow = ({ page, categoryID, currentProductSlug }) => {
     const [category, setCategory] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Event handler for resizing
     const handleResize = debounce(() => {
         setIsSmallScreen(window.innerWidth < 1280);
-    }, 250); // 250ms debounce time
+    }, 250); 
 
     useEffect(() => {
-        // Set the initial value based on the window's width
         setIsSmallScreen(window.innerWidth < 1280);
 
         window.addEventListener('resize', handleResize);
@@ -61,10 +58,10 @@ const CategoryShow = ({ page, categoryID, currentProductSlug }) => {
         };
     }, [isSmallScreen]);
 
-    // Fetch products based on the categoryID
+
     useEffect(() => {
         const fetchProducts = async () => {
-            setIsLoading(true); // Set loading to true
+            setIsLoading(true); 
             try {
                 let url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/products`;
                 let params = new URLSearchParams();
@@ -89,11 +86,11 @@ const CategoryShow = ({ page, categoryID, currentProductSlug }) => {
                     data = data.filter(product => product.slug !== currentProductSlug);
                 }
 
-                setProducts(data.slice(0, 5)); // Only take the first 5 products
+                setProducts(data.slice(0, 5)); 
             } catch (error) {
                 console.error(error);
             }
-            setIsLoading(false); // Set loading to false
+            setIsLoading(false); 
         };
 
         fetchProducts();
