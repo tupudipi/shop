@@ -1,12 +1,14 @@
 'use client';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFlag, faThumbsUp } from '@fortawesome/free-regular-svg-icons';
-import { faReply } from '@fortawesome/free-solid-svg-icons'
+import { faFlag, faThumbsUp, faTrashAlt } from '@fortawesome/free-regular-svg-icons';
+import { faReply } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useState } from 'react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from "@/firebaseInit";
 import Image from 'next/image';
+import { useSession } from 'next-auth/react';
+import ConfirmationModal from './ConfirmationModal';  
 
 const fetchAuthorName = async (author) => {
   const usersCollection = collection(db, 'Users');
@@ -14,6 +16,7 @@ const fetchAuthorName = async (author) => {
   const querySnapshot = await getDocs(q);
   return querySnapshot.docs[0].data().name;
 };
+
 const fetchAuthorImg = async (author) => {
   const usersCollection = collection(db, 'Users');
   const q = query(usersCollection, where('email', '==', author));
@@ -21,24 +24,30 @@ const fetchAuthorImg = async (author) => {
   return querySnapshot.docs[0].data().image;
 };
 
-
-const ReviewCard = ({ review }) => {
+const ReviewCard = ({ review, handleDeleteReview }) => {
+  const { data: session } = useSession();
   const [showResponseForm, setShowResponseForm] = useState(false);
+  const [showModal, setShowModal] = useState(false);  
   const [authorName, setAuthorName] = useState('');
   const [authorImg, setAuthorImg] = useState('');
+
   useEffect(() => {
     fetchAuthorName(review.author).then(name => setAuthorName(name));
     fetchAuthorImg(review.author).then(img => setAuthorImg(img));
-  });
+  }, [review.author]);
+
+  const confirmDelete = () => {
+    handleDeleteReview(review.id);
+    setShowModal(false);
+  };
 
   return (
     <div className="mb-6 md:flex md:gap-6 border-b pb-4">
       <div id="reviewHeader" className="flex flex-col gap-1 md:max-w-36 text-center">
         <div id="userData" className="flex gap-2 items-center md:flex-col">
           <div id="userImg" className="bg-gray-300 rounded-full w-8 h-8">
-            <Image src={authorImg} alt="User" className="rounded-full" width={32} height={32}/>
+            <Image src={authorImg} alt="User" className="rounded-full" width={32} height={32} />
           </div>
-
           <div id="userName">
             <p className='truncate'>{authorName}</p>
           </div>
@@ -70,16 +79,18 @@ const ReviewCard = ({ review }) => {
             <p className="pr-2 border-r">{review.likes}</p>
             <button><FontAwesomeIcon icon={faThumbsUp} className="transition-all ease-in-out hover:text-indigo-700 active:translate-y-1" /></button>
           </div>
-          <button
-            onClick={() => setShowResponseForm(!showResponseForm)}
-          >
+          <button onClick={() => setShowResponseForm(!showResponseForm)}>
             <FontAwesomeIcon icon={faReply} className="transition-all ease-in-out hover:text-indigo-700 active:translate-y-1" />
           </button>
           <button><FontAwesomeIcon icon={faFlag} className="transition-all ease-in-out hover:text-indigo-700 active:translate-y-1" /></button>
+          {session && session.user.email === review.author && (
+            <button onClick={() => setShowModal(true)}>
+              <FontAwesomeIcon icon={faTrashAlt} className="transition-all ease-in-out hover:text-indigo-700 active:translate-y-1" />
+            </button>
+          )}
         </div>
         <div
-          className={`transition-all duration-500 ease-in-out ${showResponseForm ? 'max-h-screen' : 'max-h-0'
-            } overflow-hidden`}
+          className={`transition-all duration-500 ease-in-out ${showResponseForm ? 'max-h-screen' : 'max-h-0'} overflow-hidden`}
         >
           {showResponseForm && (
             <div className="mt-4 p-2">
@@ -88,15 +99,20 @@ const ReviewCard = ({ review }) => {
                 rows="4"
                 placeholder="Your response"
               ></textarea>
-              <button
-                className="px-4 py-2 mt-2 text-white bg-blue-500 rounded-lg hover:bg-blue-700"
-              >
+              <button className="px-4 py-2 mt-2 text-white bg-blue-500 rounded-lg hover:bg-blue-700">
                 Submit
               </button>
             </div>
           )}
         </div>
       </div>
+
+      <ConfirmationModal 
+        isOpen={showModal} 
+        onClose={() => setShowModal(false)} 
+        onConfirm={confirmDelete}
+        message="Are you sure you want to delete this review?"
+      />
     </div>
   );
 };

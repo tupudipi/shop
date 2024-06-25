@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, deleteDoc, setDoc } from 'firebase/firestore';
 import { db } from "@/firebaseInit";
 import ReviewCard from './ReviewCard';
 import ReviewForm from './ReviewForm';
@@ -12,29 +12,42 @@ const ProductComments = ({ slug }) => {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
-  const reviewValue = reviews.reduce((acc, review) => acc + review.grade, 0) / reviews.length;
+
+  const fetchReviews = async () => {
+    try {
+      const reviewsCollection = collection(db, 'Reviews');
+      const q = query(reviewsCollection, where('product_id', '==', slug));
+      const querySnapshot = await getDocs(q);
+      const fetchedReviews = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setReviews(fetchedReviews);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching reviews: ', error);
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchReviews = async () => {
-      try {
-        const reviewsCollection = collection(db, 'Reviews');
-        const q = query(reviewsCollection, where('product_id', '==', slug));
-        const querySnapshot = await getDocs(q);
-        const fetchedReviews = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setReviews(fetchedReviews);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching reviews: ', error);
-        setLoading(false);
-      }
-    };
-
     fetchReviews();
-  }, [slug]);
+  });
+
+  const handleAddReview = async (reviewData) => {
+    const docRef = doc(db, 'Reviews', `${reviewData.author}-${reviewData.product_id}`);
+    await setDoc(docRef, reviewData);
+    fetchReviews();  
+  };
+
+  const handleDeleteReview = async (reviewId) => {
+    const docRef = doc(db, 'Reviews', reviewId);
+    await deleteDoc(docRef);
+    fetchReviews(); 
+  };
 
   if (loading) {
     return <p>Loading reviews...</p>;
   }
+
+  const reviewValue = reviews.reduce((acc, review) => acc + review.grade, 0) / reviews.length;
 
   return (
     <div>
@@ -61,21 +74,21 @@ const ProductComments = ({ slug }) => {
       <div>
         <div className='flex justify-center mt-4'>
           {session ? (
+            reviews.some(review => review.author === session.user.email) ? (
+              <p className='text-center text-gray-700'>You have already written a review</p>
+            ) : (
             <button
               className='bg-blue-500 text-white px-4 py-1 rounded-lg hover:bg-blue-700 transition-colors'
               onClick={() => setShowReviewForm(!showReviewForm)}
             >
               {showReviewForm ? 'Close review form' : 'Write a review'}
             </button>
-          ) :
+          )) :
             <p className='text-center text-gray-700'>You must be logged in to write a review</p>}
         </div>
-        <div
-          className={`transition-all duration-500 ease-in-out ${showReviewForm ? 'max-h-screen' : 'max-h-0'
-            } overflow-hidden`}
-        >
+        <div className={`transition-all duration-500 ease-in-out ${showReviewForm ? 'max-h-screen' : 'max-h-0'} overflow-hidden`}>
           {showReviewForm && (
-            <ReviewForm setShowReviewForm={setShowReviewForm} />
+            <ReviewForm setShowReviewForm={setShowReviewForm} handleAddReview={handleAddReview} />
           )}
         </div>
         <hr className="my-4 border rounded-full"></hr>
@@ -84,7 +97,7 @@ const ProductComments = ({ slug }) => {
       <div className="mt-4 px-4">
         {reviews.length > 0 ? (
           reviews.map(review => (
-            <ReviewCard key={review.id} review={review} />
+            <ReviewCard key={review.id} review={review} handleDeleteReview={handleDeleteReview} />
           ))
         ) : (
           <p>Seems like no one has said anything yet, be the first to let everyone know what you think!</p>

@@ -1,11 +1,9 @@
-'use client'
+'use client';
 
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { db } from '@/firebaseInit';
-import { doc, setDoc } from 'firebase/firestore';
 
-const ReviewForm = ({ setShowReviewForm }) => {
+const ReviewForm = ({ setShowReviewForm, handleAddReview }) => {
     const { data: session } = useSession();
     const [rating, setRating] = useState(0);
 
@@ -16,10 +14,6 @@ const ReviewForm = ({ setShowReviewForm }) => {
     const handleFormSubmit = async (event) => {
         event.preventDefault();
         const product_id = window.location.pathname.split('/').pop();
-        console.log(`Product ID: ${product_id}
-            Rating: ${rating}
-            Content: ${event.target[0].value}
-            Author: ${session.user.email}`);
 
         const reviewData = {
             author: session.user.email,
@@ -29,13 +23,10 @@ const ReviewForm = ({ setShowReviewForm }) => {
             likes: 0,
             product_id: product_id
         };
-        console.log(reviewData);
-        const docRef = doc(db, 'Reviews', `${session.user.email}-${product_id}`);
-        await setDoc(docRef, reviewData);
-        console.log('Review added to Firestore');
+
+        await handleAddReview(reviewData);
         setShowReviewForm(false);
     };
-    
 
     return (
         <div className='flex flex-col mt-6 gap-4'>
@@ -45,8 +36,7 @@ const ReviewForm = ({ setShowReviewForm }) => {
                     {[...Array(5)].map((_, i) => (
                         <div
                             key={i}
-                            className={`w-4 h-4 rounded-full cursor-pointer ${i < rating ? 'bg-yellow-500' : 'bg-gray-300'
-                                }`}
+                            className={`w-4 h-4 rounded-full cursor-pointer ${i < rating ? 'bg-yellow-500' : 'bg-gray-300'}`}
                             onClick={() => handleRatingChange(i + 1)}
                         ></div>
                     ))}
