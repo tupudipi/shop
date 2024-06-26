@@ -4,11 +4,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faThumbsUp, faTrashAlt } from '@fortawesome/free-regular-svg-icons';
 import { faReply } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { collection, query, where, getDocs, doc, updateDoc, arrayUnion, arrayRemove, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, updateDoc, arrayUnion, arrayRemove, getDoc, addDoc } from 'firebase/firestore';
 import { db } from "@/firebaseInit";
 import Image from 'next/image';
 import { useSession } from 'next-auth/react';
 import ConfirmationModal from './ConfirmationModal';
+import ReplyCard from './ReplyCard';
 
 const ReviewCard = ({ review, handleDeleteReview }) => {
   const { data: session } = useSession();
@@ -17,6 +18,9 @@ const ReviewCard = ({ review, handleDeleteReview }) => {
   const [authorName, setAuthorName] = useState('');
   const [authorImg, setAuthorImg] = useState('');
   const [liked, setLiked] = useState(false);
+  const [showReplies, setShowReplies] = useState(false);
+  const [replies, setReplies] = useState([]);
+  const [likeCount, setLikeCount] = useState(review.likes);
 
   // Memoized fetch functions
   const memoizedFetchAuthorName = useMemo(() => {
@@ -48,26 +52,28 @@ const ReviewCard = ({ review, handleDeleteReview }) => {
   // Memoized handleLike function
   const handleLike = useCallback(async () => {
     if (!session) return;
-
+  
     const reviewRef = doc(db, 'Reviews', review.id);
     const reviewDoc = await getDoc(reviewRef);
-
+  
     if (reviewDoc.exists()) {
       const currentLikes = reviewDoc.data().likes;
       const likedByArray = reviewDoc.data().likedBy || [];
-
+  
       if (liked) {
         await updateDoc(reviewRef, {
           likes: currentLikes - 1,
           likedBy: arrayRemove(session.user.email)
         });
         setLiked(false);
+        setLikeCount(prevCount => prevCount - 1);
       } else {
         await updateDoc(reviewRef, {
           likes: currentLikes + 1,
           likedBy: arrayUnion(session.user.email)
         });
         setLiked(true);
+        setLikeCount(prevCount => prevCount + 1);
       }
     }
   }, [session, review.id, liked]);
@@ -80,7 +86,7 @@ const ReviewCard = ({ review, handleDeleteReview }) => {
       setAuthorImg(img);
 
       if (session) {
-        setLiked(review.likedBy.includes(session.user.email));
+        setLiked((review.likedBy || []).includes(session.user.email));
       }
     };
 
@@ -89,17 +95,45 @@ const ReviewCard = ({ review, handleDeleteReview }) => {
 
   const handleReplySubmit = async (event) => {
     event.preventDefault();
-    const product_id = window.location.pathname.split('/').pop();
-
+    if (!session) return;
+  
     const replyData = {
       author: session.user.email,
-      content: event.target[0].value,
-      date: new Date().toLocaleDateString(),
-      product_id: product_id
+      authorName: session.user.name, 
+      authorImg: session.user.image, 
+      content: event.target.reply.value,
+      date: new Date().toISOString(),
     };
 
-    console.log(`Reply: ${JSON.stringify(replyData)}`);
-  }
+    console.log(replyData);
+  
+    try {
+      const repliesRef = collection(db, 'Reviews', review.id, 'replies');
+      await addDoc(repliesRef, replyData);
+      
+      fetchReplies();
+      
+      event.target.reply.value = '';
+      setShowResponseForm(false);
+    } catch (error) {
+      console.error("Error adding reply: ", error);
+    }
+  };
+
+  const fetchReplies = async () => {
+    try {
+      const repliesRef = collection(db, 'Reviews', review.id, 'replies');
+      const repliesSnapshot = await getDocs(repliesRef);
+      const fetchedReplies = repliesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setReplies(fetchedReplies);
+    } catch (error) {
+      console.error("Error fetching replies: ", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchReplies();
+  }, [review.id]);
 
   const confirmDelete = () => {
     handleDeleteReview(review.id);
@@ -140,7 +174,7 @@ const ReviewCard = ({ review, handleDeleteReview }) => {
 
         <div id="reviewFooter" className="mt-2 flex gap-4">
           <div className="flex gap-2">
-            <p className="pr-2 border-r">{review.likes}</p>
+            <p className="pr-2 border-r">{likeCount}</p>
             <button
               onClick={session ? handleLike : null}
               className={`${session ? '' : 'text-gray-400'}`}
@@ -164,23 +198,42 @@ const ReviewCard = ({ review, handleDeleteReview }) => {
               <FontAwesomeIcon icon={faTrashAlt} className="transition-all ease-in-out hover:text-indigo-700 active:translate-y-1" />
             </button>
           )}
+          <div>
+            <button
+              onClick={() => setShowReplies(!showReplies)}
+              className="text-blue-500 hover:text-blue-700"
+            >
+              {showReplies ? 'Hide Replies' : `Show Replies (${replies.length})`}
+            </button>
+          </div>
         </div>
+        {showResponseForm && (
+          <form onSubmit={handleReplySubmit} className="mt-4">
+            <textarea
+              name="reply"
+              className="w-full p-2 text-gray-700 border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-600 focus:ring-opacity-30 mb-2"
+              rows="3"
+              placeholder="Your reply"
+              required
+            ></textarea>
+            <button
+              type="submit"
+              className="px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-700"
+            >
+              Submit Reply
+            </button>
+          </form>
+        )}
+        {showReplies && (
+          <div className="ml-8 mt-2">
+            {replies.map(reply => (
+              <ReplyCard key={reply.id} reply={reply} />
+            ))}
+          </div>
+        )}
         <div
           className={`transition-all duration-500 ease-in-out ${showResponseForm ? 'max-h-screen' : 'max-h-0'} overflow-hidden`}
         >
-          {showResponseForm && (
-            <div className="mt-4 p-2">
-              <form onSubmit={(event) => handleReplySubmit(event)}>                <textarea
-                className="w-full p-2 text-gray-700 border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-600 focus:ring-opacity-30 mb-2 transition-all m-1"
-                rows="4"
-                placeholder="Your response"
-              ></textarea>
-                <button className="px-4 py-2 mt-2 text-white bg-blue-500 rounded-lg hover:bg-blue-700">
-                  Submit
-                </button>
-              </form>
-            </div>
-          )}
         </div>
       </div>
 

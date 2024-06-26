@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { collection, query, where, getDocs, doc, deleteDoc, setDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, deleteDoc, setDoc, writeBatch } from 'firebase/firestore';
 import { db } from "@/firebaseInit";
 import ReviewCard from './ReviewCard';
 import ReviewForm from './ReviewForm';
@@ -33,14 +33,36 @@ const ProductComments = ({ slug }) => {
 
   const handleAddReview = async (reviewData) => {
     const docRef = doc(db, 'Reviews', `${reviewData.author}-${reviewData.product_id}`);
-    await setDoc(docRef, reviewData);
+    await setDoc(docRef, {
+      ...reviewData,
+      likedBy: [],  
+      likes: 0      
+    });
     fetchReviews();  
   };
 
   const handleDeleteReview = async (reviewId) => {
-    const docRef = doc(db, 'Reviews', reviewId);
-    await deleteDoc(docRef);
-    fetchReviews(); 
+    const batch = writeBatch(db);
+    
+    // Delete the review document
+    const reviewRef = doc(db, 'Reviews', reviewId);
+    batch.delete(reviewRef);
+  
+    // Delete all replies in the subcollection
+    const repliesRef = collection(db, 'Reviews', reviewId, 'replies');
+    const repliesSnapshot = await getDocs(query(repliesRef));
+    repliesSnapshot.forEach((replyDoc) => {
+      batch.delete(doc(repliesRef, replyDoc.id));
+    });
+  
+    // Commit the batch
+    try {
+      await batch.commit();
+      console.log("Review and all replies deleted successfully");
+      fetchReviews(); // Refresh the reviews list
+    } catch (error) {
+      console.error("Error deleting review and replies: ", error);
+    }
   };
 
   if (loading) {
