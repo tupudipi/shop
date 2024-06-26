@@ -1,7 +1,7 @@
 'use client';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFlag, faThumbsUp, faTrashAlt } from '@fortawesome/free-regular-svg-icons';
+import { faThumbsUp, faTrashAlt } from '@fortawesome/free-regular-svg-icons';
 import { faReply } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useState } from 'react';
 import { collection, query, where, getDocs, doc, updateDoc, arrayUnion, arrayRemove, getDoc } from 'firebase/firestore';
@@ -24,6 +24,7 @@ const fetchAuthorImg = async (author) => {
   return querySnapshot.docs[0].data().image;
 };
 
+
 const ReviewCard = ({ review, handleDeleteReview }) => {
   const { data: session } = useSession();
   const [showResponseForm, setShowResponseForm] = useState(false);
@@ -31,6 +32,20 @@ const ReviewCard = ({ review, handleDeleteReview }) => {
   const [authorName, setAuthorName] = useState('');
   const [authorImg, setAuthorImg] = useState('');
   const [liked, setLiked] = useState(false);
+
+  const handleReplySubmit = async (event) => {
+    event.preventDefault();
+    const product_id = window.location.pathname.split('/').pop();
+  
+    const replyData = {
+      author: session.user.email,
+      content: event.target[0].value,
+      date: new Date().toLocaleDateString(),
+      product_id: product_id
+    };
+  
+    console.log(`Reply: ${JSON.stringify(replyData)}`);
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -143,14 +158,15 @@ const ReviewCard = ({ review, handleDeleteReview }) => {
         >
           {showResponseForm && (
             <div className="mt-4 p-2">
-              <textarea
+              <form onSubmit={(event) => handleReplySubmit(event)}>                <textarea
                 className="w-full p-2 text-gray-700 border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-600 focus:ring-opacity-30 mb-2 transition-all m-1"
                 rows="4"
                 placeholder="Your response"
               ></textarea>
-              <button className="px-4 py-2 mt-2 text-white bg-blue-500 rounded-lg hover:bg-blue-700">
-                Submit
-              </button>
+                <button className="px-4 py-2 mt-2 text-white bg-blue-500 rounded-lg hover:bg-blue-700">
+                  Submit
+                </button>
+              </form>
             </div>
           )}
         </div>
