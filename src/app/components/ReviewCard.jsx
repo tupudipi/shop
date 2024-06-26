@@ -3,27 +3,12 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faThumbsUp, faTrashAlt } from '@fortawesome/free-regular-svg-icons';
 import { faReply } from '@fortawesome/free-solid-svg-icons';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { collection, query, where, getDocs, doc, updateDoc, arrayUnion, arrayRemove, getDoc } from 'firebase/firestore';
 import { db } from "@/firebaseInit";
 import Image from 'next/image';
 import { useSession } from 'next-auth/react';
 import ConfirmationModal from './ConfirmationModal';
-
-const fetchAuthorName = async (author) => {
-  const usersCollection = collection(db, 'Users');
-  const q = query(usersCollection, where('email', '==', author));
-  const querySnapshot = await getDocs(q);
-  return querySnapshot.docs[0].data().name;
-};
-
-const fetchAuthorImg = async (author) => {
-  const usersCollection = collection(db, 'Users');
-  const q = query(usersCollection, where('email', '==', author));
-  const querySnapshot = await getDocs(q);
-  return querySnapshot.docs[0].data().image;
-};
-
 
 const ReviewCard = ({ review, handleDeleteReview }) => {
   const { data: session } = useSession();
@@ -33,36 +18,35 @@ const ReviewCard = ({ review, handleDeleteReview }) => {
   const [authorImg, setAuthorImg] = useState('');
   const [liked, setLiked] = useState(false);
 
-  const handleReplySubmit = async (event) => {
-    event.preventDefault();
-    const product_id = window.location.pathname.split('/').pop();
-  
-    const replyData = {
-      author: session.user.email,
-      content: event.target[0].value,
-      date: new Date().toLocaleDateString(),
-      product_id: product_id
+  // Memoized fetch functions
+  const memoizedFetchAuthorName = useMemo(() => {
+    const cache = new Map();
+    return async (author) => {
+      if (cache.has(author)) return cache.get(author);
+      const usersCollection = collection(db, 'Users');
+      const q = query(usersCollection, where('email', '==', author));
+      const querySnapshot = await getDocs(q);
+      const name = querySnapshot.docs[0].data().name;
+      cache.set(author, name);
+      return name;
     };
-  
-    console.log(`Reply: ${JSON.stringify(replyData)}`);
-  }
+  }, []);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const name = await fetchAuthorName(review.author);
-      setAuthorName(name);
-      const img = await fetchAuthorImg(review.author);
-      setAuthorImg(img);
-
-      if (session) {
-        setLiked(review.likedBy.includes(session.user.email));
-      }
+  const memoizedFetchAuthorImg = useMemo(() => {
+    const cache = new Map();
+    return async (author) => {
+      if (cache.has(author)) return cache.get(author);
+      const usersCollection = collection(db, 'Users');
+      const q = query(usersCollection, where('email', '==', author));
+      const querySnapshot = await getDocs(q);
+      const image = querySnapshot.docs[0].data().image;
+      cache.set(author, image);
+      return image;
     };
+  }, []);
 
-    fetchData();
-  }, [review.author, review.likedBy, session]);
-
-  const handleLike = async () => {
+  // Memoized handleLike function
+  const handleLike = useCallback(async () => {
     if (!session) return;
 
     const reviewRef = doc(db, 'Reviews', review.id);
@@ -86,13 +70,41 @@ const ReviewCard = ({ review, handleDeleteReview }) => {
         setLiked(true);
       }
     }
-  };
+  }, [session, review.id, liked]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const name = await memoizedFetchAuthorName(review.author);
+      setAuthorName(name);
+      const img = await memoizedFetchAuthorImg(review.author);
+      setAuthorImg(img);
+
+      if (session) {
+        setLiked(review.likedBy.includes(session.user.email));
+      }
+    };
+
+    fetchData();
+  }, [review.author, review.likedBy, session, memoizedFetchAuthorName, memoizedFetchAuthorImg]);
+
+  const handleReplySubmit = async (event) => {
+    event.preventDefault();
+    const product_id = window.location.pathname.split('/').pop();
+
+    const replyData = {
+      author: session.user.email,
+      content: event.target[0].value,
+      date: new Date().toLocaleDateString(),
+      product_id: product_id
+    };
+
+    console.log(`Reply: ${JSON.stringify(replyData)}`);
+  }
 
   const confirmDelete = () => {
     handleDeleteReview(review.id);
     setShowModal(false);
   };
-
   return (
     <div className="mb-6 md:flex md:gap-6 border-b pb-4">
       <div id="reviewHeader" className="flex flex-col gap-1 md:max-w-36 text-center">

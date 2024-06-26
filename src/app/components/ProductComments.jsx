@@ -29,7 +29,7 @@ const ProductComments = ({ slug }) => {
 
   useEffect(() => {
     fetchReviews();
-  }), [];
+  }, [slug]);
 
   const handleAddReview = async (reviewData) => {
     const docRef = doc(db, 'Reviews', `${reviewData.author}-${reviewData.product_id}`);
