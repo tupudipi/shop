@@ -150,7 +150,7 @@ const ReviewCard = ({ review, handleDeleteReview }) => {
             <p className='truncate'>{authorName}</p>
           </div>
         </div>
-        <div id="date" className="text-gray-700">
+        <div id="date" className="text-gray-700 text-start md:text-center text-sm">
           <p>{review.date.toLocaleString()}</p>
         </div>
       </div>
@@ -173,7 +173,7 @@ const ReviewCard = ({ review, handleDeleteReview }) => {
         </div>
 
         <div id="reviewFooter" className="mt-2 flex gap-4">
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
             <p className="pr-2 border-r">{likeCount}</p>
             <button
               onClick={session ? handleLike : null}
@@ -182,7 +182,7 @@ const ReviewCard = ({ review, handleDeleteReview }) => {
             >
               <FontAwesomeIcon
                 icon={faThumbsUp}
-                className={`${session ? 'hover:text-indigo-700 active:translate-y-1' : ''} transition-all ease-in-out ${liked ? 'text-blue-400 filter drop-shadow-[0_0_2px_rgba(59,130,246,0.6)] drop-shadow-[0_0_8px_rgba(59,130,246,0.8)] drop-shadow-[0_0_16px_rgba(59,130,246,0.5)]' : ''}`}
+                className={`${session ? 'hover:text-indigo-700 active:translate-y-1' : ''} transition-all ease-in-out ${liked ? 'text-blue-400 filter drop-shadow-[0_0_2px_rgba(59,130,246,0.6)]' : ''}`}
               />
             </button>
           </div>
@@ -201,7 +201,7 @@ const ReviewCard = ({ review, handleDeleteReview }) => {
           <div>
             <button
               onClick={() => setShowReplies(!showReplies)}
-              className="text-blue-500 hover:text-blue-700"
+              className="text-blue-500 hover:text-blue-700 text-sm"
             >
               {showReplies ? 'Hide Replies' : `Show Replies (${replies.length})`}
             </button>

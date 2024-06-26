@@ -12,7 +12,7 @@ const ReplyCard = ({ reply }) => {
           width={24} 
           height={24} 
         />
-        <span className="font-semibold">{reply.authorName || reply.author}</span>
+        <span>{reply.authorName || reply.author}</span>
       </div>
       <p className="text-sm">{reply.content}</p>
       <p className="text-xs text-gray-500 mt-1">{new Date(reply.date).toLocaleString()}</p>
