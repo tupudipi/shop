@@ -33,7 +33,7 @@ const ProductPage = async ({ params }) => {
         <div className="overflow-x-clip">
             <Navbar />
             <main className="container mx-auto px-4 md:px-8">
-                <ReviewProvider>
+                <ReviewProvider initialReviewValue={product.reviewValue} initialReviewCount={product.reviewCount}>
                     <div id="product" className="flex flex-col md:grid md:grid-cols-2 gap-4 bg-white/80 border shadow rounded-lg p-8">
                         <div className="grid place-content-center">
                             <Image src={product.image} alt={product.name} objectFit="cover" className="rounded-lg shadow-lg"
