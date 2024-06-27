@@ -25,7 +25,7 @@ const ProductCard = ({ product, isFav, isCart }) => {
         <Link href={`/products/${product.slug}`}>
           <h3 className="text-lg text-start">{product.name}</h3>
         </Link>
-        <div id="star-review" className="flex justify-between gap-3">
+        <div id="star-review" className="flex justify-between items-center gap-1 md:gap-3">
           <div className="flex gap-1">
             {[...Array(Math.floor(reviewValue))].map((_, i) => (
               <div key={i} className="w-4 h-4 bg-yellow-500 rounded-full"></div>
@@ -40,7 +40,7 @@ const ProductCard = ({ product, isFav, isCart }) => {
             ))}
           </div>
           <p className="text-sm">
-            {reviewValue.toFixed(1)} <span className="text-gray-500">({reviewCount})</span>
+            {reviewValue}<span className="text-gray-500">({reviewCount})</span>
           </p>
         </div>
         <div className="flex flex-col gap-2">
