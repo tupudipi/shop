@@ -1,17 +1,19 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { collection, query, where, getDocs, doc, deleteDoc, setDoc, writeBatch } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, deleteDoc, setDoc, writeBatch, getDoc } from 'firebase/firestore';
 import { db } from "@/firebaseInit";
 import ReviewCard from './ReviewCard';
 import ReviewForm from './ReviewForm';
 import { useSession } from 'next-auth/react';
+import { useReview } from '@/context/ReviewContext';
 
 const ProductComments = ({ slug }) => {
   const { data: session } = useSession();
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { updateReview } = useReview();
 
   const fetchReviews = async () => {
     try {
@@ -33,33 +35,80 @@ const ProductComments = ({ slug }) => {
 
   const handleAddReview = async (reviewData) => {
     const docRef = doc(db, 'Reviews', `${reviewData.author}-${reviewData.product_id}`);
+    const productRef = doc(db, 'Products', reviewData.product_id);
+
+    // Add the new review to the Reviews collection
     await setDoc(docRef, {
       ...reviewData,
-      likedBy: [],  
-      likes: 0      
+      likedBy: [],
+      likes: 0
     });
-    fetchReviews();  
+
+    // Fetch all reviews for the specific product to calculate the new review value
+    const reviewsRef = collection(db, 'Reviews');
+    const q = query(reviewsRef, where('product_id', '==', reviewData.product_id));
+    const querySnapshot = await getDocs(q);
+
+    let totalRating = 0;
+    let reviewCount = 0;
+
+    querySnapshot.forEach((doc) => {
+      const review = doc.data();
+      if (!isNaN(review.grade)) {
+        totalRating += review.grade;
+        reviewCount += 1;
+      }
+    });
+
+    const newReviewValue = reviewCount > 0 ? totalRating / reviewCount : 0;
+
+    // Update the product document with the new review count and review value
+    await setDoc(productRef, {
+      reviewCount: reviewCount,
+      reviewValue: newReviewValue
+    }, { merge: true });
+    updateReview(reviewData.grade, reviews.length + 1);
+
+    fetchReviews();
   };
 
-  const handleDeleteReview = async (reviewId) => {
+  const handleDeleteReview = async (reviewId, product_id, reviewRating) => {
+    console.log('Deleting review:', reviewId);
+    console.log('Product ID:', product_id);
+    console.log('Review Rating:', reviewRating);
+
     const batch = writeBatch(db);
-    
-    // Delete the review document
-    const reviewRef = doc(db, 'Reviews', reviewId);
-    batch.delete(reviewRef);
-  
-    // Delete all replies in the subcollection
-    const repliesRef = collection(db, 'Reviews', reviewId, 'replies');
-    const repliesSnapshot = await getDocs(query(repliesRef));
-    repliesSnapshot.forEach((replyDoc) => {
-      batch.delete(doc(repliesRef, replyDoc.id));
-    });
-  
-    // Commit the batch
+
     try {
+      const reviewRef = doc(db, 'Reviews', reviewId);
+      batch.delete(reviewRef);
+
+      const repliesRef = collection(db, 'Reviews', reviewId, 'replies');
+      const repliesSnapshot = await getDocs(query(repliesRef));
+      repliesSnapshot.forEach((replyDoc) => {
+        batch.delete(doc(repliesRef, replyDoc.id));
+      });
+
+      const productRef = doc(db, 'Products', product_id);
+      const productDoc = await getDoc(productRef);
+
+      if (productDoc.exists()) {
+        const productData = productDoc.data();
+        const newReviewCount = (productData.reviewCount || 0) - 1;
+        const newReviewValue = newReviewCount > 0 ? ((productData.reviewValue || 0) * (productData.reviewCount || 0) - reviewRating) / newReviewCount : 0;
+        updateReview(newReviewValue, newReviewCount);
+
+        batch.set(productRef, {
+          reviewCount: newReviewCount,
+          reviewValue: newReviewValue
+        }, { merge: true });
+      } else {
+        console.error("Product does not exist");
+      }
+
       await batch.commit();
       console.log("Review and all replies deleted successfully");
-      fetchReviews(); // Refresh the reviews list
+      fetchReviews();
     } catch (error) {
       console.error("Error deleting review and replies: ", error);
     }
@@ -99,18 +148,18 @@ const ProductComments = ({ slug }) => {
             reviews.some(review => review.author === session.user.email) ? (
               <p className='text-center text-gray-700'>You have already written a review for this product</p>
             ) : (
-            <button
-              className='bg-blue-500 text-white px-4 py-1 rounded-lg hover:bg-blue-700 transition-colors'
-              onClick={() => setShowReviewForm(!showReviewForm)}
-            >
-              {showReviewForm ? 'Close review form' : 'Write a review'}
-            </button>
-          )) :
+              <button
+                className='bg-blue-500 text-white px-4 py-1 rounded-lg hover:bg-blue-700 transition-colors'
+                onClick={() => setShowReviewForm(!showReviewForm)}
+              >
+                {showReviewForm ? 'Close review form' : 'Write a review'}
+              </button>
+            )) :
             <p className='text-center text-gray-700'>You must be logged in to write a review</p>}
         </div>
         <div className={`transition-all duration-500 ease-in-out ${showReviewForm ? 'max-h-screen' : 'max-h-0'} overflow-hidden`}>
           {showReviewForm && (
-            <ReviewForm setShowReviewForm={setShowReviewForm} handleAddReview={handleAddReview} />
+            <ReviewForm setShowReviewForm={setShowReviewForm} handleAddReview={handleAddReview}  />
           )}
         </div>
         <hr className="my-4 border rounded-full"></hr>
@@ -119,7 +168,7 @@ const ProductComments = ({ slug }) => {
       <div className="mt-4 px-4">
         {reviews.length > 0 ? (
           reviews.map(review => (
-            <ReviewCard key={review.id} review={review} handleDeleteReview={handleDeleteReview} />
+            <ReviewCard key={review.id} review={review} handleDeleteReview={handleDeleteReview} product_id={slug}/>
           ))
         ) : (
           <p>Seems like no one has said anything yet, be the first to let everyone know what you think!</p>

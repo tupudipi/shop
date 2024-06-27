@@ -11,7 +11,7 @@ import { useSession } from 'next-auth/react';
 import ConfirmationModal from './ConfirmationModal';
 import ReplyCard from './ReplyCard';
 
-const ReviewCard = ({ review, handleDeleteReview }) => {
+const ReviewCard = ({ review, handleDeleteReview, product_id }) => {
   const { data: session } = useSession();
   const [showResponseForm, setShowResponseForm] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -136,7 +136,7 @@ const ReviewCard = ({ review, handleDeleteReview }) => {
   }, [review.id]);
 
   const confirmDelete = () => {
-    handleDeleteReview(review.id);
+    handleDeleteReview(review.id, product_id, review.rating);
     setShowModal(false);
   };
   return (
