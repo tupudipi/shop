@@ -5,12 +5,12 @@ import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import WishListDrowpdown from './WishListDropdown';
 import CartDropdown from './CartDropdown';
 import LoginButton from './LoginButton';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
+import Search from './Search';
 
 async function getCategories() {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/categories`, {
@@ -31,7 +31,7 @@ const Sidebar = ({ closeSidebar, sidebarOpen, categories }) => {
                     <Link href='/account' >
                         <div className='hover:text-indigo-950 transition-all mb-2'>
                             <div className='flex gap-1'>
-                                 <Image width={24} height={24} alt='User' src={session.user.image}/>
+                                <Image width={24} height={24} alt='User' src={session.user.image} />
                                 <p className='mb-1'>{session.user.name}</p>
                             </div>
                         </div>
@@ -92,12 +92,7 @@ const Navbar = () => {
                 </div>
                 <div className="mt-2 relative">
                     <Sidebar closeSidebar={() => setSidebarOpen(false)} sidebarOpen={sidebarOpen} categories={categories} />
-                    <input className="w-full p-2 px-4 rounded-full pr-0 shadow active:shadow-md" type="search" placeholder="Search..." />
-                    <div
-                        className="absolute top-1/2 transform -translate-y-1/2 right-0 h-5 w-5 text-gray-500 flex items-center justify-center cursor-pointer hover:bg-sky-100 p-5 rounded-r-full hover:text-indigo-900 transition-all"
-                    >
-                        <FontAwesomeIcon icon={faSearch} />
-                    </div>
+                    <Search />
                 </div>
             </div>
         </nav>
