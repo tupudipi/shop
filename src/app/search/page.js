@@ -1,7 +1,9 @@
+// /search/page.js
+
 import ProductCard from "@/app/components/ProductCard";
 
-async function fetchAllProducts() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products/`, { cache: 'no-store' });
+async function fetchAllProducts(sort, order) {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products?sort=${sort}&order=${order}`, { cache: 'no-store' });
   if (!res.ok) {
     console.error("Failed to fetch products, response:", res); 
     throw new Error('Failed to fetch products');
@@ -17,8 +19,8 @@ export async function generateMetadata() {
   };
 }
 
-export default async function SearchPage() {
-  const products = await fetchAllProducts();
+export default async function SearchPage({ sort, order }) {
+  const products = await fetchAllProducts(sort, order);
 
   return (
     <div>
@@ -30,3 +32,4 @@ export default async function SearchPage() {
     </div>
   );
 }
+``
