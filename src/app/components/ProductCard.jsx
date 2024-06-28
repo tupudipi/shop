@@ -1,8 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
 import ProductCardQuantityClientElement from "./ProductCardQuantityClientElement";
+import ProductActionButtonsClientElement from "./ProductActionButtonsClientElement";
 
-const ProductCard = ({ product, isFav, isCart }) => {
+const ProductCard = ({ product, isCart }) => {
   const reviewValue = Number(product.reviewValue) || 0;
   const reviewCount = product.reviewCount || 0;
   const lastStarWidth = `${(reviewValue % 1) * 100}%`;
@@ -48,12 +49,8 @@ const ProductCard = ({ product, isFav, isCart }) => {
           {isCart ? (
             <ProductCardQuantityClientElement product={product}/>
           ) : (
-          <button className="bg-blue-500 text-white px-4 py-1 rounded-lg hover:bg-blue-700 transition-colors">Add to Cart</button>
+            <ProductActionButtonsClientElement product={product}/>
           )}
-
-          {isFav ? (
-            <button className="text-red-500 hover:text-red-600 hover:underline transition-all">Delete</button>
-          ) : null}
         </div>
       </div>
     </div>

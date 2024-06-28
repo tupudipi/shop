@@ -23,7 +23,7 @@ async function fetchProductsByCategoryId(categoryId, sort, order) {
 
 export async function generateMetadata({ params }) {
   const categoryId = await fetchCategoryId(params.category);
-  const products = await fetchProductsByCategoryId(categoryId, 'name', 'asc'); // default sorting
+  const products = await fetchProductsByCategoryId(categoryId, 'name', 'asc'); 
 
   return {
     title: `Cico ${params.category}`,

@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-const FiltersClient = ({ categories }) => {
+const FiltersClient = ({ initialCategories }) => {
+  const [categories, setCategories] = useState(initialCategories);
   const [active, setActive] = useState(categories[0]?.category_name || '');
   const [openSelect, setOpenSelect] = useState(false);
   const ref = useRef(null);
@@ -17,7 +18,6 @@ const FiltersClient = ({ categories }) => {
         setOpenSelect(false);
       }
     };
-
     window.addEventListener('click', handleClickOutside);
     return () => window.removeEventListener('click', handleClickOutside);
   }, []);

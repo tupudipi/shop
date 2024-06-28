@@ -36,15 +36,20 @@ export const CartProvider = ({ children }) => {
             const existingProductIndex = cart.findIndex(item => item.slug === product.slug);
             if (existingProductIndex !== -1) {
                 const existingProduct = cart[existingProductIndex];
-                const updatedProduct = { ...existingProduct, quantity: existingProduct.quantity + product.quantity };
+                // Ensure quantities are numbers and default to 1 if not
+                const existingQuantity = Number(existingProduct.quantity) || 1;
+                const addQuantity = Number(product.quantity) || 1;
+                const updatedProduct = { ...existingProduct, quantity: existingQuantity + addQuantity };
                 const docRef = doc(db, 'Carts', existingProduct.id);
                 await updateDoc(docRef, updatedProduct);
                 const updatedCart = [...cart];
                 updatedCart[existingProductIndex] = updatedProduct;
                 setCart(updatedCart);
             } else {
-                const docRef = await addDoc(collection(db, 'Carts'), { ...product, user_id: session.user.email });
-                const newProduct = { ...product, id: docRef.id };
+                // Ensure product.quantity is a number and default to 1 if not
+                const productQuantity = Number(product.quantity) || 1;
+                const docRef = await addDoc(collection(db, 'Carts'), { ...product, user_id: session.user.email, quantity: productQuantity });
+                const newProduct = { ...product, id: docRef.id, quantity: productQuantity };
                 const updatedCart = [...cart, newProduct];
                 setCart(updatedCart);
             }
@@ -52,11 +57,16 @@ export const CartProvider = ({ children }) => {
             const existingProduct = cart.find(item => item.slug === product.slug);
             let updatedCart;
             if (existingProduct) {
+                // Ensure quantities are numbers and default to 1 if not
+                const existingQuantity = Number(existingProduct.quantity) || 1;
+                const addQuantity = Number(product.quantity) || 1;
                 updatedCart = cart.map(item =>
-                    item.slug === product.slug ? { ...item, quantity: item.quantity + product.quantity } : item
+                    item.slug === product.slug ? { ...item, quantity: existingQuantity + addQuantity } : item
                 );
             } else {
-                updatedCart = [...cart, product];
+                // Ensure product.quantity is a number and default to 1 if not
+                const productQuantity = Number(product.quantity) || 1;
+                updatedCart = [...cart, { ...product, quantity: productQuantity }];
             }
             setCart(updatedCart);
             localStorage.setItem('cart', JSON.stringify(updatedCart));
