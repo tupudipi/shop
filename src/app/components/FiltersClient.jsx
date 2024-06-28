@@ -4,14 +4,33 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-const FiltersClient = ({ initialCategories }) => {
-  const [categories, setCategories] = useState(initialCategories);
+const FiltersClient = () => {
+  const [categories, setCategories] = useState([]);
   const [active, setActive] = useState('');
   const [openSelect, setOpenSelect] = useState(false);
   const ref = useRef(null);
   const pathname = usePathname();
   const currentCategory = pathname.split('/')[2] || '';
   const isAllProducts = pathname === '/search' || pathname === '/search/';
+
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const res = await fetch(`/api/categories`, {
+          cache: 'no-store',
+        });
+        if (!res.ok) {
+          throw new Error('Failed to fetch categories');
+        }
+        const data = await res.json();
+        setCategories(data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    }
+
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {

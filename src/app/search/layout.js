@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import Navbar from '../components/Navbar';
-import Filters from '../components/Filters';
+import FiltersClient from '../components/FiltersClient';
 
 
 export default function RootLayout({ children }) {
@@ -15,7 +15,7 @@ export default function RootLayout({ children }) {
       <Navbar />
       <main className="flex flex-col md:flex-row w-full container mx-auto">
         <div className="text-center md:min-w-1/4 p-4">
-          <Filters />
+          <FiltersClient />
         </div>
         <div className="flex-grow text-center p-4">
           <div id="sorting">
