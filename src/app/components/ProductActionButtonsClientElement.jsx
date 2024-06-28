@@ -26,7 +26,7 @@ const ProductActionButtonsClientElement = ({ product }) => {
   };
 
   return (
-    <div className="flex gap-2">
+    <div className="flex flex-col gap-2 justify-end">
       <button
         className="bg-blue-500 text-white px-4 py-1 rounded-lg hover:bg-blue-700 transition-colors"
         onClick={handleAddToCart}

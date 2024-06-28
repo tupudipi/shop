@@ -22,7 +22,7 @@ const ProductCard = ({ product, isCart }) => {
           />
         </div>
       </Link>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 justify-between h-[100%]">
         <Link href={`/products/${product.slug}`}>
           <h3 className="text-lg text-start">{product.name}</h3>
         </Link>
@@ -44,7 +44,7 @@ const ProductCard = ({ product, isCart }) => {
             {reviewValue}<span className="text-gray-500">({reviewCount})</span>
           </p>
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 justify-between">
           <p className="font-bold text-start">${product.price.toFixed(2)}</p>
           {isCart ? (
             <ProductCardQuantityClientElement product={product}/>
