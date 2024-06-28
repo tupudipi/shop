@@ -12,7 +12,7 @@ async function fetchCategoryId(slug) {
 }
 
 async function fetchProductsByCategoryId(categoryId, sort, order) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products/category/${categoryId}?sort=${sort}&order=${order}`, { cache: 'no-store' });
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products/category/${categoryId}`, { cache: 'no-store' });
   if (!res.ok) {
     console.error("Failed to fetch products, response:", res);
     throw new Error('Failed to fetch products');

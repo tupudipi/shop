@@ -6,7 +6,7 @@ import { collection, getDocs, query, where, orderBy } from "firebase/firestore";
 export default async function handler(req, res) {
   if (req.method === 'GET') {
     try {
-      const { id, sort = "name", order = "asc" } = req.query;
+      const { id } = req.query;
       if (!id) {
         return res.status(400).json({ error: "Category ID is required" });
       }
@@ -14,7 +14,6 @@ export default async function handler(req, res) {
       const q = query(
         collection(db, "Products"), 
         where("category_id", "==", +id),
-        orderBy(sort, order)
       );
 
       const querySnapshot = await getDocs(q);
