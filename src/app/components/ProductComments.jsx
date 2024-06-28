@@ -62,7 +62,6 @@ const ProductComments = ({ slug }) => {
 
     const newReviewValue = reviewCount > 0 ? totalRating / reviewCount : 0;
 
-    // Update the product document with the new review count and review value
     await setDoc(productRef, {
       reviewCount: reviewCount,
       reviewValue: newReviewValue

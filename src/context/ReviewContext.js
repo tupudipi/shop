@@ -6,7 +6,7 @@ const ReviewContext = createContext();
 
 export const useReview = () => useContext(ReviewContext);
 
-export const ReviewProvider = ({ children, initialReviewValue = 0, initialReviewCount = 0 }) => {
+export const ReviewProvider = ({ children, initialReviewValue, initialReviewCount }) => {
   const [reviewValue, setReviewValue] = useState(initialReviewValue);
   const [reviewCount, setReviewCount] = useState(initialReviewCount);
 

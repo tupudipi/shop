@@ -3,6 +3,7 @@ import { useReview } from "@/context/ReviewContext"
 
 const ProductReviewClient = () => {
     const { reviewValue, reviewCount } = useReview()
+    const localLastStarWidth = `${(reviewValue % 1) * 100}%`;
 
     return (
         <div className="flex gap-4 align-middle">
@@ -19,7 +20,7 @@ const ProductReviewClient = () => {
                     <div key={i} className="w-4 h-4 bg-gray-300 rounded-full"></div>
                 ))}
             </div>
-            <p className="text-sm">{reviewValue.toFixed(1)} <span className="text-gray-500">({reviewCount})</span></p>
+            <p className="text-sm">{reviewValue} <span className="text-gray-500">({reviewCount})</span></p>
         </div>
     )
 }
