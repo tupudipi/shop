@@ -23,13 +23,11 @@ export default async function SearchPage({ sort, order }) {
   const products = await fetchAllProducts(sort, order);
 
   return (
-    <div>
-      <div className="flex flex-col md:flex-row px-12 md:px-0 flex-wrap gap-4 mt-2">
+      <div className="flex flex-wrap gap-4 mt-2 justify-center md:justify-normal">
         {products.map((product) => (
           <ProductCard key={product.slug} product={product} />
         ))}
       </div>
-    </div>
   );
 }
 ``

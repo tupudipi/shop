@@ -1,5 +1,4 @@
 // Filters.js (Server Component)
-import { Suspense } from 'react';
 import FiltersClient from './FiltersClient';
 
 async function getCategories() {
@@ -19,8 +18,6 @@ export default async function Filters() {
   const categories = await getCategories();
 
   return (
-    <Suspense fallback={<div>Loading categories...</div>}>
       <FiltersClient initialCategories={categories} />
-    </Suspense>
   );
 }

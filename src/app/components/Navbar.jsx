@@ -40,6 +40,8 @@ const Sidebar = ({ closeSidebar, sidebarOpen, categories }) => {
                 </div>
             )}
             <ul className='flex flex-col gap-2 mt-2'>
+                <Link href='/search' className='hover:text-indigo-950 transition-all'>All products</Link>
+                <hr></hr>
                 {categories.map((category) => (
                     <li className='flex hover:text-indigo-950 transition-all' key={category.category_name}>
                         <Link href={`/search/${category.category_name}`} className='w-full'>{category.category_name}</Link>

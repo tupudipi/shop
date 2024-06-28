@@ -6,11 +6,12 @@ import { usePathname } from 'next/navigation';
 
 const FiltersClient = ({ initialCategories }) => {
   const [categories, setCategories] = useState(initialCategories);
-  const [active, setActive] = useState(categories[0]?.category_name || '');
+  const [active, setActive] = useState('');
   const [openSelect, setOpenSelect] = useState(false);
   const ref = useRef(null);
   const pathname = usePathname();
   const currentCategory = pathname.split('/')[2] || '';
+  const isAllProducts = pathname === '/search' || pathname === '/search/';
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -21,6 +22,15 @@ const FiltersClient = ({ initialCategories }) => {
     window.addEventListener('click', handleClickOutside);
     return () => window.removeEventListener('click', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (pathname === '/search' || pathname === '/search/') {
+      setActive('All Products');
+    } else {
+      const currentCategory = pathname.split('/')[2];
+      setActive(currentCategory || 'All Products');
+    }
+  }, [pathname]);
 
   return (
     <>
@@ -41,9 +51,20 @@ const FiltersClient = ({ initialCategories }) => {
             }}
             className="absolute z-40 w-full rounded-b-md bg-white/95 p-4 shadow-md transition-all"
           >
+            <Link href={`/search`}>
+              <p
+                className="block p-2 hover:bg-indigo-200/75 cursor-pointer rounded-md transition-all hover:shadow text-start"
+                onClick={() => setActive('All Products')}
+              >
+                All Products
+              </p>
+            </Link>
             {categories.map((category, i) => (
               <Link key={i} href={`/search/${category.category_name}`}>
-                <p onClick={() => setActive(category.category_name)} className="block p-2 hover:bg-indigo-200/75 cursor-pointer rounded-md transition-all hover:shadow text-start">
+                <p
+                  onClick={() => setActive(category.category_name)}
+                  className="block p-2 hover:bg-indigo-200/75 cursor-pointer rounded-md transition-all hover:shadow text-start"
+                >
                   {category.category_name}
                 </p>
               </Link>
@@ -55,6 +76,11 @@ const FiltersClient = ({ initialCategories }) => {
       {/* Desktop view */}
       <div className="hidden md:block">
         <ul className="bg-white p-2 rounded-lg border-2 self-start min-w-32">
+          <Link href={`/search/`}>
+            <p className={`my-1 p-2 hover:bg-indigo-200/75 cursor-pointer rounded-md transition-all hover:shadow text-start ${isAllProducts ? 'bg-indigo-200' : ''}`}>
+              All Products
+            </p>
+          </Link>
           {categories.map((category) => (
             <Link key={category.category_name} href={`/search/${category.category_name}`}>
               <li className={`my-1 p-2 hover:bg-indigo-200/75 cursor-pointer rounded-md transition-all hover:shadow text-start ${currentCategory === category.category_name ? 'bg-indigo-200' : ''}`}>

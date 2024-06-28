@@ -14,7 +14,7 @@ export default function RootLayout({ children }) {
     <>
       <Navbar />
       <main className="flex flex-col md:flex-row w-full container mx-auto">
-        <div className="text-center md:w-1/5 p-4">
+        <div className="text-center md:min-w-1/4 p-4">
           <Filters />
         </div>
         <div className="flex-grow text-center p-4">
