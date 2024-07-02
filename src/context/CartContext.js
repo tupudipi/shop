@@ -2,7 +2,7 @@
 
 import { createContext, useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { collection, query, where, getDocs, addDoc, updateDoc, doc, deleteDoc, increment } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, addDoc, updateDoc, doc, deleteDoc, getDocs } from 'firebase/firestore';
 import { db } from "@/firebaseInit";
 
 export const CartContext = createContext();
@@ -12,58 +12,76 @@ export const CartProvider = ({ children }) => {
     const [cart, setCart] = useState([]);
 
     useEffect(() => {
-        const fetchCart = async () => {
-            if (session) {
-                const q = query(collection(db, 'Carts'), where('user_id', '==', session.user.email));
-                const querySnapshot = await getDocs(q);
-                const cartData = [];
-                querySnapshot.forEach((doc) => {
-                    cartData.push({ id: doc.id, ...doc.data() });
-                });
+        let unsubscribe;
+        if (session) {
+            const q = query(collection(db, 'Carts'), where('user_id', '==', session.user.email));
+            unsubscribe = onSnapshot(q, (querySnapshot) => {
+                const cartData = querySnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
                 setCart(cartData);
-            } else {
-                const storedCart = localStorage.getItem('cart');
-                if (storedCart) {
-                    setCart(JSON.parse(storedCart));
-                }
+            });
+        } else {
+            const storedCart = localStorage.getItem('cart');
+            if (storedCart) {
+                setCart(JSON.parse(storedCart));
             }
-        };
-        fetchCart();
+        }
+        return () => unsubscribe && unsubscribe();
     }, [session]);
 
     const addToCart = async (product) => {
         if (session) {
-            const existingProductIndex = cart.findIndex(item => item.slug === product.slug);
-            if (existingProductIndex !== -1) {
-                const existingProduct = cart[existingProductIndex];
-                const existingQuantity = Number(existingProduct.quantity) || 1;
-                const addQuantity = Number(product.quantity) || 1;
-                const updatedProduct = { ...existingProduct, quantity: existingQuantity + addQuantity };
-                const docRef = doc(db, 'Carts', existingProduct.id);
+            const q = query(collection(db, 'Carts'), where('user_id', '==', session.user.email), where('slug', '==', product.slug));
+            const querySnapshot = await getDocs(q);
+
+            if (!querySnapshot.empty) {
+                const existingDoc = querySnapshot.docs[0];
+                const existingProduct = existingDoc.data();
+                const updatedProduct = { 
+                    ...existingProduct, 
+                    quantity: (existingProduct.quantity || 1) + (product.quantity || 1) 
+                };
+                const docRef = doc(db, 'Carts', existingDoc.id);
                 await updateDoc(docRef, updatedProduct);
-                const updatedCart = [...cart];
-                updatedCart[existingProductIndex] = updatedProduct;
-                setCart(updatedCart);
             } else {
-                const productQuantity = Number(product.quantity) || 1;
-                const docRef = await addDoc(collection(db, 'Carts'), { ...product, user_id: session.user.email, quantity: productQuantity });
-                const newProduct = { ...product, id: docRef.id, quantity: productQuantity };
-                const updatedCart = [...cart, newProduct];
-                setCart(updatedCart);
+                await addDoc(collection(db, 'Carts'), {
+                    ...product,
+                    user_id: session.user.email,
+                    quantity: product.quantity || 1
+                });
             }
         } else {
             const existingProduct = cart.find(item => item.slug === product.slug);
             let updatedCart;
             if (existingProduct) {
-                const existingQuantity = Number(existingProduct.quantity) || 1;
-                const addQuantity = Number(product.quantity) || 1;
                 updatedCart = cart.map(item =>
-                    item.slug === product.slug ? { ...item, quantity: existingQuantity + addQuantity } : item
+                    item.slug === product.slug ? {
+                        ...item,
+                        quantity: (item.quantity || 1) + (product.quantity || 1)
+                    } : item
                 );
             } else {
-                const productQuantity = Number(product.quantity) || 1;
-                updatedCart = [...cart, { ...product, quantity: productQuantity }];
+                updatedCart = [...cart, { ...product, quantity: product.quantity || 1 }];
             }
+            setCart(updatedCart);
+            localStorage.setItem('cart', JSON.stringify(updatedCart));
+        }
+    };
+
+    const removeFromCart = async (slug) => {
+        if (session) {
+            const q = query(collection(db, 'Carts'), where('user_id', '==', session.user.email), where('slug', '==', slug));
+            const querySnapshot = await getDocs(q);
+
+            if (!querySnapshot.empty) {
+                const existingDoc = querySnapshot.docs[0];
+                const docRef = doc(db, 'Carts', existingDoc.id);
+                await deleteDoc(docRef);
+            }
+        } else {
+            const updatedCart = cart.filter(item => item.slug !== slug);
             setCart(updatedCart);
             localStorage.setItem('cart', JSON.stringify(updatedCart));
         }
@@ -71,30 +89,25 @@ export const CartProvider = ({ children }) => {
 
     const decrementCartItem = async (slug) => {
         if (session) {
-            const existingProductIndex = cart.findIndex(item => item.slug === slug);
-            if (existingProductIndex !== -1) {
-                const existingProduct = cart[existingProductIndex];
+            const q = query(collection(db, 'Carts'), where('user_id', '==', session.user.email), where('slug', '==', slug));
+            const querySnapshot = await getDocs(q);
+
+            if (!querySnapshot.empty) {
+                const existingDoc = querySnapshot.docs[0];
+                const existingProduct = existingDoc.data();
                 if (existingProduct.quantity > 1) {
                     const updatedProduct = { ...existingProduct, quantity: existingProduct.quantity - 1 };
-                    const docRef = doc(db, 'Carts', existingProduct.id);
+                    const docRef = doc(db, 'Carts', existingDoc.id);
                     await updateDoc(docRef, updatedProduct);
-                    const updatedCart = [...cart];
-                    updatedCart[existingProductIndex] = updatedProduct;
-                    setCart(updatedCart);
                 } else {
-                    const docRef = doc(db, 'Carts', existingProduct.id);
+                    const docRef = doc(db, 'Carts', existingDoc.id);
                     await deleteDoc(docRef);
-                    const updatedCart = cart.filter(item => item.id !== existingProduct.id);
-                    setCart(updatedCart);
                 }
             }
         } else {
             const updatedCart = cart
-                .map(item =>
-                    item.slug === slug ? { ...item, quantity: item.quantity - 1 } : item
-                )
+                .map(item => item.slug === slug ? { ...item, quantity: item.quantity - 1 } : item)
                 .filter(item => item.quantity > 0);
-
             setCart(updatedCart);
             localStorage.setItem('cart', JSON.stringify(updatedCart));
         }
@@ -102,36 +115,20 @@ export const CartProvider = ({ children }) => {
 
     const incrementCartItem = async (slug) => {
         if (session) {
-            const existingProductIndex = cart.findIndex(item => item.slug === slug);
-            if (existingProductIndex !== -1) {
-                const existingProduct = cart[existingProductIndex];
+            const q = query(collection(db, 'Carts'), where('user_id', '==', session.user.email), where('slug', '==', slug));
+            const querySnapshot = await getDocs(q);
+
+            if (!querySnapshot.empty) {
+                const existingDoc = querySnapshot.docs[0];
+                const existingProduct = existingDoc.data();
                 const updatedProduct = { ...existingProduct, quantity: existingProduct.quantity + 1 };
-                const docRef = doc(db, 'Carts', existingProduct.id);
+                const docRef = doc(db, 'Carts', existingDoc.id);
                 await updateDoc(docRef, updatedProduct);
-                const updatedCart = [...cart];
-                updatedCart[existingProductIndex] = updatedProduct;
-                setCart(updatedCart);
             }
         } else {
             const updatedCart = cart.map(item =>
                 item.slug === slug ? { ...item, quantity: item.quantity + 1 } : item
             );
-            setCart(updatedCart);
-            localStorage.setItem('cart', JSON.stringify(updatedCart));
-        }
-    }
-
-    const removeFromCart = async (slug) => {
-        if (session) {
-            const existingProduct = cart.find(item => item.slug === slug);
-            if (existingProduct) {
-                const docRef = doc(db, 'Carts', existingProduct.id);
-                await deleteDoc(docRef);
-                const updatedCart = cart.filter(item => item.slug !== slug);
-                setCart(updatedCart);
-            }
-        } else {
-            const updatedCart = cart.filter(item => item.slug !== slug);
             setCart(updatedCart);
             localStorage.setItem('cart', JSON.stringify(updatedCart));
         }

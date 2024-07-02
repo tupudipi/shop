@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import ProductCard from "@/app/components/ProductCard";
 import { useContext } from "react";
