@@ -9,16 +9,16 @@ const ProductCard = ({ product, isCart }) => {
   const lastStarWidth = `${(reviewValue % 1) * 100}%`;
 
   return (
-    <div className="flex flex-col gap-3 bg-white p-3 rounded-lg shadow hover:shadow-lg transition-shadow items-center max-w-[260px] flex-1">
+    <div className="flex flex-col gap-3 bg-white p-3 rounded-lg shadow hover:shadow-lg transition-shadow items-center max-w-[480px] md:max-w-[280px] flex-1">
       <Link href={`/products/${product.slug}`}>
         <div className="grid place-content-center">
           <Image
             src={product.image}
             alt={product.name}
             objectFit="cover"
-            className="rounded-lg shadow-lg"
-            width={150}
-            height={150}
+            className="rounded-lg shadow-lg md:w-[150px] md:h-[150px] w-[250px] h-[250px]"
+            width={250}
+            height={250}
           />
         </div>
       </Link>
@@ -47,9 +47,9 @@ const ProductCard = ({ product, isCart }) => {
         <div className="flex flex-col gap-2 justify-between">
           <p className="font-bold text-start">${product.price.toFixed(2)}</p>
           {isCart ? (
-            <ProductCardQuantityClientElement product={product}/>
+            <ProductCardQuantityClientElement product={product} />
           ) : (
-            <ProductActionButtonsClientElement product={product}/>
+            <ProductActionButtonsClientElement product={product} />
           )}
         </div>
       </div>
