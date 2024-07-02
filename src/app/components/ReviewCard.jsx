@@ -22,7 +22,6 @@ const ReviewCard = ({ review, handleDeleteReview, product_id }) => {
   const [replies, setReplies] = useState([]);
   const [likeCount, setLikeCount] = useState(review.likes);
 
-  // Memoized fetch functions
   const memoizedFetchAuthorName = useMemo(() => {
     const cache = new Map();
     return async (author) => {
@@ -49,7 +48,6 @@ const ReviewCard = ({ review, handleDeleteReview, product_id }) => {
     };
   }, []);
 
-  // Memoized handleLike function
   const handleLike = useCallback(async () => {
     if (!session) return;
   

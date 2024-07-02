@@ -37,14 +37,12 @@ const ProductComments = ({ slug }) => {
     const docRef = doc(db, 'Reviews', `${reviewData.author}-${reviewData.product_id}`);
     const productRef = doc(db, 'Products', reviewData.product_id);
 
-    // Add the new review to the Reviews collection
     await setDoc(docRef, {
       ...reviewData,
       likedBy: [],
       likes: 0
     });
 
-    // Fetch all reviews for the specific product to calculate the new review value
     const reviewsRef = collection(db, 'Reviews');
     const q = query(reviewsRef, where('product_id', '==', reviewData.product_id));
     const querySnapshot = await getDocs(q);

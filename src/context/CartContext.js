@@ -36,7 +36,6 @@ export const CartProvider = ({ children }) => {
             const existingProductIndex = cart.findIndex(item => item.slug === product.slug);
             if (existingProductIndex !== -1) {
                 const existingProduct = cart[existingProductIndex];
-                // Ensure quantities are numbers and default to 1 if not
                 const existingQuantity = Number(existingProduct.quantity) || 1;
                 const addQuantity = Number(product.quantity) || 1;
                 const updatedProduct = { ...existingProduct, quantity: existingQuantity + addQuantity };
@@ -46,7 +45,6 @@ export const CartProvider = ({ children }) => {
                 updatedCart[existingProductIndex] = updatedProduct;
                 setCart(updatedCart);
             } else {
-                // Ensure product.quantity is a number and default to 1 if not
                 const productQuantity = Number(product.quantity) || 1;
                 const docRef = await addDoc(collection(db, 'Carts'), { ...product, user_id: session.user.email, quantity: productQuantity });
                 const newProduct = { ...product, id: docRef.id, quantity: productQuantity };
@@ -57,14 +55,12 @@ export const CartProvider = ({ children }) => {
             const existingProduct = cart.find(item => item.slug === product.slug);
             let updatedCart;
             if (existingProduct) {
-                // Ensure quantities are numbers and default to 1 if not
                 const existingQuantity = Number(existingProduct.quantity) || 1;
                 const addQuantity = Number(product.quantity) || 1;
                 updatedCart = cart.map(item =>
                     item.slug === product.slug ? { ...item, quantity: existingQuantity + addQuantity } : item
                 );
             } else {
-                // Ensure product.quantity is a number and default to 1 if not
                 const productQuantity = Number(product.quantity) || 1;
                 updatedCart = [...cart, { ...product, quantity: productQuantity }];
             }

@@ -1,4 +1,3 @@
-// /api/products/category/[id].js
 
 import { db } from "@/firebaseInit";
 import { collection, getDocs, query, where, orderBy } from "firebase/firestore";

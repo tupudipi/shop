@@ -85,7 +85,7 @@ const Search = () => {
 
             const results = [...products, ...categories]
                 .sort((a, b) => a.name.toLowerCase().indexOf(searchTermLower) - b.name.toLowerCase().indexOf(searchTermLower))
-                .slice(0, 10); // Limit to top 10 results
+                .slice(0, 10);
 
             console.log('Search results:', results);
             setSearchResults(results);

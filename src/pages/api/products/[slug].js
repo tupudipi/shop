@@ -1,4 +1,3 @@
-// /api/products/[slug].js
 
 import { db } from "@/firebaseInit";
 import { doc, getDoc } from "firebase/firestore";
