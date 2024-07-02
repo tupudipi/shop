@@ -17,12 +17,10 @@ function LayoutContent({ children }) {
 
   const handleSortChange = (e) => {
     updateSortType(e.target.value);
-    console.log(e.target.value);
   }
 
   const handleOrderChange = (e) => {
     updateSortOrder(e.target.value);
-    console.log(e.target.value);
   }
 
   return (

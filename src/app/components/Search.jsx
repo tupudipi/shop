@@ -46,7 +46,6 @@ const Search = () => {
         setIsLoading(true);
         setError(null);
         setShowDropdown(true);
-        console.log('Performing search for:', searchTerm);
 
         const searchTermLower = searchTerm.toLowerCase();
 
@@ -87,7 +86,6 @@ const Search = () => {
                 .sort((a, b) => a.name.toLowerCase().indexOf(searchTermLower) - b.name.toLowerCase().indexOf(searchTermLower))
                 .slice(0, 10);
 
-            console.log('Search results:', results);
             setSearchResults(results);
         } catch (error) {
             console.error('Error searching:', error);
@@ -131,7 +129,7 @@ const Search = () => {
                         <Link
                             key={`${result.type}-${result.id}`}
                             href={result.type === 'product' ? `/products/${result.id}` : `/categories/${result.id}`}
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                            className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
                         >
                             {result.type === 'product' && result.image && (
                                 <div className="w-10 h-10 mr-3 relative">

@@ -44,7 +44,7 @@ function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Checkout submitted', { billingAddress, shippingAddress, paymentMethod, total });
+    console.log('Checkout submitted', { billingAddress, shippingAddress, paymentMethod, total, userEmail, products});
     onClose();
   };
 
@@ -106,6 +106,7 @@ function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
             >
               <option value="credit">Credit Card</option>
               <option value="paypal">PayPal</option>
+              <option value="cash">Cash on delivery</option>
             </select>
           </div>
           <div className="flex justify-end">

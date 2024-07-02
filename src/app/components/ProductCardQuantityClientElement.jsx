@@ -7,8 +7,6 @@ const ProductCardQuantityClientElement = ({ product }) => {
 
     const existingProduct = cart.find(item => item.slug === product.slug);
 
-    console.log(`ProductCardQuantityClientElement: ${JSON.stringify(product)}`)
-
     return (
         <div className="flex flex-col gap-2">
             <div className="flex gap-1">

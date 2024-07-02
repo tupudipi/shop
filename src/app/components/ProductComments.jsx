@@ -70,9 +70,6 @@ const ProductComments = ({ slug }) => {
   };
 
   const handleDeleteReview = async (reviewId, product_id, reviewRating) => {
-    console.log('Deleting review:', reviewId);
-    console.log('Product ID:', product_id);
-    console.log('Review Rating:', reviewRating);
 
     const batch = writeBatch(db);
 
@@ -104,7 +101,6 @@ const ProductComments = ({ slug }) => {
       }
 
       await batch.commit();
-      console.log("Review and all replies deleted successfully");
       fetchReviews();
     } catch (error) {
       console.error("Error deleting review and replies: ", error);

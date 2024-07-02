@@ -102,8 +102,6 @@ const ReviewCard = ({ review, handleDeleteReview, product_id }) => {
       content: event.target.reply.value,
       date: new Date().toISOString(),
     };
-
-    console.log(replyData);
   
     try {
       const repliesRef = collection(db, 'Reviews', review.id, 'replies');
