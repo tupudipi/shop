@@ -9,7 +9,7 @@ const ProductCard = ({ product, isCart }) => {
   const lastStarWidth = `${(reviewValue % 1) * 100}%`;
 
   return (
-    <div className="flex flex-col gap-3 bg-white p-3 rounded-lg shadow hover:shadow-lg transition-shadow items-center max-w-[260px]">
+    <div className="flex flex-col gap-3 bg-white p-3 rounded-lg shadow hover:shadow-lg transition-shadow items-center max-w-[260px] flex-1">
       <Link href={`/products/${product.slug}`}>
         <div className="grid place-content-center">
           <Image

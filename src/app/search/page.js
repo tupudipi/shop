@@ -1,11 +1,10 @@
-// /search/page.js
+import { Suspense } from 'react';
+import ProductList from '@/app/components/ProductList';
 
-import ProductCard from "@/app/components/ProductCard";
-
-async function fetchAllProducts(sort, order) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products`, { cache: 'no-store' });
+async function fetchAllProductsWithReviewCount() {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products-with-review-count`, { cache: 'no-store' });
   if (!res.ok) {
-    console.error("Failed to fetch products, response:", res); 
+    console.error("Failed to fetch products, response:", res);
     throw new Error('Failed to fetch products');
   }
   const products = await res.json();
@@ -19,15 +18,12 @@ export async function generateMetadata() {
   };
 }
 
-export default async function SearchPage({ sort, order }) {
-  const products = await fetchAllProducts(sort, order);
+export default async function SearchPage() {
+  const products = await fetchAllProductsWithReviewCount();
 
   return (
-      <div className="flex flex-wrap gap-4 mt-2 justify-center md:justify-normal">
-        {products.map((product) => (
-          <ProductCard key={product.slug} product={product} />
-        ))}
-      </div>
+    <Suspense fallback={<div>Loading...</div>}>
+      <ProductList initialProducts={products} />
+    </Suspense>
   );
 }
-``

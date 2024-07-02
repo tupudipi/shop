@@ -1,6 +1,5 @@
-// /search/[category]/page.js
-
-import ProductCard from "@/app/components/ProductCard";
+import { Suspense } from 'react';
+import ProductList from '@/app/components/ProductList';
 
 async function fetchCategoryId(slug) {
   const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/categories?category_name=${slug}`, { cache: 'no-store' });
@@ -11,8 +10,8 @@ async function fetchCategoryId(slug) {
   return category.id;
 }
 
-async function fetchProductsByCategoryId(categoryId, sort, order) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products/category/${categoryId}`, { cache: 'no-store' });
+async function fetchProductsWithReviewCount(categoryId) {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products-with-review-count?categoryId=${categoryId}`, { cache: 'no-store' });
   if (!res.ok) {
     console.error("Failed to fetch products, response:", res);
     throw new Error('Failed to fetch products');
@@ -22,24 +21,19 @@ async function fetchProductsByCategoryId(categoryId, sort, order) {
 }
 
 export async function generateMetadata({ params }) {
-  const categoryId = await fetchCategoryId(params.category);
-  const products = await fetchProductsByCategoryId(categoryId, 'name', 'asc'); 
-
   return {
     title: `Cico ${params.category}`,
     description: `Explore products in the ${params.category} category.`,
   };
 }
 
-export default async function Page({ params, sort, order }) {
+export default async function Page({ params }) {
   const categoryId = await fetchCategoryId(params.category);
-  const products = await fetchProductsByCategoryId(categoryId, sort, order);
+  const products = await fetchProductsWithReviewCount(categoryId);
 
   return (
-    <div className="flex flex-wrap gap-4 mt-2 justify-center md:justify-normal">
-      {products.map((product) => (
-        <ProductCard key={product.slug} product={product} />
-      ))}
-    </div>
+    <Suspense fallback={<div>Loading...</div>}>
+      <ProductList initialProducts={products} />
+    </Suspense>
   );
 }

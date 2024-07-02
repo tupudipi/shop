@@ -1,14 +1,29 @@
-// search/layout.js
 'use client'
-
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import Navbar from '../components/Navbar';
 import FiltersClient from '../components/FiltersClient';
-
+import { SortProvider, SortContext } from '@/context/SortContext';
 
 export default function RootLayout({ children }) {
-  const [sort, setSort] = useState('name');
-  const [order, setOrder] = useState('asc');
+  return (
+    <SortProvider initialSortType="name" initialSortOrder="asc">
+      <LayoutContent>{children}</LayoutContent>
+    </SortProvider>
+  );
+}
+
+function LayoutContent({ children }) {
+  const { sortType, sortOrder, updateSortType, updateSortOrder } = useContext(SortContext);
+
+  const handleSortChange = (e) => {
+    updateSortType(e.target.value);
+    console.log(e.target.value);
+  }
+
+  const handleOrderChange = (e) => {
+    updateSortOrder(e.target.value);
+    console.log(e.target.value);
+  }
 
   return (
     <>
@@ -26,8 +41,8 @@ export default function RootLayout({ children }) {
                   name="sort"
                   id="sort"
                   className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                  value={sort}
-                  onChange={(e) => setSort(e.target.value)}
+                  value={sortType}
+                  onChange={handleSortChange}
                 >
                   <option value="name">Name</option>
                   <option value="price">Price</option>
@@ -40,8 +55,8 @@ export default function RootLayout({ children }) {
                   name="order"
                   id="order"
                   className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                  value={order}
-                  onChange={(e) => setOrder(e.target.value)}
+                  value={sortOrder}
+                  onChange={handleOrderChange}
                 >
                   <option value="asc">Ascending</option>
                   <option value="desc">Descending</option>
