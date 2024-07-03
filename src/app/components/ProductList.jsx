@@ -28,7 +28,7 @@ export default function ProductList({ initialProducts }) {
   }, [initialProducts, sortType, sortOrder]);
 
   return (
-    <div className="flex flex-wrap flex-col md:flex-row gap-4 mt-2 justify-center items-center md:justify-normal md:items-stretch pr-4">
+    <div className="flex flex-wrap flex-col md:flex-row gap-4 mt-2 justify-center items-center md:justify-normal md:items-stretch md:pr-4">
       {sortedProducts.map((product) => (
         <ProductCard key={product.slug} product={product} />
       ))}

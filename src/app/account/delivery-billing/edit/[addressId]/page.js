@@ -1,7 +1,66 @@
 import Link from "next/link"
+import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { db } from "@/firebaseInit";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import { redirect } from 'next/navigation';
+import AddressForm from './AddressForm';
 
-const editAdressPage = ({ params }) => {
+const fetchAddressData = async (addressId, userEmail) => {
+    const addressCollection = collection(db, 'Addresses');
+    const q = query(addressCollection, where('__name__', '==', addressId), where('user_email', '==', userEmail));
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.docs.length > 0) {
+        return { id: querySnapshot.docs[0].id, ...querySnapshot.docs[0].data() };
+    }
+    return null;
+}
+
+const updateAddress = async (addressId, updatedData, userEmail) => {
+    const addressRef = doc(db, 'Addresses', addressId);
+    const addressDoc = await getDocs(query(collection(db, 'Addresses'), where('__name__', '==', addressId), where('user_email', '==', userEmail)));
+
+    if (addressDoc.empty) {
+        throw new Error('Address not found or user not authorized');
+    }
+
+    await updateDoc(addressRef, updatedData);
+}
+
+export default async function EditAddressPage({ params }) {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+        redirect('/login');
+    }
+
     const addressId = params.addressId;
+    const address = await fetchAddressData(addressId, session.user.email);
+
+    if (!address) {
+        return <div>Address not found or you&apos;re not authorized to edit this address</div>;
+    }
+
+    async function handleSubmit(formData) {
+        'use server'
+        const updatedAddress = {
+            firstname: formData.get('firstName'),
+            surname: formData.get('lastName'),
+            phone: formData.get('phoneNumber'),
+            address: formData.get('address'),
+            city: formData.get('city'),
+            county: formData.get('county'),
+            delivery: formData.get('useAsDeliveryAddress') === 'on',
+            billing: formData.get('useAsBillingAddress') === 'on',
+        };
+
+        try {
+            await updateAddress(addressId, updatedAddress, session.user.email);
+            return { success: true };
+        } catch (error) {
+            console.error('Error updating address:', error);
+            return { success: false, error: error.message };
+        }
+    }
 
     return (
         <div>
@@ -9,63 +68,7 @@ const editAdressPage = ({ params }) => {
                 <p className="text-blue-500 hover:underline hover:text-blue-700 my-1">{"<"} Back to Delivery and Billing</p>
             </Link>
             <h1 className="text-4xl font-medium">Edit Address</h1>
-
-            <form className="lg:grid lg:grid-cols-2">
-                <div className="mt-6 flex flex-col gap-2 lg:mr-32">
-                    <h2 className="text-2xl font-medium mb-2">Contact Details</h2>
-                    <div>
-                        <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">First Name</label>
-                        <input type="text" name="firstName" id="firstName" className="mt-1 focus:outline-none focus:ring-1 focus:ring-blue-600 focus:ring-opacity-40 mb-2 transition-all w-full rounded-md shadow h-7 p-4" />
-                    </div>
-
-                    <div>
-                        <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">Last Name</label>
-                        <input type="text" name="lastName" id="lastName" className="mt-1 focus:outline-none focus:ring-1 focus:ring-blue-600 focus:ring-opacity-40 mb-2 transition-all w-full rounded-md shadow h-7 p-4" />
-                    </div>
-
-                    <div >
-                        <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">Phone Number</label>
-                        <input type="tel" name="phoneNumber" id="phoneNumber" autoComplete="tel" className="mt-1 focus:outline-none focus:ring-1 focus:ring-blue-600 focus:ring-opacity-40 mb-2 transition-all w-full rounded-md shadow h-7 p-4" />
-                    </div>
-                </div>
-
-                <div className="mt-6 flex flex-col gap-2">
-                    <h2 className="text-2xl font-medium mb-2">Address Details</h2>
-                    <div>
-                        <label htmlFor="address" className="block text-sm font-medium text-gray-700">Address</label>
-                        <textarea name="address" id="address" className="mt-1 focus:outline-none focus:ring-1 focus:ring-blue-600 focus:ring-opacity-40 mb-2 transition-all w-full rounded-md shadow h-20 p-4" />
-                    </div>
-                    <div>
-                        <label htmlFor="city" className="block text-sm font-medium text-gray-700">City</label>
-                        <input type="text" name="city" id="city" className="mt-1 focus:outline-none focus:ring-1 focus:ring-blue-600 focus:ring-opacity-40 mb-2 transition-all w-full rounded-md shadow h-7 p-4" />
-                    </div>
-                    <div>
-                        <label htmlFor="county" className="block text-sm font-medium text-gray-700">County</label>
-                        <input type="text" name="county" id="county" className="mt-1 focus:outline-none focus:ring-1 focus:ring-blue-600 focus:ring-opacity-40 mb-2 transition-all w-full rounded-md shadow h-7 p-4" />
-                    </div>
-                </div>
-
-                <div className="mt-6 w-full lg:w-auto text-center lg:text-left">
-
-                    <div>
-                        <div>
-                            <input type="checkbox" id="useAsDeliveryAddress" name="useAsDeliveryAddress" className="mr-2" />
-                            <label htmlFor="useAsDeliveryAddress" className="text-sm font-medium text-gray-700">Use this as main delivery address</label>
-                        </div>
-
-                        <div>
-                            <input type="checkbox" id="useAsBillingAddress" name="useAsBillingAddress" className="mr-2" />
-                            <label htmlFor="useAsBillingAddress" className="text-sm font-medium text-gray-700">Use this as billing address</label>
-                        </div>
-                    </div>
-                    <button type="submit" className="px-4 py-2 border border-transparent rounded-md shadow hover:shadow-md font-semibold text-white bg-indigo-500 hover:bg-indigo-700 w-2/3 text-center mt-2">
-                        Submit
-                    </button>
-                </div>
-            </form>
-
+            <AddressForm address={address} handleSubmit={handleSubmit} />
         </div>
     )
 }
-
-export default editAdressPage

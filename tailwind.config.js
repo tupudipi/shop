@@ -6,4 +6,11 @@ module.exports = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   plugins: [],
+  theme: {
+    extend: {
+      animation: {
+        'slide-in': 'slideIn 0.2s ease-in',
+      },
+    },
+  },
 };

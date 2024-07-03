@@ -29,7 +29,7 @@ const AddressCard = ({ isDelivery, isMain, isInfo, address }) => {
 
             {!isInfo && (
                 <div className="flex gap-3">
-                    <Link href="/account/delivery-billing/edit/1" className="text-blue-500 underline">
+                    <Link href={`/account/delivery-billing/edit/${address.id}`} className="text-blue-500 underline">
                         Edit
                     </Link>
                     {!isMain && (
