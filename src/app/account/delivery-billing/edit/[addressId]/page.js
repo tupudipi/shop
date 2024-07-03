@@ -27,7 +27,7 @@ const updateAddress = async (addressId, updatedData, userEmail) => {
     await updateDoc(addressRef, updatedData);
 }
 
-export default async function EditAddressPage({ params }) {
+export default async function AddAddressPage({ params }) {
     const session = await getServerSession(authOptions);
     if (!session) {
         redirect('/login');
