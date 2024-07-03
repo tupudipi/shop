@@ -9,14 +9,14 @@ const ProductCard = ({ product, isCart }) => {
   const lastStarWidth = `${(reviewValue % 1) * 100}%`;
 
   return (
-    <div className="flex flex-col gap-3 bg-white p-3 rounded-lg shadow hover:shadow-lg transition-shadow items-center max-w-[480px] md:max-w-[280px] flex-1">
+    <div className="flex flex-col gap-3 bg-white p-3 rounded-lg shadow hover:shadow-lg transition-shadow items-center min-w-fit max-w-[480px] md:max-w-[280px]">
       <Link href={`/products/${product.slug}`}>
         <div className="grid place-content-center">
           <Image
             src={product.image}
             alt={product.name}
             objectFit="cover"
-            className="rounded-lg shadow-lg md:w-[150px] md:h-[150px] w-[250px] h-[250px]"
+            className="rounded-lg shadow-lg md:w-[150px] md:h-[150px] min-w-[150px] min-h-[150px] max-w-[250px] max-h-[250px] w-auto h-auto"
             width={250}
             height={250}
           />

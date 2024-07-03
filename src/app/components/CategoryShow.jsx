@@ -114,13 +114,13 @@ const CategoryShow = ({ page, categoryID, currentProductSlug }) => {
     }, [categoryID]);
 
     return (
-        <div className="my-6 px-4">
+        <div className="my-6">
             <h2 className="text-2xl mb-4 font-medium capitalize">
                 {page === 'home' ? category?.category_name : 'Related Products'}
             </h2>
             <div
                 ref={scrollContainer}
-                className="flex gap-3 md:gap-6 max-w-sm md:max-w-3xl overflow-auto pb-6 lg:max-w-5xl xl:max-w-7xl mb-2"
+                className="flex gap-3 md:gap-6 max-w-sm md:max-w-3xl overflow-scroll pb-6 lg:max-w-5xl xl:max-w-7xl mb-2"
                 style={{ scrollBehavior: 'smooth' }}
             >
                 {isLoading ? (
