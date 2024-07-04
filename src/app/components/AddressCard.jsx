@@ -1,47 +1,30 @@
 import Link from "next/link";
+import AddressCardDeleteButton from "./AddressCardDeleteButton";
 
-const AddressCard = ({ isDelivery, isMain, isInfo, address }) => {
-    return (
-        <div className="bg-white rounded-lg shadow p-4">
-            <div className="mb-4">
-                <h2 className="text-lg">
-                    {isDelivery ? "Delivery Details" : "Billing Details"}
-                </h2>
-            </div>
+const AddressCard = ({ isMainDelivery, isMainBilling,  address, removeAddress }) => {
+  const title = isMainDelivery ? "Main Delivery Address" : 
+                isMainBilling ? "Main Billing Address" : 
+                "";
 
-            <div className="mb-2 font-light">
-                <p className="text-sm">
-                    Full Name: {address.firstname} {address.surname}
-                </p>
-                <p className="text-sm">
-                    Address: {address.address}
-                </p>
-                <p className="text-sm">
-                    City: {address.city}
-                </p>
-                <p className="text-sm">
-                    County: {address.county}
-                </p>
-                <p className="text-sm">
-                    Phone Number: {address.phone}
-                </p>
-            </div>
-
-            {!isInfo && (
-                <div className="flex gap-3">
-                    <Link href={`/account/delivery-billing/edit/${address.id}`} className="text-blue-500 underline">
-                        Edit
-                    </Link>
-                    {!isMain && (
-                        <button className="text-red-500 underline">
-                            Remove
-                        </button>
-                    )}
-                </div>
-            )}
-        </div>
-    );
+  return (
+    <div className="border p-4 rounded shadow bg-white">
+      <h3 className="text-lg font-semibold mb-2">{title}</h3>
+      <p>Full Name: {address.firstname} {address.surname}</p>
+      <p>Address: {address.address}</p>
+      <p>City: {address.city}</p>
+      <p>County: {address.county}</p>
+      <p>Phone Number: {address.phone}</p>
+      
+      <div className="mt-4 space-x-2">
+        <Link href={`/account/delivery-billing/edit/${address.id}`} className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
+          Edit
+        </Link>
+        {!isMainDelivery && !isMainBilling && (
+          <AddressCardDeleteButton removeAddress={removeAddress} addressId={address.id} />
+        )}
+      </div>
+    </div>
+  );
 }
 
 export default AddressCard;
-

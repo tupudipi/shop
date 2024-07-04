@@ -69,12 +69,12 @@ export default function AddressForm({ address = {}, handleSubmit }) {
                 <div className="mt-6 w-full lg:w-auto text-center lg:text-left">
                     <div>
                         <div>
-                            <input type="checkbox" id="useAsDeliveryAddress" name="useAsDeliveryAddress" defaultChecked={address.delivery} className="mr-2" />
+                            <input type="checkbox" id="useAsDeliveryAddress" name="useAsDeliveryAddress" defaultChecked={address.isMainDelivery} className="mr-2" />
                             <label htmlFor="useAsDeliveryAddress" className="text-sm font-medium text-gray-700">Use this as main delivery address</label>
                         </div>
                         <div>
-                            <input type="checkbox" id="useAsBillingAddress" name="useAsBillingAddress" defaultChecked={address.billing} className="mr-2" />
-                            <label htmlFor="useAsBillingAddress" className="text-sm font-medium text-gray-700">Use this as billing address</label>
+                            <input type="checkbox" id="useAsBillingAddress" name="useAsBillingAddress" defaultChecked={address.isMainBilling} className="mr-2" />
+                            <label htmlFor="useAsBillingAddress" className="text-sm font-medium text-gray-700">Use this as main billing address</label>
                         </div>
                     </div>
                     <button type="submit" className="px-4 py-2 border border-transparent rounded-md shadow hover:shadow-md font-semibold text-white bg-indigo-500 hover:bg-indigo-700 w-2/3 text-center mt-2">

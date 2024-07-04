@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { redirect } from 'next/navigation';
 import AddressForm from './AddressForm';
+import { revalidatePath } from "next/cache";
 
 const fetchAddressData = async (addressId, userEmail) => {
     const addressCollection = collection(db, 'Addresses');
@@ -23,6 +24,7 @@ const updateAddress = async (addressId, updatedData, userEmail) => {
     if (addressDoc.empty) {
         throw new Error('Address not found or user not authorized');
     }
+    revalidatePath('/account/delivery-billing');
 
     await updateDoc(addressRef, updatedData);
 }
@@ -49,8 +51,8 @@ export default async function AddAddressPage({ params }) {
             address: formData.get('address'),
             city: formData.get('city'),
             county: formData.get('county'),
-            delivery: formData.get('useAsDeliveryAddress') === 'on',
-            billing: formData.get('useAsBillingAddress') === 'on',
+            isMainDelivery: formData.get('useAsDeliveryAddress') === 'on',
+            isMainBilling: formData.get('useAsBillingAddress') === 'on',
         };
 
         try {

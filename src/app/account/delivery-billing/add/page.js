@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { redirect } from 'next/navigation';
 import AddressForm from './AddressForm';
+import { revalidatePath } from "next/cache";
 
 const addAddress = async (newData, userEmail) => {
     const addressesCollection = collection(db, 'Addresses');
@@ -29,11 +30,12 @@ export default async function AddAddressPage() {
             address: formData.get('address'),
             city: formData.get('city'),
             county: formData.get('county'),
-            delivery: formData.get('useAsDeliveryAddress') === 'on',
-            billing: formData.get('useAsBillingAddress') === 'on',
+            isMainDelivery: formData.get('useAsDeliveryAddress') === 'on',
+            isMainBilling: formData.get('useAsBillingAddress') === 'on',
         };
 
         try {
+            revalidatePath('/account/delivery-billing');
             await addAddress(newAddress, session.user.email);
             return { success: true };
         } catch (error) {
