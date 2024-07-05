@@ -1,9 +1,12 @@
 'use client'
 import { useState, useEffect, useRef } from 'react';
 import { db } from "@/firebaseInit";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { addDoc, collection, serverTimestamp, query, where, getDocs, deleteDoc } from "firebase/firestore";
+import { useRouter } from 'next/navigation';
+
 
 function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
+  const router = useRouter();
   const [addresses, setAddresses] = useState([]);
   const [billingAddress, setBillingAddress] = useState('');
   const [shippingAddress, setShippingAddress] = useState('');
@@ -20,7 +23,6 @@ function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
       });
       setAddresses(fetchedAddresses);
 
-      // Set default billing and shipping addresses
       const defaultBilling = fetchedAddresses.find(addr => addr.isMainBilling);
       const defaultShipping = fetchedAddresses.find(addr => addr.isMainDelivery);
 
@@ -49,19 +51,58 @@ function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
     };
   }, [isOpen, onClose]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Checkout submitted', { billingAddress, shippingAddress, paymentMethod, total, userEmail, products });
-    onClose();
+
+    const truncatedProducts = products.map(product => ({
+      name: product.name,
+      quantity: product.quantity,
+      pricePerPiece: product.price,
+      totalPerProduct: product.price * product.quantity
+    }));
+
+    try {
+      const orderData = {
+        billingAddress,
+        shippingAddress,
+        paymentMethod,
+        total,
+        userEmail,
+        products: truncatedProducts,
+        createdAt: serverTimestamp(),
+        status: 'pending'
+      };
+
+      const docRef = await addDoc(collection(db, "Orders"), orderData);
+
+      console.log('Order submitted successfully with ID: ', docRef.id);
+
+      await clearUserCart(userEmail);
+
+      onClose();
+      router.push('/account/orders');
+    } catch (error) {
+      console.error("Error processing order: ", error);
+    }
+  };
+
+  const clearUserCart = async (userEmail) => {
+    const cartQuery = query(collection(db, "Carts"), where("user_id", "==", userEmail));
+    const querySnapshot = await getDocs(cartQuery);
+
+    const deletePromises = querySnapshot.docs.map(doc => deleteDoc(doc.ref));
+    await Promise.all(deletePromises);
+
+    console.log("User's cart cleared successfully");
   };
 
   if (!isOpen) return null;
 
   const renderAddressOptions = (isShipping) => {
-    const mainAddress = addresses.find(addr => 
+    const mainAddress = addresses.find(addr =>
       isShipping ? addr.isMainDelivery : addr.isMainBilling
     );
-  
+
     return (
       <>
         {addresses.map((addr) => (
