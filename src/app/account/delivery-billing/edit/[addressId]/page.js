@@ -17,6 +17,28 @@ const fetchAddressData = async (addressId, userEmail) => {
     return null;
 }
 
+async function updateMainAddressStatus(userEmail, isDelivery, newMainAddressId) {
+    const addressesCollection = collection(db, 'Addresses');
+    const fieldToUpdate = isDelivery ? 'isMainDelivery' : 'isMainBilling';
+
+    // Query for the current main address
+    const q = query(addressesCollection,
+        where('user_email', '==', userEmail),
+        where(fieldToUpdate, '==', true)
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    // Update the old main address
+    querySnapshot.forEach(async (document) => {
+        if (document.id !== newMainAddressId) {
+            await updateDoc(doc(db, 'Addresses', document.id), {
+                [fieldToUpdate]: false
+            });
+        }
+    });
+}
+
 const updateAddress = async (addressId, updatedData, userEmail) => {
     const addressRef = doc(db, 'Addresses', addressId);
     const addressDoc = await getDocs(query(collection(db, 'Addresses'), where('__name__', '==', addressId), where('user_email', '==', userEmail)));
@@ -24,9 +46,17 @@ const updateAddress = async (addressId, updatedData, userEmail) => {
     if (addressDoc.empty) {
         throw new Error('Address not found or user not authorized');
     }
-    revalidatePath('/account/delivery-billing');
 
+    // Update the address
     await updateDoc(addressRef, updatedData);
+
+    // Update main address status if necessary
+    if (updatedData.isMainDelivery) {
+        await updateMainAddressStatus(userEmail, true, addressId);
+    }
+    if (updatedData.isMainBilling) {
+        await updateMainAddressStatus(userEmail, false, addressId);
+    }
 }
 
 export default async function AddAddressPage({ params }) {
@@ -56,6 +86,7 @@ export default async function AddAddressPage({ params }) {
         };
 
         try {
+            revalidatePath('/account/delivery-billing');
             await updateAddress(addressId, updatedAddress, session.user.email);
             return { success: true };
         } catch (error) {

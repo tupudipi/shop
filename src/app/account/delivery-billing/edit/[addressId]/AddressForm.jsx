@@ -1,15 +1,18 @@
 'use client';
 import { useState, useEffect } from 'react';
 import EditAddressToast from '@/app/components/EditAddressToast';
+import { useRouter } from 'next/navigation';
 
 export default function AddressForm({ address, handleSubmit }) {
     const [toastState, setToastState] = useState({ show: false, loading: false });
+    const router = useRouter();
 
     useEffect(() => {
         if (toastState.show && !toastState.loading) {
             const timer = setTimeout(() => {
                 setToastState({ show: false, loading: false });
-            }, 3000);
+                router.push('/account/delivery-billing');
+            }, 2000);
             return () => clearTimeout(timer);
         }
     }, [toastState]);
@@ -83,7 +86,7 @@ export default function AddressForm({ address, handleSubmit }) {
                 <EditAddressToast
                     message="Address updated successfully!"
                     isLoading={toastState.loading}
-                    duration={3000}
+                    duration={2000}
                 />
             )}
         </>

@@ -86,7 +86,7 @@ export default function AddressForm({ address = {}, handleSubmit }) {
                 <Toast
                     message="Address saved successfully!"
                     isLoading={toastState.loading}
-                    duration={3000}
+                    duration={2000}
                 />
             )}
         </>

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
 import { db } from "@/firebaseInit";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
@@ -7,12 +7,44 @@ import { redirect } from 'next/navigation';
 import AddressForm from './AddressForm';
 import { revalidatePath } from "next/cache";
 
+async function updateMainAddressStatus(userEmail, isDelivery, newMainAddressId) {
+    const addressesCollection = collection(db, 'Addresses');
+    const fieldToUpdate = isDelivery ? 'isMainDelivery' : 'isMainBilling';
+
+    // Query for the current main address
+    const q = query(addressesCollection,
+        where('user_email', '==', userEmail),
+        where(fieldToUpdate, '==', true)
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    // Update the old main address
+    querySnapshot.forEach(async (document) => {
+        if (document.id !== newMainAddressId) {
+            await updateDoc(doc(db, 'Addresses', document.id), {
+                [fieldToUpdate]: false
+            });
+        }
+    });
+}
+
 const addAddress = async (newData, userEmail) => {
     const addressesCollection = collection(db, 'Addresses');
-    await addDoc(addressesCollection, {
+
+    // Add the new address
+    const docRef = await addDoc(addressesCollection, {
         ...newData,
         user_email: userEmail
     });
+
+    // Update main address status if necessary
+    if (newData.isMainDelivery) {
+        await updateMainAddressStatus(userEmail, true, docRef.id);
+    }
+    if (newData.isMainBilling) {
+        await updateMainAddressStatus(userEmail, false, docRef.id);
+    }
 }
 
 export default async function AddAddressPage() {
