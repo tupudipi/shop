@@ -11,7 +11,6 @@ async function updateMainAddressStatus(userEmail, isDelivery, newMainAddressId) 
     const addressesCollection = collection(db, 'Addresses');
     const fieldToUpdate = isDelivery ? 'isMainDelivery' : 'isMainBilling';
 
-    // Query for the current main address
     const q = query(addressesCollection,
         where('user_email', '==', userEmail),
         where(fieldToUpdate, '==', true)
@@ -19,7 +18,6 @@ async function updateMainAddressStatus(userEmail, isDelivery, newMainAddressId) 
 
     const querySnapshot = await getDocs(q);
 
-    // Update the old main address
     querySnapshot.forEach(async (document) => {
         if (document.id !== newMainAddressId) {
             await updateDoc(doc(db, 'Addresses', document.id), {
@@ -32,13 +30,11 @@ async function updateMainAddressStatus(userEmail, isDelivery, newMainAddressId) 
 const addAddress = async (newData, userEmail) => {
     const addressesCollection = collection(db, 'Addresses');
 
-    // Add the new address
     const docRef = await addDoc(addressesCollection, {
         ...newData,
         user_email: userEmail
     });
 
-    // Update main address status if necessary
     if (newData.isMainDelivery) {
         await updateMainAddressStatus(userEmail, true, docRef.id);
     }

@@ -12,7 +12,6 @@ const fetchAddressesData = async (user_email) => {
   const querySnapshot = await getDocs(q);
   const addresses = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-  // Sort addresses: main delivery and billing first, then others
   return addresses.sort((a, b) => {
     if (a.isMainDelivery || a.isMainBilling) return -1;
     if (b.isMainDelivery || b.isMainBilling) return 1;

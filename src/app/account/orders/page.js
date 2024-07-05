@@ -1,12 +1,23 @@
 import Link from "next/link";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from "@/firebaseInit";
 
-const ordersPage = () => {
-  const orders = [
-    { orderNumber: 1, date: '2024-01-01', orderValue: 100, status: 'Pending', link: '/account/orders/1'},
-    { orderNumber: 2, date: '2024-01-02', orderValue: 200, status: 'Completed', link: '/account/orders/2'},
-    { orderNumber: 3, date: '2024-01-03', orderValue: 150, status: 'Pending', link: '/account/orders/3'}, 
-    { orderNumber: 4, date: '2024-01-04', orderValue: 300, status: 'Canceled', link: '/account/orders/3'}, 
-  ];
+const fetchOrdersData = async (user_email) => {
+  const ordersCollection = collection(db, 'Orders');
+  const q = query(ordersCollection, where('userEmail', '==', user_email));
+  const querySnapshot = await getDocs(q);
+  const orders = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  
+  orders.sort((a, b) => b.orderNumber - a.orderNumber);
+
+  return orders;
+}
+
+async function ordersPage() {
+  const session = await getServerSession(authOptions);
+  const orders = await fetchOrdersData(session.user.email);
 
   return (
     <div>
@@ -25,26 +36,26 @@ const ordersPage = () => {
         
         <div className="bg-white divide-y divide-gray-200 font-light md:table-row-group rounded-lg">
           {orders.map((order) => (
-            <div key={order.orderNumber} className="md:table-row">
+            <div key={order.id} className="md:table-row">
               <div className="px-6 py-4 whitespace-nowrap md:table-cell">
                 <div className="font-medium text-gray-500 uppercase tracking-wider md:hidden block">Order #</div>
                 {order.orderNumber}
               </div>
               <div className="px-6 py-4 whitespace-nowrap md:table-cell">
                 <div className="font-medium text-gray-500 uppercase tracking-wider md:hidden block">Date</div>
-                {order.date}
+                {new Date(order.createdAt.seconds * 1000).toLocaleDateString('en-GB')}
               </div>
               <div className="px-6 py-4 whitespace-nowrap md:table-cell">
                 <div className="font-medium text-gray-500 uppercase tracking-wider md:hidden block">Order Value</div>
-                {order.orderValue}
+                ${order.total.toFixed(2)}
               </div>
-              <div className={`px-6 py-4 whitespace-nowrap md:table-cell ${order.status === 'Pending' ? 'text-yellow-500' : order.status === 'Canceled' ? 'text-red-500' : 'text-green-500'}`}>
+              <div className={`px-6 py-4 whitespace-nowrap md:table-cell font-medium ${order.status === 'pending' ? 'text-yellow-500' : order.status === 'canceled' ? 'text-red-600' : order.status === 'delivered' ? 'text-green-600' : order.status === 'processing' ? 'text-blue-600' : 'text-purple-600'}`}>
                 <div className="font-medium text-gray-500 uppercase tracking-wider md:hidden block">Status</div>
-                {order.status}
+                {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
               </div>
               <div className="px-6 py-4 whitespace-nowrap md:table-cell">
-                <Link href={order.link}>
-                  <p className="text-blue-500 hover:text-blue-800 underline">View order</p>
+                <Link href={`/orders/${order.id}`}>
+                  <p className="text-blue-500 hover:text-blue-800 hover:underline">View order</p>
                 </Link>
               </div>
             </div>

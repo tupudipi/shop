@@ -3,7 +3,20 @@ import { useState, useEffect, useRef } from 'react';
 import { db } from "@/firebaseInit";
 import { addDoc, collection, serverTimestamp, query, where, getDocs, deleteDoc } from "firebase/firestore";
 import { useRouter } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
 
+function generateOrderNumber() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = (now.getMonth() + 1).toString().padStart(2, '0');
+  const day = now.getDate().toString().padStart(2, '0');
+  const hours = now.getHours().toString().padStart(2, '0');
+  const minutes = now.getMinutes().toString().padStart(2, '0');
+  const seconds = now.getSeconds().toString().padStart(2, '0');
+  const randomSuffix = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+
+  return `${year}${month}${day}-${hours}${minutes}${seconds}-${randomSuffix}`;
+}
 
 function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
   const router = useRouter();
@@ -61,8 +74,11 @@ function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
       totalPerProduct: product.price * product.quantity
     }));
 
+    const orderNumber = generateOrderNumber();
+
     try {
       const orderData = {
+        orderNumber,
         billingAddress,
         shippingAddress,
         paymentMethod,
@@ -75,11 +91,9 @@ function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
 
       const docRef = await addDoc(collection(db, "Orders"), orderData);
 
-      console.log('Order submitted successfully with ID: ', docRef.id);
-
       await clearUserCart(userEmail);
-
       onClose();
+
       router.push('/account/orders');
     } catch (error) {
       console.error("Error processing order: ", error);
@@ -92,8 +106,6 @@ function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
 
     const deletePromises = querySnapshot.docs.map(doc => deleteDoc(doc.ref));
     await Promise.all(deletePromises);
-
-    console.log("User's cart cleared successfully");
   };
 
   if (!isOpen) return null;
