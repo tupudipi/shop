@@ -54,7 +54,7 @@ async function ordersPage() {
                 {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
               </div>
               <div className="px-6 py-4 whitespace-nowrap md:table-cell">
-                <Link href={`/orders/${order.id}`}>
+                <Link href={`/account/orders/${order.id}`}>
                   <p className="text-blue-500 hover:text-blue-800 hover:underline">View order</p>
                 </Link>
               </div>

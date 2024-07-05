@@ -71,7 +71,8 @@ function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
       name: product.name,
       quantity: product.quantity,
       pricePerPiece: product.price,
-      totalPerProduct: product.price * product.quantity
+      totalPerProduct: product.price * product.quantity,
+      slug: product.slug
     }));
 
     const orderNumber = generateOrderNumber();
