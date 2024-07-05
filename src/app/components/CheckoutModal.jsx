@@ -7,7 +7,7 @@ function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
   const [addresses, setAddresses] = useState([]);
   const [billingAddress, setBillingAddress] = useState('');
   const [shippingAddress, setShippingAddress] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('credit');
+  const [paymentMethod, setPaymentMethod] = useState('cash');
   const modalRef = useRef();
 
   useEffect(() => {
@@ -19,6 +19,13 @@ function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
         fetchedAddresses.push({ id: doc.id, ...doc.data() });
       });
       setAddresses(fetchedAddresses);
+
+      // Set default billing and shipping addresses
+      const defaultBilling = fetchedAddresses.find(addr => addr.isMainBilling);
+      const defaultShipping = fetchedAddresses.find(addr => addr.isMainDelivery);
+
+      if (defaultBilling) setBillingAddress(defaultBilling.id);
+      if (defaultShipping) setShippingAddress(defaultShipping.id);
     };
 
     if (isOpen) {
@@ -44,11 +51,27 @@ function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Checkout submitted', { billingAddress, shippingAddress, paymentMethod, total, userEmail, products});
+    console.log('Checkout submitted', { billingAddress, shippingAddress, paymentMethod, total, userEmail, products });
     onClose();
   };
 
   if (!isOpen) return null;
+
+  const renderAddressOptions = (isShipping) => {
+    const mainAddress = addresses.find(addr => 
+      isShipping ? addr.isMainDelivery : addr.isMainBilling
+    );
+  
+    return (
+      <>
+        {addresses.map((addr) => (
+          <option key={addr.id} value={addr.id}>
+            {`${addr.firstname} ${addr.surname}, ${addr.address}, ${addr.city}, ${addr.county}, ${addr.phone}${addr.id === mainAddress?.id ? ' (Main)' : ''}`}
+          </option>
+        ))}
+      </>
+    );
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
@@ -67,39 +90,29 @@ function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
           </div>
           <div className="mb-4">
             <label className="block mb-2">Billing Address</label>
-            <select 
+            <select
               className="w-full p-2 border rounded"
               value={billingAddress}
               onChange={(e) => setBillingAddress(e.target.value)}
               required
             >
-              <option value="">Select Billing Address</option>
-              {addresses.filter(addr => addr.billing).map((addr) => (
-                <option key={addr.id} value={addr.id}>
-                  {`${addr.firstname} ${addr.surname}, ${addr.address}, ${addr.city}, ${addr.county}`}
-                </option>
-              ))}
+              {renderAddressOptions(false)}
             </select>
           </div>
           <div className="mb-4">
             <label className="block mb-2">Shipping Address</label>
-            <select 
+            <select
               className="w-full p-2 border rounded"
               value={shippingAddress}
               onChange={(e) => setShippingAddress(e.target.value)}
               required
             >
-              <option value="">Select Shipping Address</option>
-              {addresses.filter(addr => addr.delivery).map((addr) => (
-                <option key={addr.id} value={addr.id}>
-                  {`${addr.firstname} ${addr.surname}, ${addr.address}, ${addr.city}, ${addr.county}`}
-                </option>
-              ))}
+              {renderAddressOptions(true)}
             </select>
           </div>
           <div className="mb-4">
             <label className="block mb-2">Payment Method</label>
-            <select 
+            <select
               className="w-full p-2 border rounded"
               value={paymentMethod}
               onChange={(e) => setPaymentMethod(e.target.value)}
@@ -110,14 +123,14 @@ function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
             </select>
           </div>
           <div className="flex justify-end">
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={onClose}
               className="mr-2 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
             >
               Cancel
             </button>
-            <button 
+            <button
               type="submit"
               className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
             >
