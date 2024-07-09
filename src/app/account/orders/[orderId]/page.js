@@ -4,6 +4,7 @@ import { db } from "@/firebaseInit";
 import { doc, getDoc } from "firebase/firestore";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import Image from "next/image";
 
 const fetchOrderData = async (orderId, userEmail) => {
     const orderDocRef = doc(db, 'Orders', orderId);
@@ -25,47 +26,71 @@ async function viewOrderPage({ params }) {
             <Link href="/account/orders">
                 <p className="text-blue-500 hover:text-blue-700 hover:underline my-1"> {"<"} Back to Order History</p>
             </Link>
-            <h1 className="text-4xl font-medium">Order Details</h1>
-        
-            <div className="flex flex-col gap-4">
-                <div className="divide-y divide-gray-200 mt-6 shadow md:table min-w-full">
-                    <div className="bg-gray-50 hidden md:table-header-group">
-                        <div className="md:table-row">
-                            <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider md:table-cell">Product</div>
-                            <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider md:table-cell">Quantity</div>
-                            <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider md:table-cell">Subtotal</div>
+            <h1 className="text-4xl font-medium mb-4">Order Details</h1>
+            <div>
+                <h2 className="text-2xl mb-2 align-middle">Order #{order.orderNumber} <span className={` ${order.status === 'pending' ? 'bg-yellow-500' : order.status === 'canceled' ? 'bg-red-600' : order.status === 'delivered' ? 'bg-green-600' : order.status === 'processing' ? 'bg-blue-600' : 'bg-purple-600'} text-white font-semibold p-1 rounded text-sm align-middle`}>{order.status}</span></h2>
+                <div className="flex flex-col md:flex-row gap-8">
+                    <div className="flex flex-col gap-4">
+                        <h3 className="text-xl">Products:</h3>
+                        <div className="divide-y divide-gray-200 shadow md:table min-w-full">
+                            <div className="bg-gray-50 hidden md:table-header-group">
+                                <div className="md:table-row">
+                                    <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider md:table-cell">Product</div>
+                                    <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider md:table-cell">Quantity</div>
+                                    <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider md:table-cell">Subtotal</div>
+                                </div>
+                            </div>
+
+                            <div className="bg-white divide-y divide-gray-200 font-light md:table-row-group rounded-lg">
+                                {order.products.map((product, index) => (
+                                    <div key={index} className="md:table-row">
+                                        <div className="px-6 py-4 whitespace-nowrap md:table-cell">
+                                            <div className="font-medium text-gray-500 uppercase tracking-wider block md:hidden">Product</div>
+                                            <Link href={`/products/${product.slug}`} className="text-blue-500 hover:text-blue-700 hover:underline">
+                                                <div className="flex items-center gap-2">
+                                                    <Image src={product.image} alt={product.name} width={50} height={50} />
+                                                    <span>{product.name}</span>
+                                                </div>
+                                            </Link>
+                                        </div>
+                                        <div className="px-6 py-4 whitespace-nowrap md:table-cell md:text-center align-middle">
+                                            <div className="font-medium text-gray-500 uppercase tracking-wider block md:hidden">Quantity</div>
+                                            {product.quantity}
+                                        </div>
+                                        <div className="px-6 py-4 whitespace-nowrap md:table-cell md:text-center align-middle">
+                                            <div className="font-medium text-gray-500 uppercase tracking-wider block md:hidden">Subtotal</div>
+                                            {product.pricePerPiece * product.quantity}
+                                        </div>
+                                    </div>
+                                ))}
+                                <div className="md:table-row">
+                                    <div className="px-6 py-4 whitespace-nowrap text-right font-medium md:table-cell">
+                                        <div className="font-medium text-gray-500 uppercase tracking-wider text-left">Total:</div>
+                                    </div>
+                                    <div className="px-6 py-4 whitespace-nowrap hidden md:table-cell text-lg font-medium"></div>
+                                    <div className="px-6 py-4 whitespace-nowrap md:table-cell text-lg font-medium table text-center">{order.total.toFixed(2)}</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-        
-                    <div className="bg-white divide-y divide-gray-200 font-light md:table-row-group rounded-lg">
-                        {order.products.map((product, index) => (
-                            <div key={index} className="md:table-row">
-                                <div className="px-6 py-4 whitespace-nowrap md:table-cell">
-                                    <div className="font-medium text-gray-500 uppercase tracking-wider block md:hidden">Product</div>
-                                    <Link href={`/products/${product.slug}`} className="text-blue-500 hover:text-blue-700 hover:underline">{product.name}</Link>
-                                </div>
-                                <div className="px-6 py-4 whitespace-nowrap md:table-cell">
-                                    <div className="font-medium text-gray-500 uppercase tracking-wider block md:hidden">Quantity</div>
-                                    {product.quantity}
-                                </div>
-                                <div className="px-6 py-4 whitespace-nowrap md:table-cell">
-                                    <div className="font-medium text-gray-500 uppercase tracking-wider block md:hidden">Subtotal</div>
-                                    {product.pricePerPiece * product.quantity}
-                                </div>
-                            </div>
-                        ))}
-                        <div className="md:table-row">
-                            <div className="px-6 py-4 whitespace-nowrap text-right font-medium md:table-cell md:col-span-3">
-                                <div className="font-medium text-gray-500 uppercase tracking-wider text-left">Total:</div>
-                            </div>
-                            <div className="px-6 py-4 whitespace-nowrap md:table-cell text-lg font-medium">{order.total.toFixed(2)}</div>
-                        </div>
+
+                    <div className="flex flex-col gap-4">
+                        <h3 className="text-xl">Shipping Address</h3>
+                        {console.log(`Shipping Address: ${order.shippingAddress}`)}
+                        <AddressCard addressId={order.shippingAddress} />
+                        <h3 className="text-xl">Billing Address</h3>
+                        {console.log(`Billing Address: ${order.billingAddress}`)}
+                        <AddressCard addressId={order.billingAddress} />
+                        <h3 className="text-xl">Payment Method</h3>
+                        <p>{order.paymentMethod}</p>
                     </div>
                 </div>
-        
-                {/* <AddressCard addressId={order.shippingAddress}  />
-                <AddressCard addressId={order.billingAddress} /> */}
+
+                <div>
+                    <h3 className="text-xl">Order Status History</h3>
+                </div>
             </div>
+
         </div>
     )
 }
