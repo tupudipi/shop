@@ -8,6 +8,14 @@ import { doc, getDoc } from "firebase/firestore";
 import ProductReviewClient from "@/app/components/ProductReviewClient";
 import { ReviewProvider } from '@/context/ReviewContext';
 
+export async function generateMetadata({ params }){
+    const product = await fetchProductData(params.id);
+    return {
+      title: `Cico ${product.name}`,
+      description: `Product page for ${product.name} from Cico Shop.`,
+    };
+  }
+
 async function fetchProductData(slug) {
     const productRef = doc(db, "Products", slug);
     const productSnap = await getDoc(productRef);
