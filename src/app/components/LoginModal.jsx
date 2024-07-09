@@ -3,14 +3,28 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 import { signIn } from 'next-auth/react';
+import { mergeWishlistAndCart } from '@/utils/mergeData';
 
 
 const handleSignIn = async () => {
-    const result = await signIn('google');
-    if (result?.ok) {
-      console.log('Signed in successfully');
-    } else {
-      console.error('Failed to sign in');
+    console.log('Sign-in process started'); 
+    try {
+      const result = await signIn('google', { redirect: false });
+      console.log('Sign-in result:', result); 
+      if (result?.ok) {
+        console.log('Signed in successfully');
+        if (result.user && result.user.email) {
+          console.log('Attempting to merge data for:', result.user.email);
+          await mergeWishlistAndCart(result.user.email);
+          console.log('Merge completed');
+        } else {
+          console.error('User email not found in result');
+        }
+      } else {
+        console.error('Failed to sign in');
+      }
+    } catch (error) {
+      console.error('Error during sign in process:', error);
     }
   };
 
