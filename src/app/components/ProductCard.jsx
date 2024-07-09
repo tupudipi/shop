@@ -9,24 +9,21 @@ const ProductCard = ({ product, isCart }) => {
   const lastStarWidth = `${(reviewValue % 1) * 100}%`;
 
   return (
-    <div className="flex flex-col gap-3 bg-white p-3 rounded-lg shadow hover:shadow-lg transition-shadow items-center min-w-fit max-w-[480px] md:max-w-[280px]">
-      <Link href={`/products/${product.slug}`}>
-        <div className="grid place-content-center">
-          <Image
-            src={product.image}
-            alt={product.name}
-            objectFit="cover"
-            className="rounded-lg shadow-lg md:w-[150px] md:h-[150px] min-w-[150px] min-h-[150px] max-w-[250px] max-h-[250px] w-auto h-auto"
-            width={250}
-            height={250}
-          />
-        </div>
+    <div className="flex flex-col bg-white rounded-lg shadow hover:shadow-lg transition-shadow w-full max-w-[280px] mx-auto">
+      <Link href={`/products/${product.slug}`} className="block aspect-square relative overflow-hidden">
+        <Image
+          src={product.image}
+          alt={product.name}
+          layout="fill"
+          objectFit="cover"
+          className="rounded-t-lg"
+        />
       </Link>
-      <div className="flex flex-col gap-4 justify-between h-[100%]">
+      <div className="p-4 flex flex-col gap-2 flex-grow">
         <Link href={`/products/${product.slug}`}>
-          <h3 className="text-lg text-start">{product.name}</h3>
+          <h3 className="text-lg font-medium line-clamp-2 text-start">{product.name}</h3>
         </Link>
-        <div id="star-review" className="flex justify-between items-center gap-1 md:gap-3">
+        <div id="star-review" className="flex items-center gap-3">
           <div className="flex gap-1">
             {[...Array(Math.floor(reviewValue))].map((_, i) => (
               <div key={i} className="w-4 h-4 bg-yellow-500 rounded-full"></div>
@@ -44,14 +41,12 @@ const ProductCard = ({ product, isCart }) => {
             {reviewValue}<span className="text-gray-500">({reviewCount})</span>
           </p>
         </div>
-        <div className="flex flex-col gap-2 justify-between">
-          <p className="font-bold text-start">${product.price.toFixed(2)}</p>
-          {isCart ? (
-            <ProductCardQuantityClientElement product={product} />
-          ) : (
-            <ProductActionButtonsClientElement product={product} />
-          )}
-        </div>
+        <p className="font-medium text-lg mt-auto text-start">${product.price.toFixed(2)}</p>
+        {isCart ? (
+          <ProductCardQuantityClientElement product={product} />
+        ) : (
+          <ProductActionButtonsClientElement product={product} />
+        )}
       </div>
     </div>
   );
