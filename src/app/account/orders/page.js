@@ -3,14 +3,19 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from "@/firebaseInit";
+export const dynamic = 'force-dynamic'
 
 const fetchOrdersData = async (user_email) => {
   const ordersCollection = collection(db, 'Orders');
   const q = query(ordersCollection, where('userEmail', '==', user_email));
   const querySnapshot = await getDocs(q);
   const orders = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-  
-  orders.sort((a, b) => b.orderNumber - a.orderNumber);
+  orders.sort((a, b) => {
+    const timeComparison = b.createdAt.seconds - a.createdAt.seconds;
+    if (timeComparison !== 0) return timeComparison;
+    
+    return b.orderNumber - a.orderNumber;
+  });
 
   return orders;
 }

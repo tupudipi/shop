@@ -66,17 +66,19 @@ function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const truncatedProducts = products.map(product => ({
       name: product.name,
       quantity: product.quantity,
       pricePerPiece: product.price,
       totalPerProduct: product.price * product.quantity,
-      slug: product.slug
+      slug: product.slug,
+      image: product.image
     }));
-
+  
     const orderNumber = generateOrderNumber();
-
+    const currentTimestamp = new Date();
+  
     try {
       const orderData = {
         orderNumber,
@@ -87,14 +89,21 @@ function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
         userEmail,
         products: truncatedProducts,
         createdAt: serverTimestamp(),
-        status: 'pending'
+        status: 'pending',
+        statusHistory: [
+          {
+            status: 'pending',
+            timestamp: currentTimestamp.toISOString(),
+            note: 'Order placed'
+          }
+        ]
       };
-
+  
       const docRef = await addDoc(collection(db, "Orders"), orderData);
-
+  
       await clearUserCart(userEmail);
       onClose();
-
+  
       router.push('/account/orders');
     } catch (error) {
       console.error("Error processing order: ", error);
