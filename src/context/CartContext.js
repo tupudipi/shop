@@ -134,8 +134,24 @@ export const CartProvider = ({ children }) => {
         }
     };
 
+    const clearCart = async () => {
+        if (session) {
+            const q = query(collection(db, 'Carts'), where('user_id', '==', session.user.email));
+            const querySnapshot = await getDocs(q);
+
+            if (!querySnapshot.empty) {
+                querySnapshot.forEach(async doc => {
+                    await deleteDoc(doc.ref);
+                });
+            }
+        } else {
+            setCart([]);
+            localStorage.removeItem('cart');
+        }
+    }
+
     return (
-        <CartContext.Provider value={{ cart, addToCart, removeFromCart, decrementCartItem, incrementCartItem }}>
+        <CartContext.Provider value={{ cart, addToCart, removeFromCart, decrementCartItem, incrementCartItem, clearCart }}>
             {children}
         </CartContext.Provider>
     );

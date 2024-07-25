@@ -3,7 +3,7 @@
 import { useState, useContext } from 'react';
 import { CartContext } from "@/context/CartContext";
 import ProductCard from "@/app/components/ProductCard";
-import CheckoutModal from "@/app/components/CheckoutModal";
+import VisitorCheckoutModal from "@/app/components/VisitorCheckoutModal";
 
 function CartPage() {
   const { cart } = useContext(CartContext);
@@ -43,15 +43,14 @@ function CartPage() {
           </div>
         )
       }
-      {/* {isModalOpen && (
-        <CheckoutModal
+       {isModalOpen && (
+        <VisitorCheckoutModal
           isOpen={isModalOpen}
           onClose={handleCloseModal}
           total={products.reduce((acc, product) => acc + product.price * product.quantity, 0)}
           products={products}
-          userEmail={session?.user?.email}
         />
-      )} */}
+      )} 
     </div>
   );
 }
