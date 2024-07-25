@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars } from '@fortawesome/free-solid-svg-icons';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faUser } from '@fortawesome/free-regular-svg-icons';
 import WishListDrowpdown from './WishListDropdown';
 import CartDropdown from './CartDropdown';
 import LoginButton from './LoginButton';
@@ -26,13 +26,25 @@ const Sidebar = ({ closeSidebar, sidebarOpen, categories }) => {
     const { data: session } = useSession();
     return (<>
         <div className={`fixed left-0 h-full w-64 bg-white p-4 flex flex-col z-40 transition-transform duration-200 ease-in-out ${sidebarOpen ? 'transform translate-x-0' : 'transform -translate-x-full'}`}>
-            {session && (
+            {session ? (
                 <div>
                     <Link href='/account' >
                         <div className='hover:text-indigo-950 transition-all mb-2'>
                             <div className='flex gap-1'>
                                 <Image width={24} height={24} alt='User' src={session.user.image} />
                                 <p className='mb-1'>{session.user.name}</p>
+                            </div>
+                        </div>
+                    </Link>
+                    <hr className='border-2 text-slate-600 rounded-full'></hr>
+                </div>
+            ) : (
+                <div>
+                    <Link href='/visitor' >
+                        <div className='hover:text-indigo-950 transition-all mb-2'>
+                            <div className='flex gap-1 items-baseline'>
+                                <FontAwesomeIcon icon={faUser} />
+                                <p className='mb-1'>Visitor Account</p>
                             </div>
                         </div>
                     </Link>

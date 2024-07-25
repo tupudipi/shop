@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { useState, useRef, useContext } from "react";
+import { useState, useRef, useContext, useEffect } from "react";
 import { faHeart, faAngleDown, faTimes, faAngleRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import useOutsideClick from "./useOutsideClick";
@@ -10,7 +10,7 @@ import { WishlistContext } from "@/context/WishlistContext";
 import { useSession } from "next-auth/react";
 
 export default function WishlistDropdown(props) {
-    const { data: session } = useSession();
+    const { data: session, status } = useSession();
     const [wishlistOpen, setWishlistOpen] = useState(false);
     const wishlistRef = useRef(null);
 
@@ -23,6 +23,12 @@ export default function WishlistDropdown(props) {
     const handleDeleteItem = (slug) => {
         removeFromWishlist(slug);
     };
+
+    useEffect(() => {
+        console.log(`session`, session);
+    }, [session]);
+
+    const isAuthenticated = session && status === 'authenticated';
 
     return (
         <>
@@ -44,7 +50,7 @@ export default function WishlistDropdown(props) {
                                 <li key={item.slug} className="flex justify-between items-center mb-2 gap-5 border-b-2 pb-1">
                                     <Link href={`/products/${item.slug}`}>
                                         <div className="flex items-center">
-                                            <Image src={item.image} alt={item.name} className="object-cover mr-2" width={'40'} height={'40'} />
+                                            <Image src={item.image} alt={item.name} className="object-cover mr-2" width={40} height={40} />
                                             <p className="hover:underline hover:text-indigo-900 w-40">{item.name}</p>
                                         </div>
                                     </Link>
@@ -56,11 +62,11 @@ export default function WishlistDropdown(props) {
                             ))}
                         </ul>
                         {wishlist.length > 0 ? (
-                            <Link href="/account/wishlist">
+                            <Link href={!isAuthenticated ? "/visitor/wishlist" : "/account/wishlist"}>
                                 <p className="mt-2 inline-block bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-all hover:shadow">Go to Wishlist</p>
                             </Link>
                         ) : (
-                            <p className={`mt-2 text-center transition-all ${wishlistOpen ? ('opacity-100') : ('opacity-0')}`}>Your wishlist is empty. Start adding your favourite products!</p>
+                            <p className={`mt-2 text-center transition-all ${wishlistOpen ? 'opacity-100' : 'opacity-0'}`}>Your wishlist is empty. Start adding your favourite products!</p>
                         )}
                     </div>
                 </div>
@@ -71,7 +77,7 @@ export default function WishlistDropdown(props) {
                     <div className="group cursor-pointer hover:text-indigo-950 transition-all"
                         onClick={() => setWishlistOpen(!wishlistOpen)}
                     >
-                        <FontAwesomeIcon icon={faHeart} className="mr-2"/>
+                        <FontAwesomeIcon icon={faHeart} className="mr-2" />
                         {wishlist.length > 0 &&
                             <span className="absolute -top-2 -left-2 p-0.5 bg-red-500/75 group-hover:bg-red-500 text-white text-xs font-bold rounded-full">{wishlist.length}</span>
                         }
@@ -83,7 +89,7 @@ export default function WishlistDropdown(props) {
                                 <li key={item.slug} className="flex justify-between items-center mb-2 gap-5 border-b-2 pb-1">
                                     <Link href={`/products/${item.slug}`}>
                                         <div className="flex items-center">
-                                            <Image src={item.image} alt={item.name} className="object-cover mr-2" width={'40'} height={'40'} />
+                                            <Image src={item.image} alt={item.name} className="object-cover mr-2" width={40} height={40} />
                                             <p className="hover:underline hover:text-indigo-900 w-20">{item.name}</p>
                                         </div>
                                     </Link>
@@ -95,7 +101,7 @@ export default function WishlistDropdown(props) {
                             ))}
                         </ul>
                         {wishlist.length > 0 ? (
-                            <Link href="/account/wishlist">
+                            <Link href={!isAuthenticated ? "/visitor/wishlist" : "/account/wishlist"}>
                                 <p className="mt-2 inline-block bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-all hover:shadow">Go to Wishlist</p>
                             </Link>
                         ) : (
@@ -106,4 +112,4 @@ export default function WishlistDropdown(props) {
             }
         </>
     );
-};
+}

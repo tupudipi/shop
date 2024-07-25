@@ -1,17 +1,19 @@
 'use client';
 
-import { useState, useRef, useContext } from "react";
+import { useState, useRef, useContext, useEffect } from "react";
 import { faShoppingCart, faAngleDown, faTimes, faAngleRight, faMinus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import useOutsideClick from "./useOutsideClick";
 import Link from "next/link";
 import Image from "next/image";
 import { CartContext } from '@/context/CartContext';
+import { useSession } from "next-auth/react";
 
 export default function CartDropdown(props) {
     const { cart, removeFromCart, decrementCartItem } = useContext(CartContext);
     const [cartOpen, setCartOpen] = useState(false);
     const cartRef = useRef(null);
+    const { data: session, status } = useSession();
 
     useOutsideClick(cartRef, () => {
         setCartOpen(false);
@@ -19,6 +21,12 @@ export default function CartDropdown(props) {
 
     const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
     const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+
+    useEffect(() => {
+        console.log(`session`, session);
+    }, [session]);
+
+    const isAuthenticated = session && status === 'authenticated';
 
     return (
         <>
@@ -60,7 +68,7 @@ export default function CartDropdown(props) {
                                         ))}
                                     </ul>
                                     <p className="mt-2">Total: ${total.toFixed(2)}</p>
-                                    <Link href="/account/cart">
+                                    <Link href={!isAuthenticated ? "/visitor/cart" : "/account/cart"}>
                                         <p className="mt-2 inline-block bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-all hover:shadow">Go to Cart</p>
                                     </Link>
                                 </>
@@ -109,7 +117,7 @@ export default function CartDropdown(props) {
                                         ))}
                                     </ul>
                                     <p className="mt-2">Total: ${total.toFixed(2)}</p>
-                                    <Link href="/account/cart">
+                                    <Link href={!isAuthenticated ? "/visitor/cart" : "/account/cart"}>
                                         <p className="mt-2 inline-block bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-all hover:shadow">Go to Cart</p>
                                     </Link>
                                 </>
