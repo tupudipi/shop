@@ -98,6 +98,9 @@ const Navbar = () => {
                         </div>
                         <Link href="/" className="font-bold text-xl">Cico Shop</Link>
                     </div>
+                    <div className='flex-1 px-4 hidden md:block'>
+                        <Search />
+                    </div>
                     <div className="flex justify-end gap-5 items-center">
                         <WishListDrowpdown navbar />
                         <CartDropdown navbar />
@@ -106,7 +109,9 @@ const Navbar = () => {
                 </div>
                 <div className="mt-2 relative">
                     <Sidebar closeSidebar={() => setSidebarOpen(false)} sidebarOpen={sidebarOpen} categories={categories} />
-                    <Search />
+                    <div className='md:hidden'>
+                        <Search />
+                    </div>
                 </div>
             </div>
         </nav>
