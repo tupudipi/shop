@@ -22,10 +22,6 @@ export default function CartDropdown(props) {
     const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
     const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
-    useEffect(() => {
-        console.log(`session`, session);
-    }, [session]);
-
     const isAuthenticated = session && status === 'authenticated';
 
     return (

@@ -8,13 +8,13 @@ import { doc, getDoc } from "firebase/firestore";
 import ProductReviewClient from "@/app/components/ProductReviewClient";
 import { ReviewProvider } from '@/context/ReviewContext';
 
-export async function generateMetadata({ params }){
+export async function generateMetadata({ params }) {
     const product = await fetchProductData(params.id);
     return {
-      title: `Cico ${product.name}`,
-      description: `Product page for ${product.name} from Cico Shop.`,
+        title: `Cico ${product.name}`,
+        description: `Product page for ${product.name} from Cico Shop.`,
     };
-  }
+}
 
 async function fetchProductData(slug) {
     const productRef = doc(db, "Products", slug);
@@ -53,18 +53,19 @@ const ProductPage = async ({ params }) => {
                             <div>
                                 <h1 className="text-3xl mb-2">{product.name}</h1>
                                 <ProductReviewClient reviewValue={product.reviewValue} reviewCount={product.reviewCount} lastStarWidth={lastStarWidth} />
+                            </div>
 
-                                <p className="font-bold text-2xl">${product.price}</p>
 
-                                <div>
-                                    <div className="flex flex-col mt-4 gap-4">
-                                        <div className="flex flex-col gap-2">
-                                            <p className={`text-green-700 ${product.stock > 0 ? 'block' : 'hidden'}`}>In stock</p>
-                                            <p className={`text-red-700 ${product.stock === 0 ? 'block' : 'hidden'}`}>Out of stock</p>
-                                            <p className={`text-yellow-500 ${product.stock > 0 && product.stock <= 10 ? 'block' : 'hidden'}`}>Only {product.stock} left!</p>
+                            <p className="font-bold text-2xl">${product.price}</p>
 
-                                            <ClientProductSection product={product} />
-                                        </div>
+                            <div>
+                                <div className="flex flex-col mt-4 gap-4">
+                                    <div className="flex flex-col gap-2">
+                                        <p className={`text-green-700 ${product.stock > 0 ? 'block' : 'hidden'}`}>In stock</p>
+                                        <p className={`text-red-700 ${product.stock === 0 ? 'block' : 'hidden'}`}>Out of stock</p>
+                                        <p className={`text-yellow-500 ${product.stock > 0 && product.stock <= 10 ? 'block' : 'hidden'}`}>Only {product.stock} left!</p>
+
+                                        <ClientProductSection product={product} />
                                     </div>
                                 </div>
                             </div>

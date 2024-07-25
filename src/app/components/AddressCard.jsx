@@ -19,9 +19,6 @@ async function AddressCard ({ isMainDelivery, isMainBilling, address, removeAddr
   let addressDataFromId = null;
   if (addressId) {
     addressDataFromId = await fetchAddressesData(addressId);
-    console.log(`
-      addressId: ${addressId}
-      addressDataFromId: ${addressDataFromId}`);
   }
 
   return (

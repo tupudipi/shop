@@ -120,7 +120,7 @@ const CategoryShow = ({ page, categoryID, currentProductSlug }) => {
             </h2>
             <div
                 ref={scrollContainer}
-                className="flex gap-3 md:gap-6 max-w-sm md:max-w-3xl overflow-scroll pb-6 lg:max-w-5xl xl:max-w-7xl mb-2"
+                className="flex gap-3 md:gap-6 max-w-sm md:max-w-3xl overflow-x-auto pb-6 lg:max-w-5xl xl:max-w-7xl mb-2"
                 style={{ scrollBehavior: 'smooth' }}
             >
                 {isLoading ? (

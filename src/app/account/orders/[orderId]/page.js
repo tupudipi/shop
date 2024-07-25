@@ -76,10 +76,10 @@ async function viewOrderPage({ params }) {
 
                     <div className="flex flex-col gap-4">
                         <h3 className="text-xl">Shipping Address</h3>
-                        {console.log(`Shipping Address: ${order.shippingAddress}`)}
+                        
                         <AddressCard addressId={order.shippingAddress} />
                         <h3 className="text-xl">Billing Address</h3>
-                        {console.log(`Billing Address: ${order.billingAddress}`)}
+                        
                         <AddressCard addressId={order.billingAddress} />
                         <h3 className="text-xl">Payment Method</h3>
                         <p>{order.paymentMethod}</p>

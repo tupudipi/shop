@@ -24,10 +24,6 @@ export default function WishlistDropdown(props) {
         removeFromWishlist(slug);
     };
 
-    useEffect(() => {
-        console.log(`session`, session);
-    }, [session]);
-
     const isAuthenticated = session && status === 'authenticated';
 
     return (
