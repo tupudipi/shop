@@ -43,7 +43,7 @@ export default function CartDropdown(props) {
                         <FontAwesomeIcon icon={faAngleDown} className={`max-h-4 transition-transform ${cartOpen ? 'rotate-180' : ''}`} />
                     </div>
                     {
-                        <div className={`rounded-md flex flex-col items-center transition-all overflow-hidden absolute top-8 right-0 bg-white shadow-md w-content z-50 ${cartOpen ? 'max-h-96 p-4 pb-2' : 'max-h-0 p-0'}`}>
+                        <div className={`rounded-md flex flex-col items-center transition-all overflow-x-hidden overflow-y-auto absolute top-8 right-0 bg-white shadow-md w-content z-50 ${cartOpen ? 'max-h-96 p-4 pb-2' : 'max-h-0 p-0'}`}>
                             {cart.length > 0 ? (
                                 <>
                                     <ul className={`transition-all ${cartOpen ? 'text-indigo-500' : ''}`}>
@@ -67,10 +67,12 @@ export default function CartDropdown(props) {
                                             </li>
                                         ))}
                                     </ul>
-                                    <p className="mt-2">Total: ${total.toFixed(2)}</p>
-                                    <Link href={!isAuthenticated ? "/visitor/cart" : "/account/cart"}>
-                                        <p className="mt-2 inline-block bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-all hover:shadow">Go to Cart</p>
-                                    </Link>
+                                    <div>
+                                        <p className="mt-2">Total: ${total.toFixed(2)}</p>
+                                        <Link href={!isAuthenticated ? "/visitor/cart" : "/account/cart"}>
+                                            <p className="mt-2 inline-block bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-all hover:shadow">Go to Cart</p>
+                                        </Link>
+                                    </div>
                                 </>
                             ) : (
                                 <p className={`p-2 text-center transition-all ${cartOpen ? ('opacity-100') : ('opacity-0')}`}>Your cart is empty.</p>
@@ -92,7 +94,7 @@ export default function CartDropdown(props) {
                         Cart <FontAwesomeIcon icon={faAngleRight} className={`max-h-4 transition-transform ${cartOpen ? 'rotate-180' : ''}`} />
                     </div>
                     {
-                        <div className={`rounded-md flex flex-col items-center transition-all overflow-hidden absolute top-0 left-28 bg-white shadow-md w-content z-50 ${cartOpen ? 'border max-h-96 p-4 pb-2 opacity-100' : 'max-h-0 p-0 opacity-0'}`}>
+                        <div className={`rounded-md flex flex-col items-center transition-all overflow-x-hidden overflow-y-auto absolute top-0 left-28 bg-white shadow-md w-content z-50 ${cartOpen ? 'border max-h-96 p-4 pb-2 opacity-100' : 'max-h-0 p-0 opacity-0'}`}>
                             {cart.length > 0 ? (
                                 <>
                                     <ul className={`transition-all ${cartOpen ? 'text-indigo-500' : ''}`}>
@@ -116,10 +118,12 @@ export default function CartDropdown(props) {
                                             </li>
                                         ))}
                                     </ul>
-                                    <p className="mt-2">Total: ${total.toFixed(2)}</p>
-                                    <Link href={!isAuthenticated ? "/visitor/cart" : "/account/cart"}>
-                                        <p className="mt-2 inline-block bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-all hover:shadow">Go to Cart</p>
-                                    </Link>
+                                    <div>
+                                        <p className="mt-2">Total: ${total.toFixed(2)}</p>
+                                        <Link href={!isAuthenticated ? "/visitor/cart" : "/account/cart"}>
+                                            <p className="mt-2 inline-block bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-all hover:shadow">Go to Cart</p>
+                                        </Link>
+                                    </div>
                                 </>
                             ) : (
                                 <p className="p-4">Your cart is empty.</p>
