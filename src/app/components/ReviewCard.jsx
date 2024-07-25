@@ -197,7 +197,8 @@ const ReviewCard = ({ review, handleDeleteReview, product_id }) => {
           <div>
             <button
               onClick={() => setShowReplies(!showReplies)}
-              className="text-blue-500 hover:text-blue-700 text-sm"
+              className={`text-blue-500 ${replies.length > 0 ? ('hover:text-blue-700') : ('')} text-sm`}
+              {...(replies.length === 0 && { disabled: true })}
             >
               {showReplies ? 'Hide Replies' : `Show Replies (${replies.length})`}
             </button>
