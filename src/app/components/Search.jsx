@@ -128,7 +128,7 @@ const Search = () => {
                     {!isLoading && !error && searchResults.map((result) => (
                         <Link
                             key={`${result.type}-${result.id}`}
-                            href={result.type === 'product' ? `/products/${result.id}` : `/categories/${result.id}`}
+                            href={result.type === 'product' ? `/products/${result.id}` : `/search/${result.name}`}
                             className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
                         >
                             {result.type === 'product' && result.image && (
