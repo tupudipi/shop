@@ -1,7 +1,6 @@
-'use client'
 import { useState, useEffect, useRef, useContext } from 'react';
 import { db } from "@/firebaseInit";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { addDoc, collection, serverTimestamp, getDoc, doc, writeBatch } from "firebase/firestore";
 import { CartContext } from "@/context/CartContext";
 import Toast from '@/app/components/Toast';
 
@@ -97,7 +96,36 @@ function VisitorCheckoutModal({ isOpen, onClose, total, products }) {
         ]
       };
 
-      await addDoc(collection(db, "Orders"), orderData);
+      console.log("Order data:", orderData);
+
+      // Batch write for order creation and stock update
+      const batch = writeBatch(db);
+
+      // Add the order to the batch
+      const orderRef = doc(collection(db, "Orders"));
+      batch.set(orderRef, orderData);
+
+      // Update stock for each product in the batch
+      for (const product of truncatedProducts) {
+        const productRef = doc(db, "Products", product.slug);
+        const productDoc = await getDoc(productRef);
+
+        if (productDoc.exists()) {
+          const currentStock = productDoc.data().stock;
+          const newStock = currentStock - product.quantity;
+
+          if (newStock >= 0) {
+            batch.update(productRef, { stock: newStock });
+          } else {
+            throw new Error(`Insufficient stock for product: ${product.name}`);
+          }
+        } else {
+          throw new Error(`Product not found: ${product.name}`);
+        }
+      }
+
+      // Commit the batch
+      await batch.commit();
 
       console.log("Order data:", orderData);
       clearCart();
@@ -126,7 +154,7 @@ function VisitorCheckoutModal({ isOpen, onClose, total, products }) {
               <h3 className="text-lg font-semibold mb-2">Order Summary</h3>
               <div className="bg-gray-100 p-2 rounded">
                 {products.map((product) => (
-                  <div key={product.id} className="flex justify-between items-center mb-1">
+                  <div key={product.slug} className="flex justify-between items-center mb-1">
                     <span>{product.name} x {product.quantity}</span>
                     <span>${(product.price * product.quantity).toFixed(2)}</span>
                   </div>

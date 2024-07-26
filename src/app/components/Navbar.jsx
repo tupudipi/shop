@@ -87,7 +87,7 @@ const Navbar = () => {
 
     return (
         <nav className="text-indigo-800">
-            <div className="px-4 py-2 container mx-auto">
+            <div className="px-4 py-2 mx-auto">
                 <div className="flex justify-between align-middle">
                     <div className="flex items-center gap-2">
                         <div
@@ -98,7 +98,7 @@ const Navbar = () => {
                         </div>
                         <Link href="/" className="font-bold text-xl">Cico Shop</Link>
                     </div>
-                    <div className='flex-1 px-4 hidden md:block'>
+                    <div className='flex-1 md:px-4 hidden md:block'>
                         <Search />
                     </div>
                     <div className="flex justify-end gap-5 items-center">
