@@ -26,17 +26,22 @@ export default function WishlistDropdown(props) {
 
     const moveToCart = () => {
         const tempCart = [...cart];
+        if (session && status === 'authenticated') {
+            for (const item of wishlist) {
+                addToCart(item);
+            }
+        } else {
+            for (const item of wishlist) {
+                const existingProductIndex = tempCart.findIndex(cartItem => cartItem.slug === item.slug);
 
-        for (const item of wishlist) {
-            const existingProductIndex = tempCart.findIndex(cartItem => cartItem.slug === item.slug);
-
-            if (existingProductIndex !== -1) {
-                tempCart[existingProductIndex] = {
-                    ...tempCart[existingProductIndex],
-                    quantity: (tempCart[existingProductIndex].quantity || 1) + (item.quantity || 1)
-                };
-            } else {
-                tempCart.push({ ...item, quantity: item.quantity || 1 });
+                if (existingProductIndex !== -1) {
+                    tempCart[existingProductIndex] = {
+                        ...tempCart[existingProductIndex],
+                        quantity: (tempCart[existingProductIndex].quantity || 1) + (item.quantity || 1)
+                    };
+                } else {
+                    tempCart.push({ ...item, quantity: item.quantity || 1 });
+                }
             }
         }
 
@@ -93,7 +98,7 @@ export default function WishlistDropdown(props) {
                     </div>
                 </div>
             }
-            
+
             {props.sidebar &&
                 <div className="block relative select-none md:hidden">
                     <div className="group cursor-pointer hover:text-indigo-950 transition-all flex items-center gap-1"
