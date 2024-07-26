@@ -10,7 +10,7 @@ import { CartContext } from '@/context/CartContext';
 import { useSession } from "next-auth/react";
 
 export default function CartDropdown(props) {
-    const { cart, removeFromCart, decrementCartItem } = useContext(CartContext);
+    const { cart, removeFromCart, decrementCartItem, clearCart } = useContext(CartContext);
     const [cartOpen, setCartOpen] = useState(false);
     const cartRef = useRef(null);
     const { data: session, status } = useSession();
@@ -40,6 +40,9 @@ export default function CartDropdown(props) {
                     </div>
                     {
                         <div className={`rounded-md flex flex-col items-center transition-all overflow-x-hidden overflow-y-auto absolute top-8 right-0 bg-white shadow-md w-content z-50 ${cartOpen ? 'max-h-96 p-4 pb-2' : 'max-h-0 p-0'}`}>
+                            {cart.length > 5 ?
+                                (<button onClick={clearCart} className="sticky top-0 mt-2 inline-block text-red-500 bg-white border border-red-500 px-2 py-1 text-sm rounded-full hover:bg-red-500 hover:text-white transition-all hover:shadow">Clear Cart</button>) :
+                                (<></>)}
                             {cart.length > 0 ? (
                                 <>
                                     <ul className={`transition-all ${cartOpen ? 'text-indigo-500' : ''}`}>
@@ -91,6 +94,9 @@ export default function CartDropdown(props) {
                     </div>
                     {
                         <div className={`rounded-md flex flex-col items-center transition-all overflow-x-hidden overflow-y-auto absolute top-0 left-28 bg-white shadow-md w-content z-50 ${cartOpen ? 'border max-h-96 p-4 pb-2 opacity-100' : 'max-h-0 p-0 opacity-0'}`}>
+                            {cart.length > 5 ?
+                                (<button onClick={clearCart} className="sticky top-0 mt-2 inline-block text-red-500 bg-white border border-red-500 px-2 py-1 text-sm rounded-full hover:bg-red-500 hover:text-white transition-all hover:shadow">Clear Cart</button>) :
+                                (<></>)}
                             {cart.length > 0 ? (
                                 <>
                                     <ul className={`transition-all ${cartOpen ? 'text-indigo-500' : ''}`}>

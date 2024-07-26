@@ -47,6 +47,24 @@ export const WishlistProvider = ({ children }) => {
         }
     };
 
+    const clearWishlist = () => {
+        if (session) {
+            wishlist.forEach(async (item) => {
+                const q = query(collection(db, 'Wishlists'), where('user_id', '==', session.user.email), where('slug', '==', item.slug));
+                const querySnapshot = await getDocs(q);
+                querySnapshot.forEach(async (doc) => {
+                    await deleteDoc(doc.ref);
+                });
+            });
+            setWishlist([]);
+        }
+        else {
+            setWishlist([]);
+            localStorage.removeItem('wishlist');
+        }
+    }
+
+
     const removeFromWishlist = async (slug) => {
         if (session) {
             const q = query(collection(db, 'Wishlists'), where('user_id', '==', session.user.email), where('slug', '==', slug));
@@ -64,7 +82,7 @@ export const WishlistProvider = ({ children }) => {
     };
 
     return (
-        <WishlistContext.Provider value={{ wishlist, addToWishlist, removeFromWishlist }}>
+        <WishlistContext.Provider value={{ wishlist, addToWishlist, removeFromWishlist, clearWishlist }}>
             {children}
         </WishlistContext.Provider>
     );

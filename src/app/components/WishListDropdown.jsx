@@ -18,7 +18,7 @@ export default function WishlistDropdown(props) {
         setWishlistOpen(false);
     });
 
-    const { wishlist, removeFromWishlist } = useContext(WishlistContext);
+    const { wishlist, removeFromWishlist, clearWishlist } = useContext(WishlistContext);
 
     const handleDeleteItem = (slug) => {
         removeFromWishlist(slug);
@@ -41,6 +41,11 @@ export default function WishlistDropdown(props) {
                         <FontAwesomeIcon icon={faAngleDown} className={`max-h-4 transition-transform ${wishlistOpen ? 'rotate-180' : ''}`} />
                     </div>
                     <div className={`rounded-md flex flex-col items-center transition-all overflow-x-hidden overflow-y-auto absolute top-8 right-0 bg-white shadow-md w-content min-w-36 z-50 ${wishlistOpen ? 'max-h-96 p-4 pb-2' : 'max-h-0 p-0'}`}>
+
+                        {wishlist.length > 5 ?
+                            (<button onClick={clearWishlist} className="sticky top-0 mt-2 inline-block text-red-500 bg-white border border-red-500 px-2 py-1 text-sm rounded-full hover:bg-red-500 hover:text-white transition-all hover:shadow">Clear Wishlist</button>) :
+                            (<></>)}
+
                         <ul className={`transition-all ${wishlistOpen ? 'text-indigo-500 opacity-100' : 'opacity-0'}`}>
                             {wishlist.map(item => (
                                 <li key={item.slug} className="flex justify-between items-center mb-2 gap-5 border-b-2 pb-1">
@@ -59,7 +64,7 @@ export default function WishlistDropdown(props) {
                         </ul>
                         {wishlist.length > 0 ? (
                             <Link href={!isAuthenticated ? "/visitor/wishlist" : "/account/wishlist"}>
-                                <p className="mt-2 inline-block bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-all hover:shadow">Go to Wishlist</p>
+                                <p className="mt-2 inline-block bg-indigo-500 text-white px-4 py-</Link>2 rounded hover:bg-indigo-700 transition-all hover:shadow">Go to Wishlist</p>
                             </Link>
                         ) : (
                             <p className={`mt-2 text-center transition-all ${wishlistOpen ? 'opacity-100' : 'opacity-0'}`}>Your wishlist is empty. Start adding your favourite products!</p>
