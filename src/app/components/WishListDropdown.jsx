@@ -43,7 +43,7 @@ export default function WishlistDropdown(props) {
                     <div className={`rounded-md flex flex-col items-center transition-all overflow-x-hidden overflow-y-auto absolute top-8 right-0 bg-white shadow-md w-content min-w-36 z-50 ${wishlistOpen ? 'max-h-96 p-4 pb-2' : 'max-h-0 p-0'}`}>
 
                         {wishlist.length > 5 ?
-                            (<button onClick={clearWishlist} className="sticky top-0 mt-2 inline-block text-red-500 bg-white border border-red-500 px-2 py-1 text-sm rounded-full hover:bg-red-500 hover:text-white transition-all hover:shadow">Clear Wishlist</button>) :
+                            (<button onClick={clearWishlist} className="sticky top-0 inline-block text-red-500 bg-white border border-red-500 px-2 py-1 text-sm rounded-full hover:bg-red-500 hover:text-white transition-all hover:shadow">Clear Wishlist</button>) :
                             (<></>)}
 
                         <ul className={`transition-all ${wishlistOpen ? 'text-indigo-500 opacity-100' : 'opacity-0'}`}>
@@ -85,6 +85,11 @@ export default function WishlistDropdown(props) {
                         Wishlist <FontAwesomeIcon icon={faAngleRight} className={`max-h-4 transition-transform ${wishlistOpen ? 'rotate-180' : ''}`} />
                     </div>
                     <div className={`rounded-md flex flex-col items-center transition-all overflow-x-hidden overflow-y-auto absolute top-0 left-28 bg-white shadow-md min-w-48 w-content z-50 ${wishlistOpen ? 'border max-h-96 p-4 pb-2 opacity-100' : 'max-h-0 p-0 opacity-0'}`}>
+
+                        {wishlist.length > 5 ?
+                            (<button onClick={clearWishlist} className="sticky top-0 inline-block text-red-500 bg-white border border-red-500 px-2 py-1 text-sm rounded-full hover:bg-red-500 hover:text-white transition-all hover:shadow">Clear Wishlist</button>) :
+                            (<></>)}
+
                         <ul className={`transition-all ${wishlistOpen ? 'text-indigo-500' : ''}`}>
                             {wishlist.map(item => (
                                 <li key={item.slug} className="flex justify-between items-center mb-2 gap-5 border-b-2 pb-1">
