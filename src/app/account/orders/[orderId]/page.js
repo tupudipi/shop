@@ -72,22 +72,51 @@ async function viewOrderPage({ params }) {
                                 </div>
                             </div>
                         </div>
+                        <div className="mt-8">
+                            <h3 className="text-2xl mb-4">Order Status History</h3>
+                            <div className="border-l-2 border-gray-200 ml-4">
+                                {order.statusHistory.map((status, index) => (
+                                    <div key={index} className="mb-6 relative">
+                                        <div className={`absolute -left-2 mt-2 w-4 h-4 rounded-full ${status.status === 'pending' ? 'bg-yellow-500' :
+                                            status.status === 'canceled' ? 'bg-red-600' :
+                                                status.status === 'delivered' ? 'bg-green-600' :
+                                                    status.status === 'processing' ? 'bg-blue-600' : 'bg-purple-600'
+                                            }`}></div>
+                                        <div className="ml-6">
+                                            <p className="font-semibold">{status.status.charAt(0).toUpperCase() + status.status.slice(1)}</p>
+                                            <p className="text-sm text-gray-500">{new Date(status.timestamp).toLocaleString()}</p>
+                                            <p className="text-sm">{status.note}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     </div>
 
                     <div className="flex flex-col gap-4">
                         <h3 className="text-xl">Shipping Address</h3>
-                        
-                        <AddressCard addressId={order.shippingAddress} />
+                        <div className="border p-4 rounded shadow bg-white">
+                            <p>Full Name: {order.shippingAddress.firstname} {order.shippingAddress.surname}</p>
+                            <p>Phone Number: {order.billingAddress.phone}</p>
+                            <p>E-mail: {order.billingAddress.user_email}</p>
+                            <p>Address: {order.shippingAddress.address}</p>
+                            <p>City: {order.shippingAddress.city}</p>
+                            <p>County: {order.shippingAddress.county}</p>
+                        </div>
+
                         <h3 className="text-xl">Billing Address</h3>
-                        
-                        <AddressCard addressId={order.billingAddress} />
+                        <div className="border p-4 rounded shadow bg-white">
+                            <p>Full Name: {order.billingAddress.firstname} {order.billingAddress.surname}</p>
+                            <p>Phone Number: {order.billingAddress.phone}</p>
+                            <p>E-mail: {order.billingAddress.user_email}</p>
+                            <p>Address: {order.billingAddress.address}</p>
+                            <p>City: {order.billingAddress.city}</p>
+                            <p>County: {order.billingAddress.county}</p>
+                        </div>
+
                         <h3 className="text-xl">Payment Method</h3>
                         <p>{order.paymentMethod}</p>
                     </div>
-                </div>
-
-                <div>
-                    <h3 className="text-xl">Order Status History</h3>
                 </div>
             </div>
 

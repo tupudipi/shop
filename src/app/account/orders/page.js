@@ -1,28 +1,25 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
-import { collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from "@/firebaseInit";
-export const dynamic = 'force-dynamic'
 
-const fetchOrdersData = async (user_email) => {
-  const ordersCollection = collection(db, 'Orders');
-  const q = query(ordersCollection, where('userEmail', '==', user_email));
-  const querySnapshot = await getDocs(q);
-  const orders = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+async function OrdersPage() {
+  const session = await getServerSession(authOptions);
+  
+  // Fetch orders from the API route
+  const orders = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/getOrders?email=${session.user.email}`, { 
+    cache: 'no-store',
+    next: { revalidate: 0 }
+  }).then(res => res.json());
+
+  // Sort orders
   orders.sort((a, b) => {
     const timeComparison = b.createdAt.seconds - a.createdAt.seconds;
     if (timeComparison !== 0) return timeComparison;
-    
-    return b.orderNumber - a.orderNumber;
+    return b.orderNumber.localeCompare(a.orderNumber);
   });
-
-  return orders;
-}
-
-async function ordersPage() {
-  const session = await getServerSession(authOptions);
-  const orders = await fetchOrdersData(session.user.email);
 
   return (
     <div>
@@ -54,7 +51,12 @@ async function ordersPage() {
                 <div className="font-medium text-gray-500 uppercase tracking-wider md:hidden block">Order Value</div>
                 ${order.total.toFixed(2)}
               </div>
-              <div className={`px-6 py-4 whitespace-nowrap md:table-cell font-medium ${order.status === 'pending' ? 'text-yellow-500' : order.status === 'canceled' ? 'text-red-600' : order.status === 'delivered' ? 'text-green-600' : order.status === 'processing' ? 'text-blue-600' : 'text-purple-600'}`}>
+              <div className={`px-6 py-4 whitespace-nowrap md:table-cell font-medium ${
+                order.status === 'pending' ? 'text-yellow-500' : 
+                order.status === 'canceled' ? 'text-red-600' : 
+                order.status === 'delivered' ? 'text-green-600' : 
+                order.status === 'processing' ? 'text-blue-600' : 'text-purple-600'
+              }`}>
                 <div className="font-medium text-gray-500 uppercase tracking-wider md:hidden block">Status</div>
                 {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
               </div>
@@ -69,6 +71,6 @@ async function ordersPage() {
       </div>
     </div>
   );
-};
+}
 
-export default ordersPage;
+export default OrdersPage;

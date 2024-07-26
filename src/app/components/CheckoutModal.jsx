@@ -1,9 +1,9 @@
 'use client'
 import { useState, useEffect, useRef } from 'react';
 import { db } from "@/firebaseInit";
-import { addDoc, collection, serverTimestamp, query, where, getDocs, deleteDoc } from "firebase/firestore";
+import { collection, serverTimestamp, query, where, getDocs, writeBatch, doc, getDoc, deleteDoc } from "firebase/firestore";
 import { useRouter } from 'next/navigation';
-import { revalidatePath } from 'next/cache';
+import Toast from '@/app/components/Toast';
 
 function generateOrderNumber() {
   const now = new Date();
@@ -21,10 +21,11 @@ function generateOrderNumber() {
 function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
   const router = useRouter();
   const [addresses, setAddresses] = useState([]);
-  const [billingAddress, setBillingAddress] = useState('');
-  const [shippingAddress, setShippingAddress] = useState('');
+  const [billingAddressId, setBillingAddressId] = useState('');
+  const [shippingAddressId, setShippingAddressId] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('cash');
   const modalRef = useRef();
+  const [toastConfig, setToastConfig] = useState({ show: false, message: '', isLoading: false });
 
   useEffect(() => {
     const fetchAddresses = async () => {
@@ -39,8 +40,8 @@ function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
       const defaultBilling = fetchedAddresses.find(addr => addr.isMainBilling);
       const defaultShipping = fetchedAddresses.find(addr => addr.isMainDelivery);
 
-      if (defaultBilling) setBillingAddress(defaultBilling.id);
-      if (defaultShipping) setShippingAddress(defaultShipping.id);
+      if (defaultBilling) setBillingAddressId(defaultBilling.id);
+      if (defaultShipping) setShippingAddressId(defaultShipping.id);
     };
 
     if (isOpen) {
@@ -64,26 +65,48 @@ function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
     };
   }, [isOpen, onClose]);
 
+  const fetchAddressById = async (id) => {
+    const addressDoc = await getDoc(doc(db, "Addresses", id));
+    return addressDoc.exists() ? addressDoc.data() : null;
+  };
+
+  const removeFields = (address) => {
+    const { isMainBilling, isMainDelivery, ...filteredAddress } = address;
+    return filteredAddress;
+  };
+
+  const fetchSelectedAddresses = async () => {
+    const billing = await fetchAddressById(billingAddressId);
+    const shipping = await fetchAddressById(shippingAddressId);
+    return {
+      billing: removeFields(billing),
+      shipping: removeFields(shipping)
+    };
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    const truncatedProducts = products.map(product => ({
-      name: product.name,
-      quantity: product.quantity,
-      pricePerPiece: product.price,
-      totalPerProduct: product.price * product.quantity,
-      slug: product.slug,
-      image: product.image
-    }));
-  
-    const orderNumber = generateOrderNumber();
-    const currentTimestamp = new Date();
-  
+    setToastConfig({ show: true, message: 'Processing order...', isLoading: true });
+
     try {
+      const { billing, shipping } = await fetchSelectedAddresses();
+
+      const truncatedProducts = products.map(product => ({
+        name: product.name,
+        quantity: product.quantity,
+        pricePerPiece: product.price,
+        totalPerProduct: product.price * product.quantity,
+        slug: product.slug,
+        image: product.image
+      }));
+
+      const orderNumber = generateOrderNumber();
+      const currentTimestamp = new Date();
+
       const orderData = {
         orderNumber,
-        billingAddress,
-        shippingAddress,
+        billingAddress: billing,
+        shippingAddress: shipping,
         paymentMethod,
         total,
         userEmail,
@@ -98,15 +121,47 @@ function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
           }
         ]
       };
-  
-      const docRef = await addDoc(collection(db, "Orders"), orderData);
-  
+
+      const batch = writeBatch(db);
+
+      const orderRef = doc(collection(db, "Orders"));
+      batch.set(orderRef, orderData);
+
+      for (const product of truncatedProducts) {
+        const productRef = doc(db, "Products", product.slug);
+        const productDoc = await getDoc(productRef);
+
+        if (productDoc.exists()) {
+          const currentStock = productDoc.data().stock;
+          const newStock = currentStock - product.quantity;
+
+          if (newStock >= 0) {
+            batch.update(productRef, { stock: newStock });
+          } else {
+            throw new Error(`Insufficient stock for product: ${product.name}`);
+          }
+        } else {
+          throw new Error(`Product not found: ${product.name}`);
+        }
+      }
+
+      await batch.commit();
+
       await clearUserCart(userEmail);
-      onClose();
-  
-      router.push('/account/orders');
+      setToastConfig({ show: true, message: 'Order placed successfully!', isLoading: false });
+
+      setTimeout(() => {
+        setToastConfig({ show: false, message: '', isLoading: false });
+        onClose();
+        router.push('/account/orders');
+      }, 2000);
+
     } catch (error) {
       console.error("Error processing order: ", error);
+      setToastConfig({ show: true, message: 'Error placing order. Please try again.', isLoading: false });
+      setTimeout(() => {
+        setToastConfig({ show: false, message: '', isLoading: false });
+      }, 2000);
     }
   };
 
@@ -144,7 +199,7 @@ function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
           <div className="mb-4">
             <h3 className="text-xl font-semibold mb-2">Order Summary</h3>
             {products.map((product) => (
-              <div key={product.id} className="flex justify-between items-center mb-2">
+              <div key={product.slug} className="flex justify-between items-center mb-2">
                 <span>{product.name} x {product.quantity}</span>
                 <span>${(product.price * product.quantity).toFixed(2)}</span>
               </div>
@@ -155,8 +210,8 @@ function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
             <label className="block mb-2">Billing Address</label>
             <select
               className="w-full p-2 border rounded"
-              value={billingAddress}
-              onChange={(e) => setBillingAddress(e.target.value)}
+              value={billingAddressId}
+              onChange={(e) => setBillingAddressId(e.target.value)}
               required
             >
               {renderAddressOptions(false)}
@@ -166,8 +221,8 @@ function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
             <label className="block mb-2">Shipping Address</label>
             <select
               className="w-full p-2 border rounded"
-              value={shippingAddress}
-              onChange={(e) => setShippingAddress(e.target.value)}
+              value={shippingAddressId}
+              onChange={(e) => setShippingAddressId(e.target.value)}
               required
             >
               {renderAddressOptions(true)}
@@ -195,13 +250,21 @@ function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-blue-300"
+              disabled={toastConfig.isLoading || toastConfig.show}
             >
-              Place Order
+              {toastConfig.isLoading ? 'Processing...' : 'Place Order'}
             </button>
           </div>
         </form>
       </div>
+      {toastConfig.show && (
+        <Toast
+          message={toastConfig.message}
+          isLoading={toastConfig.isLoading}
+          duration={2000}
+        />
+      )}
     </div>
   );
 }
