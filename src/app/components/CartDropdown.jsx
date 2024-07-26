@@ -40,11 +40,11 @@ export default function CartDropdown(props) {
                     </div>
                     {
                         <div className={`rounded-md flex flex-col items-center transition-all overflow-x-hidden overflow-y-auto absolute top-8 right-0 bg-white shadow-md w-content z-50 ${cartOpen ? 'max-h-96 p-4 pb-2' : 'max-h-0 p-0'}`}>
-                            {cart.length > 5 ?
-                                (<button onClick={clearCart} className="sticky top-0 inline-block text-red-500 bg-white border border-red-500 px-2 py-1 text-sm rounded-full hover:bg-red-500 hover:text-white transition-all hover:shadow">Clear Cart</button>) :
-                                (<></>)}
                             {cart.length > 0 ? (
                                 <>
+                                    <Link className="sticky top-0" href={!isAuthenticated ? "/visitor/cart" : "/account/cart"}>
+                                        <p className="sticky top-0 mb-2 inline-block bg-indigo-500 text-white px-2 py-1 rounded hover:bg-indigo-700 transition-all hover:shadow">Go to Checkout</p>
+                                    </Link>
                                     <ul className={`transition-all ${cartOpen ? 'text-indigo-500' : ''}`}>
                                         {cart.map(item => (
                                             <li key={item.slug} className="flex justify-between items-center mb-2 gap-5 border-b-2 pb-1">
@@ -66,11 +66,11 @@ export default function CartDropdown(props) {
                                             </li>
                                         ))}
                                     </ul>
-                                    <div>
+                                    <div className="text-center">
                                         <p className="mt-2">Total: ${total.toFixed(2)}</p>
-                                        <Link href={!isAuthenticated ? "/visitor/cart" : "/account/cart"}>
-                                            <p className="mt-2 inline-block bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-all hover:shadow">Go to Cart</p>
-                                        </Link>
+                                        {cart.length > 5 ?
+                                            (<button onClick={clearCart} className="inline-block text-red-500 bg-white border border-red-500 px-2 py-1 text-sm rounded-full hover:bg-red-500 hover:text-white transition-all hover:shadow">Clear Cart</button>) :
+                                            (<></>)}
                                     </div>
                                 </>
                             ) : (

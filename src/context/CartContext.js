@@ -35,7 +35,7 @@ export const CartProvider = ({ children }) => {
         if (session) {
             const q = query(collection(db, 'Carts'), where('user_id', '==', session.user.email), where('slug', '==', product.slug));
             const querySnapshot = await getDocs(q);
-
+    
             if (!querySnapshot.empty) {
                 const existingDoc = querySnapshot.docs[0];
                 const existingProduct = existingDoc.data();
@@ -53,22 +53,23 @@ export const CartProvider = ({ children }) => {
                 });
             }
         } else {
-            const existingProduct = cart.find(item => item.slug === product.slug);
-            let updatedCart;
-            if (existingProduct) {
-                updatedCart = cart.map(item =>
-                    item.slug === product.slug ? {
-                        ...item,
-                        quantity: (item.quantity || 1) + (product.quantity || 1)
-                    } : item
-                );
+            const updatedCart = [...cart];
+            const existingProductIndex = updatedCart.findIndex(item => item.slug === product.slug);
+            
+            if (existingProductIndex !== -1) {
+                updatedCart[existingProductIndex] = {
+                    ...updatedCart[existingProductIndex],
+                    quantity: (updatedCart[existingProductIndex].quantity || 1) + (product.quantity || 1)
+                };
             } else {
-                updatedCart = [...cart, { ...product, quantity: product.quantity || 1 }];
+                updatedCart.push({ ...product, quantity: product.quantity || 1 });
             }
+            
             setCart(updatedCart);
             localStorage.setItem('cart', JSON.stringify(updatedCart));
         }
     };
+    
 
     const removeFromCart = async (slug) => {
         if (session) {
@@ -151,7 +152,7 @@ export const CartProvider = ({ children }) => {
     }
 
     return (
-        <CartContext.Provider value={{ cart, addToCart, removeFromCart, decrementCartItem, incrementCartItem, clearCart }}>
+        <CartContext.Provider value={{ cart, addToCart, removeFromCart, decrementCartItem, incrementCartItem, clearCart, setCart }}>
             {children}
         </CartContext.Provider>
     );
