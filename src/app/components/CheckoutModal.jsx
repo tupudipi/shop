@@ -46,7 +46,12 @@ function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
 
     if (isOpen) {
       fetchAddresses();
+      document.body.style.overflow = 'hidden';
     }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
   }, [isOpen, userEmail]);
 
   useEffect(() => {
@@ -173,8 +178,6 @@ function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
     await Promise.all(deletePromises);
   };
 
-  if (!isOpen) return null;
-
   const renderAddressOptions = (isShipping) => {
     const mainAddress = addresses.find(addr =>
       isShipping ? addr.isMainDelivery : addr.isMainBilling
@@ -191,11 +194,15 @@ function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
     );
   };
 
+  if (!isOpen) return null;
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div ref={modalRef} className="bg-white p-8 rounded-lg max-w-2xl w-full max-h-90vh overflow-y-auto">
-        <h2 className="text-2xl font-bold mb-4">Checkout</h2>
-        <form onSubmit={handleSubmit}>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 overflow-y-auto">
+      <div ref={modalRef} className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="sticky top-0 bg-white z-10 p-4 border-b">
+          <h2 className="text-2xl font-bold">Checkout</h2>
+        </div>
+        <form onSubmit={handleSubmit} className="p-4">
           <div className="mb-4">
             <h3 className="text-xl font-semibold mb-2">Order Summary</h3>
             {products.map((product) => (

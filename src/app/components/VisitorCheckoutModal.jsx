@@ -43,10 +43,21 @@ function VisitorCheckoutModal({ isOpen, onClose, total, products }) {
       document.body.style.overflow = 'unset';
     }
 
+    const handleClickOutside = (event) => {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
     return () => {
       document.body.style.overflow = 'unset';
+      document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isOpen]);
+  }, [isOpen, onClose]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
