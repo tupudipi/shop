@@ -93,7 +93,7 @@ export default function WishlistDropdown(props) {
                 </div>
             }
             {props.sidebar &&
-                <div className="block select-none md:hidden" ref={wishlistRef}>
+                <div className="block relative select-none md:hidden" ref={wishlistRef}>
                     <div className="group cursor-pointer hover:text-indigo-950 transition-all flex items-center gap-1"
                         onClick={() => setWishlistOpen(!wishlistOpen)}
                     >

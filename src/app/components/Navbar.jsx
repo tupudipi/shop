@@ -25,7 +25,7 @@ async function getCategories() {
 const Sidebar = ({ closeSidebar, sidebarOpen, categories }) => {
     const { data: session } = useSession();
     return (<>
-        <div className={`fixed left-0 h-full w-64 bg-white p-4 flex flex-col z-40 transition-transform duration-200 ease-in-out ${sidebarOpen ? 'transform translate-x-0' : 'transform -translate-x-full'}`}>
+        <div className={`fixed left-0 top-0 h-screen w-64 bg-white p-4 flex flex-col z-40 transition-transform duration-200 ease-in-out overflow-y-auto ${sidebarOpen ? 'transform translate-x-0' : 'transform -translate-x-full'}`}>
             {session ? (
                 <div>
                     <Link href='/account' >
@@ -84,6 +84,18 @@ const Navbar = () => {
                 console.error('Error fetching categories:', error);
             });
     }, []);
+
+    useEffect(() => {
+        if (sidebarOpen) {
+            document.body.classList.add('overflow-hidden');
+        } else {
+            document.body.classList.remove('overflow-hidden');
+        }
+
+        return () => {
+            document.body.classList.remove('overflow-hidden');
+        };
+    }, [sidebarOpen]);
 
     return (
         <nav className="text-indigo-800">
