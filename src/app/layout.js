@@ -15,13 +15,15 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${inter.className} bg-slate-100`}>
-        <SessionProvider>
-          <WishlistProvider>
-            <CartProvider>
-              {children}
-            </CartProvider>
-          </WishlistProvider>
-        </SessionProvider>
+        <div id="modal-root">
+          <SessionProvider>
+            <WishlistProvider>
+              <CartProvider>
+                {children}
+              </CartProvider>
+            </WishlistProvider>
+          </SessionProvider>
+        </div>
       </body>
     </html>
   );
