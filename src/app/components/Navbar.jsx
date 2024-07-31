@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faTimes, faScrewdriverWrench } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { faUser } from '@fortawesome/free-regular-svg-icons';
 import WishListDrowpdown from './WishListDropdown';
 import CartDropdown from './CartDropdown';
@@ -11,8 +11,6 @@ import LoginButton from './LoginButton';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Search from './Search';
-import { db } from '@/firebaseInit';
-import { doc, getDoc } from 'firebase/firestore';
 
 async function getCategories() {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/categories`, {
@@ -76,19 +74,6 @@ const Sidebar = ({ closeSidebar, sidebarOpen, categories }) => {
 const Navbar = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [categories, setCategories] = useState([]);
-    const { data: session } = useSession();
-    const [userRole, setUserRole] = useState('');
-
-    if (session) {
-        const docRef = doc(db, 'Users', session.user.email);
-        getDoc(docRef).then(docSnap => {
-            if (docSnap.exists()) {
-                const user = docSnap.data();
-                setUserRole(user.role);
-            }
-        }
-        );
-    }
 
     useEffect(() => {
         getCategories()
@@ -131,10 +116,6 @@ const Navbar = () => {
                     <div className="flex justify-end gap-5 items-center">
                         <WishListDrowpdown navbar />
                         <CartDropdown navbar />
-                        {
-                            userRole === 'admin' &&
-                            <Link href='/admin' className='bg-sky-500 text-white px-3 py-1 rounded-lg hover:bg-sky-700 transition-colors'><FontAwesomeIcon icon={faScrewdriverWrench} className="max-h-4"/> Admin</Link>
-                        }
                         <LoginButton />
                     </div>
                 </div>
