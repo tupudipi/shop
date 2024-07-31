@@ -29,7 +29,7 @@ const Sidebar = ({ closeSidebar, sidebarOpen, categories }) => {
             {session ? (
                 <div>
                     <Link href='/account' >
-                        <div className='hover:text-indigo-950 transition-all mb-2'>
+                        <div className='hover:text-blue-950 transition-all mb-2'>
                             <div className='flex gap-1'>
                                 <Image width={24} height={24} alt='User' src={session.user.image} />
                                 <p className='mb-1'>{session.user.name}</p>
@@ -41,7 +41,7 @@ const Sidebar = ({ closeSidebar, sidebarOpen, categories }) => {
             ) : (
                 <div>
                     <Link href='/visitor' >
-                        <div className='hover:text-indigo-950 transition-all mb-2'>
+                        <div className='hover:text-blue-950 transition-all mb-2'>
                             <div className='flex gap-1 items-baseline'>
                                 <FontAwesomeIcon icon={faUser} />
                                 <p className='mb-1'>Visitor Account</p>
@@ -52,10 +52,10 @@ const Sidebar = ({ closeSidebar, sidebarOpen, categories }) => {
                 </div>
             )}
             <ul className='flex flex-col gap-2 mt-2'>
-                <Link href='/search' className='hover:text-indigo-950 transition-all'>All products</Link>
+                <Link href='/search' className='hover:text-blue-950 transition-all'>All products</Link>
                 <hr></hr>
                 {categories.map((category) => (
-                    <li className='flex hover:text-indigo-950 transition-all' key={category.category_name}>
+                    <li className='flex hover:text-blue-950 transition-all' key={category.category_name}>
                         <Link href={`/search/${category.category_name}`} className='w-full'>{category.category_name}</Link>
                     </li>
                 ))}
@@ -66,7 +66,7 @@ const Sidebar = ({ closeSidebar, sidebarOpen, categories }) => {
                 <CartDropdown sidebar />
             </div>
         </div>
-        <div id="cover" className={`fixed left-0 h-full w-full bg-indigo-950/50 z-30 ${sidebarOpen ? 'block' : 'hidden'}`} onClick={closeSidebar}></div>
+        <div id="cover" className={`fixed left-0 h-full w-full bg-blue-950/50 z-30 ${sidebarOpen ? 'block' : 'hidden'}`} onClick={closeSidebar}></div>
     </>
     )
 }
@@ -98,12 +98,12 @@ const Navbar = () => {
     }, [sidebarOpen]);
 
     return (
-        <nav className="text-indigo-800">
+        <nav className="text-blue-800">
             <div className="px-4 py-2 mx-auto">
                 <div className="flex justify-between align-middle">
                     <div className="flex items-center gap-2">
                         <div
-                            className="cursor-pointer hover:text-indigo-950 transition-all"
+                            className="cursor-pointer hover:text-blue-950 transition-all"
                             onClick={() => setSidebarOpen(!sidebarOpen)}
                         >
                             {sidebarOpen ? <FontAwesomeIcon icon={faTimes} /> : <FontAwesomeIcon icon={faBars} />}
