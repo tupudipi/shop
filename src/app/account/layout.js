@@ -2,6 +2,7 @@ import Navbar from "../components/Navbar";
 import AccountSidebar from "../components/AccountSidebar";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import { redirect } from "next/navigation";
 
 export const metadata = {
     title: 'Account - Cico Shop',
@@ -23,9 +24,7 @@ export default async function RootLayout({ children }) {
                             {children}
                         </>
                     ) : (
-                        <div className="container">
-                            <h1 className="text-xl font-medium">You must be logged in to access your account.</h1>
-                        </div>
+                        redirect('/')
                     )
                 }
             </main>

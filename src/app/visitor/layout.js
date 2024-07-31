@@ -1,5 +1,8 @@
 import Navbar from "../components/Navbar";
 import VisitorSidebar from "../components/VisitorSidebar";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import { redirect } from "next/navigation";
 
 export const metadata = {
     title: 'Visitor - Cico Shop',
@@ -8,6 +11,10 @@ export const metadata = {
 }
 
 export default async function RootLayout({ children }) {
+    const session = await getServerSession(authOptions);
+    if (session) {
+        return redirect('/account');
+    }
 
     return (
         <>
