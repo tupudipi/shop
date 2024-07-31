@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faTimes, faScrewdriverWrench } from '@fortawesome/free-solid-svg-icons';
 import { faUser } from '@fortawesome/free-regular-svg-icons';
 import WishListDrowpdown from './WishListDropdown';
 import CartDropdown from './CartDropdown';
@@ -133,7 +133,7 @@ const Navbar = () => {
                         <CartDropdown navbar />
                         {
                             userRole === 'admin' &&
-                            <Link href='/admin' className='bg-sky-500 text-white px-3 py-1 rounded-lg hover:bg-sky-700 transition-colors'>Admin</Link>
+                            <Link href='/admin' className='bg-sky-500 text-white px-3 py-1 rounded-lg hover:bg-sky-700 transition-colors'><FontAwesomeIcon icon={faScrewdriverWrench} className="max-h-4"/> Admin</Link>
                         }
                         <LoginButton />
                     </div>
