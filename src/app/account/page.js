@@ -92,13 +92,13 @@ export default async function accountPage() {
   const favoriteCategory = await getFavoriteCategory(session.user.email);
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-4xl font-bold mb-6">Account Overview</h1>
+    <div>
+      <h1 className="text-4xl font-medium mb-6">Account Overview</h1>
       <p className="text-xl mb-8">Welcome back, {session.user.name.split(' ')[0]}!</p>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="bg-white shadow-lg rounded-lg p-6">
-          <h2 className="text-2xl font-semibold mb-4">Order Summary</h2>
+          <h2 className="text-2xl font-medium mb-4">Order Summary</h2>
           <p className="flex items-center mb-2">
             <FontAwesomeIcon icon={faShoppingBag} className="mr-2" /> Total Orders: {totalOrders}
           </p>
@@ -111,14 +111,14 @@ export default async function accountPage() {
         </div>
         
         <div className="bg-white shadow-lg rounded-lg p-6">
-          <h2 className="text-2xl font-semibold mb-4">Address Information</h2>
+          <h2 className="text-2xl font-medium mb-4">Address Information</h2>
           <p className="flex items-center mb-2">
             <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" /> Total Addresses: {totalAddresses}
           </p>
         </div>
         
         <div className="bg-white shadow-lg rounded-lg p-6">
-          <h2 className="text-2xl font-semibold mb-4">Review Summary</h2>
+          <h2 className="text-2xl font-medium mb-4">Review Summary</h2>
           <p className="flex items-center mb-2">
             <FontAwesomeIcon icon={faCommentDots} className="mr-2" /> Total Reviews: {totalReviews}
           </p>
@@ -128,7 +128,7 @@ export default async function accountPage() {
         </div>
         
         <div className="bg-white shadow-lg rounded-lg p-6 col-span-full lg:col-span-1">
-          <h2 className="text-2xl font-semibold mb-4">Favorite Category</h2>
+          <h2 className="text-2xl font-medium mb-4">Favorite Category</h2>
           <p className="flex items-center">
             <FontAwesomeIcon icon={faHeart} className="mr-2" /> {favoriteCategory}
           </p>
