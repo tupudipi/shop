@@ -75,6 +75,21 @@ function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
     return addressDoc.exists() ? addressDoc.data() : null;
   };
 
+  const fetchCategoryById = async (id) => {
+    try {
+      const categoryDoc = await getDoc(doc(db, "Categories", String(id)));
+      if (categoryDoc.exists()) {
+        return categoryDoc.data().category_name;
+      } else {
+        throw new Error(`Category not found for id: ${id}`);
+      }
+    } catch (error) {
+      console.error('Error fetching category:', error);
+      return 'Unknown Category';
+    }
+  };
+  
+
   const removeFields = (address) => {
     const { isMainBilling, isMainDelivery, ...filteredAddress } = address;
     return filteredAddress;
@@ -92,22 +107,26 @@ function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setToastConfig({ show: true, message: 'Processing order...', isLoading: true });
-
+  
     try {
       const { billing, shipping } = await fetchSelectedAddresses();
-
-      const truncatedProducts = products.map(product => ({
-        name: product.name,
-        quantity: product.quantity,
-        pricePerPiece: product.price,
-        totalPerProduct: product.price * product.quantity,
-        slug: product.slug,
-        image: product.image
+  
+      const truncatedProducts = await Promise.all(products.map(async product => {
+        const categoryName = await fetchCategoryById(product.category_id);
+        return {
+          name: product.name,
+          quantity: product.quantity,
+          pricePerPiece: product.price,
+          totalPerProduct: product.price * product.quantity,
+          slug: product.slug,
+          image: product.image,
+          category: categoryName
+        };
       }));
-
+  
       const orderNumber = generateOrderNumber();
       const currentTimestamp = new Date();
-
+  
       const orderData = {
         orderNumber,
         billingAddress: billing,
@@ -126,20 +145,20 @@ function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
           }
         ]
       };
-
+  
       const batch = writeBatch(db);
-
+  
       const orderRef = doc(collection(db, "Orders"));
       batch.set(orderRef, orderData);
-
+  
       for (const product of truncatedProducts) {
         const productRef = doc(db, "Products", product.slug);
         const productDoc = await getDoc(productRef);
-
+  
         if (productDoc.exists()) {
           const currentStock = productDoc.data().stock;
           const newStock = currentStock - product.quantity;
-
+  
           if (newStock >= 0) {
             batch.update(productRef, { stock: newStock });
           } else {
@@ -149,18 +168,18 @@ function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
           throw new Error(`Product not found: ${product.name}`);
         }
       }
-
+  
       await batch.commit();
-
+  
       await clearUserCart(userEmail);
       setToastConfig({ show: true, message: 'Order placed successfully!', isLoading: false });
-
+  
       setTimeout(() => {
         setToastConfig({ show: false, message: '', isLoading: false });
         onClose();
         router.push('/account/orders');
       }, 2000);
-
+  
     } catch (error) {
       console.error("Error processing order: ", error);
       setToastConfig({ show: true, message: 'Error placing order. Please try again.', isLoading: false });
@@ -169,6 +188,8 @@ function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
       }, 2000);
     }
   };
+  
+  
 
   const clearUserCart = async (userEmail) => {
     const cartQuery = query(collection(db, "Carts"), where("user_id", "==", userEmail));

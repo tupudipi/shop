@@ -35,14 +35,14 @@ async function DeliveryBillingPage() {
   const additionalAddresses = addresses.filter(a => !a.isMainDelivery && !a.isMainBilling);
 
   return (
-    <div className="container mx-auto px-4">
-      <h1 className="text-2xl font-bold mb-4">Delivery and Billing Details</h1>
+    <div>
+      <h1 className="text-4xl font-medium">Delivery and Billing Details</h1>
 
       {addresses.length === 0 ? (
         <p className="mb-4">You have no saved addresses. Please add an address.</p>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 mt-6">
             {mainDeliveryAddress ? (
               <AddressCard
                 isMainDelivery={true}
