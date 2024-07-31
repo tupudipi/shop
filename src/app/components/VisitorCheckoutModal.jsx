@@ -64,17 +64,36 @@ function VisitorCheckoutModal({ isOpen, onClose, total, products }) {
     setFormData(prevData => ({ ...prevData, [name]: value }));
   };
 
+  const fetchCategoryById = async (id) => {
+    try {
+      const categoryDoc = await getDoc(doc(db, "Categories", String(id)));
+      if (categoryDoc.exists()) {
+        return categoryDoc.data().category_name;
+      } else {
+        throw new Error(`Category not found for id: ${id}`);
+      }
+    } catch (error) {
+      console.error('Error fetching category:', error);
+      return 'Unknown Category';
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setToastConfig({ show: true, message: 'Processing order...', isLoading: true });
 
-    const truncatedProducts = products.map(product => ({
-      name: product.name,
-      quantity: product.quantity,
-      pricePerPiece: product.price,
-      totalPerProduct: product.price * product.quantity,
-      slug: product.slug,
-      image: product.image
+
+    const truncatedProducts = await Promise.all(products.map(async product => {
+      const categoryName = await fetchCategoryById(product.category_id);
+      return {
+        name: product.name,
+        quantity: product.quantity,
+        pricePerPiece: product.price,
+        totalPerProduct: product.price * product.quantity,
+        slug: product.slug,
+        image: product.image,
+        category: categoryName
+      };
     }));
 
     const orderNumber = generateOrderNumber();
@@ -219,7 +238,6 @@ function VisitorCheckoutModal({ isOpen, onClose, total, products }) {
                 onChange={handleInputChange}
                 className="w-full p-2 border rounded mb-2"
               >
-                <option value="credit">Credit Card</option>
                 <option value="paypal">PayPal</option>
                 <option value="cash">Cash on delivery</option>
               </select>

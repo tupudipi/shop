@@ -1,4 +1,3 @@
-
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { db } from "@/firebaseInit";
@@ -10,17 +9,16 @@ const getTotalOrders = async (userId) => {
   const ordersRef = collection(db, "Orders");
   const querySnapshot = await getDocs(ordersRef);
   const orders = querySnapshot.docs.filter((doc) => doc.data().userEmail === userId);
-  return orders.length;
-}
+  return orders.length || 0;
+};
 
 const getTotalOrdersValue = async (userId) => {
   const ordersRef = collection(db, "Orders");
   const querySnapshot = await getDocs(ordersRef);
   const orders = querySnapshot.docs.filter((doc) => doc.data().userEmail === userId);
   const totalValue = orders.reduce((sum, order) => sum + order.data().total, 0);
-
-  return totalValue;
-}
+  return totalValue || 0;
+};
 
 const getOrdersLastMonth = async (userId) => {
   const ordersRef = collection(db, "Orders");
@@ -35,13 +33,15 @@ const getOrdersLastMonth = async (userId) => {
     return data.userEmail === userId && createdAt >= lastMonth && createdAt <= now;
   });
 
-  return orders.length;
-}
+  return orders.length || 0;
+};
 
 const getFavoriteCategory = async (userId) => {
   const ordersRef = collection(db, "Orders");
   const querySnapshot = await getDocs(ordersRef);
   const orders = querySnapshot.docs.filter((doc) => doc.data().userEmail === userId);
+
+  if (orders.length === 0) return "None";
 
   const categories = orders.reduce((acc, order) => {
     const data = order.data();
@@ -56,31 +56,30 @@ const getFavoriteCategory = async (userId) => {
 
   const favoriteCategory = Object.keys(categoryCount).reduce((a, b) => categoryCount[a] > categoryCount[b] ? a : b);
 
-  return favoriteCategory;
-}
+  return favoriteCategory || "None";
+};
 
 const getTotalAddresses = async (userId) => {
   const addressesRef = collection(db, "Addresses");
   const querySnapshot = await getDocs(addressesRef);
   const addresses = querySnapshot.docs.filter((doc) => doc.data().user_email === userId);
-  return addresses.length;
-}
+  return addresses.length || 0;
+};
 
 const getTotalReviews = async (userId) => {
   const reviewsRef = collection(db, "Reviews");
   const querySnapshot = await getDocs(reviewsRef);
   const reviews = querySnapshot.docs.filter((doc) => doc.data().author === userId);
-  return reviews.length;
-}
+  return reviews.length || 0;
+};
 
 const getAverageReviewGrade = async (userId) => {
   const reviewsRef = collection(db, "Reviews");
   const querySnapshot = await getDocs(reviewsRef);
   const reviews = querySnapshot.docs.filter((doc) => doc.data().author === userId);
   const totalGrade = reviews.reduce((sum, review) => sum + review.data().grade, 0);
-
-  return totalGrade / reviews.length;
-}
+  return reviews.length ? (totalGrade / reviews.length).toFixed(1) : "N/A";
+};
 
 export default async function accountPage() {
   const session = await getServerSession(authOptions);
@@ -92,10 +91,10 @@ export default async function accountPage() {
   const averageReviewGrade = await getAverageReviewGrade(session.user.email);
   const favoriteCategory = await getFavoriteCategory(session.user.email);
 
-return (
-    <div>
-      <h1 className="text-4xl font-medium">Account Overview</h1>
-      <p className="text-xl mb-8 mt-6">Welcome back, {session.user.name.split(' ')[0]}!</p>
+  return (
+    <div className="container mx-auto p-4">
+      <h1 className="text-4xl font-bold mb-6">Account Overview</h1>
+      <p className="text-xl mb-8">Welcome back, {session.user.name.split(' ')[0]}!</p>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="bg-white shadow-lg rounded-lg p-6">

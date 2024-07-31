@@ -263,7 +263,6 @@ function CheckoutModal({ isOpen, onClose, total, products, userEmail }) {
               value={paymentMethod}
               onChange={(e) => setPaymentMethod(e.target.value)}
             >
-              <option value="credit">Credit Card</option>
               <option value="paypal">PayPal</option>
               <option value="cash">Cash on delivery</option>
             </select>
