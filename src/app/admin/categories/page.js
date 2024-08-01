@@ -6,7 +6,7 @@ import { db } from "@/firebaseInit";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSortUp, faSortDown, faSort, faSearch } from '@fortawesome/free-solid-svg-icons';
 import Toast from '@/app/components/Toast';
-import Pagination from './Pagination';
+import Pagination from '../components/Pagination';
 
 const CategoriesAdminPage = () => {
   const [categories, setCategories] = useState([]);

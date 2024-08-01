@@ -53,9 +53,9 @@ async function OrdersPage() {
               </div>
               <div className={`px-6 py-4 whitespace-nowrap md:table-cell font-medium ${
                 order.status === 'pending' ? 'text-yellow-500' : 
-                order.status === 'canceled' ? 'text-red-600' : 
-                order.status === 'delivered' ? 'text-green-600' : 
-                order.status === 'processing' ? 'text-blue-600' : 'text-purple-600'
+                order.status === 'Canceled' ? 'text-red-600' : 
+                order.status === 'Delivered' ? 'text-green-600' : 
+                order.status === 'Processing' ? 'text-blue-600' : 'text-purple-600'
               }`}>
                 <div className="font-medium text-gray-500 uppercase tracking-wider md:hidden block">Status</div>
                 {order.status.charAt(0).toUpperCase() + order.status.slice(1)}

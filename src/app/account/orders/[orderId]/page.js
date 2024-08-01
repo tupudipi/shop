@@ -28,7 +28,7 @@ async function viewOrderPage({ params }) {
             </Link>
             <h1 className="text-4xl font-medium mb-4">Order Details</h1>
             <div>
-                <h2 className="text-2xl mb-2 align-middle">Order #{order.orderNumber} <span className={` ${order.status === 'pending' ? 'bg-yellow-500' : order.status === 'canceled' ? 'bg-red-600' : order.status === 'delivered' ? 'bg-green-600' : order.status === 'processing' ? 'bg-blue-600' : 'bg-purple-600'} text-white font-semibold p-1 rounded text-sm align-middle`}>{order.status}</span></h2>
+                <h2 className="text-2xl mb-2 align-middle">Order #{order.orderNumber} <span className={` ${order.status === 'pending' ? 'bg-yellow-500' : order.status === 'Canceled' ? 'bg-red-600' : order.status === 'Delivered' ? 'bg-green-600' : order.status === 'Processing' ? 'bg-blue-600' : 'bg-purple-600'} text-white font-semibold p-1 rounded text-sm align-middle`}>{order.status}</span></h2>
                 <div className="flex flex-col md:flex-row gap-8">
                     <div className="flex flex-col gap-4">
                         <h3 className="text-xl">Products:</h3>
@@ -78,9 +78,9 @@ async function viewOrderPage({ params }) {
                                 {order.statusHistory.map((status, index) => (
                                     <div key={index} className="mb-6 relative">
                                         <div className={`absolute -left-2 mt-2 w-4 h-4 rounded-full ${status.status === 'pending' ? 'bg-yellow-500' :
-                                            status.status === 'canceled' ? 'bg-red-600' :
-                                                status.status === 'delivered' ? 'bg-green-600' :
-                                                    status.status === 'processing' ? 'bg-blue-600' : 'bg-purple-600'
+                                            status.status === 'Canceled' ? 'bg-red-600' :
+                                                status.status === 'Delivered' ? 'bg-green-600' :
+                                                    status.status === 'Processing' ? 'bg-blue-600' : 'bg-purple-600'
                                             }`}></div>
                                         <div className="ml-6">
                                             <p className="font-semibold">{status.status.charAt(0).toUpperCase() + status.status.slice(1)}</p>

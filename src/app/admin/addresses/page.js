@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSortUp, faSortDown, faSort, faSearch } from '@fortawesome/free-solid-svg-icons';
 import Modal from './Modal';
 import Toast from '@/app/components/Toast';
-import Pagination from './Pagination';
+import Pagination from '../components/Pagination';
 
 const AddressesAdminPage = () => {
   const [addresses, setAddresses] = useState([]);
