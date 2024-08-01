@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useContext, useEffect } from "react";
+import { useState, useRef, useContext } from "react";
 import { faHeart, faAngleDown, faTimes, faAngleRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import useOutsideClick from "./useOutsideClick";
@@ -10,6 +10,7 @@ import { WishlistContext } from "@/context/WishlistContext";
 import { useSession } from "next-auth/react";
 import { CartContext } from "@/context/CartContext";
 import { createPortal } from 'react-dom';
+import Toast from "./Toast";
 
 export default function WishlistDropdown(props) {
     const { data: session, status } = useSession();
@@ -18,13 +19,18 @@ export default function WishlistDropdown(props) {
     useOutsideClick(wishlistRef, () => {
         setWishlistOpen(false);
     });
+    const [toastConfig, setToastConfig] = useState({ show: false, message: '', isLoading: false });
     const { wishlist, removeFromWishlist, clearWishlist } = useContext(WishlistContext);
     const { cart, addToCart, setCart } = useContext(CartContext);
+
     const handleDeleteItem = (slug) => {
         removeFromWishlist(slug);
     };
 
     const moveToCart = () => {
+        setToastConfig({ show: true, message: 'Moving items...', isLoading: true });
+        console.log("Toast Config after setting moving items: ", toastConfig);
+
         const tempCart = [...cart];
         if (session && status === 'authenticated') {
             for (const item of wishlist) {
@@ -47,10 +53,19 @@ export default function WishlistDropdown(props) {
 
         setCart(tempCart);
         localStorage.setItem('cart', JSON.stringify(tempCart));
+
+        setToastConfig({ show: true, message: 'Items moved successfully!', isLoading: false });
+        console.log("Toast Config after setting success message: ", toastConfig);
+        setWishlistOpen(false);
+
+        setTimeout(() => {
+            setToastConfig({ show: false, message: '', isLoading: false });
+            console.log("Toast Config after hiding toast: ", toastConfig);
+        }, 2000);
     };
 
-
     const isAuthenticated = session && status === 'authenticated';
+
     return (
         <>
             {props.navbar &&
@@ -161,6 +176,12 @@ export default function WishlistDropdown(props) {
                     )}
                 </div>
             }
+            {toastConfig.show &&
+            createPortal(<div style={{zIndex: 9999}}className="fixed inset-0 z-[9999] flex items-center justify-center"><Toast
+                message={toastConfig.message}
+                isLoading={toastConfig.isLoading}
+                duration={2000} /></div>,
+                document.body)}
         </>
     );
 }

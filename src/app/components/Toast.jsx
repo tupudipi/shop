@@ -2,21 +2,24 @@
 import { useState, useEffect } from 'react';
 
 export default function Toast({ message, isLoading, duration = 2000 }) {
-    const [isVisible, setIsVisible] = useState(true);
+    const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
-        if (!isLoading) {
-            const timer = setTimeout(() => {
-                setIsVisible(false);
-            }, duration);
-            return () => clearTimeout(timer);
+        if (message) {
+            setIsVisible(true);
+            if (!isLoading) {
+                const timer = setTimeout(() => {
+                    setIsVisible(false);
+                }, duration);
+                return () => clearTimeout(timer);
+            }
         }
-    }, [isLoading, duration]);
+    }, [message, isLoading, duration]);
 
     if (!isVisible) return null;
 
     return (
-        <div className={`fixed bottom-5 right-5 px-4 py-2 rounded shadow-lg transition-all duration-500 ease-in-out transform translate-y-0 animate-slide-in ${isLoading ? 'bg-yellow-500' : 'bg-green-500'}`}>
+        <div className={`fixed bottom-5 right-5 px-4 py-2 rounded shadow-lg transition-all duration-500 ease-in-out transform ${isVisible ? 'translate-y-0' : 'translate-y-full'} ${isLoading ? 'bg-yellow-500' : 'bg-green-500'}`}>
             <div className="flex items-center">
                 {isLoading ? (
                     <>

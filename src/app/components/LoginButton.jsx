@@ -34,15 +34,15 @@ export default function LoginButton() {
     return (
         <div>
             {session ? (
-                <div className='flex justify-around gap-5 items-center'>
+                <div className='flex justify-around gap-3 md:gap-5 items-center'>
                     {userRole === 'admin' && (
-                        <Link href='/admin' className='bg-sky-500 text-white px-3 py-1 rounded-lg hover:bg-sky-700 transition-colors'>
+                        <Link href='/admin' className='bg-sky-500 text-white px-3 py-1 rounded-lg hover:bg-sky-700 transition-colors text-sm md:text-base'>
                             <FontAwesomeIcon icon={faScrewdriverWrench} className="max-h-4" /> Admin
                         </Link>
                     )}
                     <button
                         onClick={() => signOut()}
-                        className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700 transition-colors"
+                        className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700 transition-colors text-sm md:text-base"
                     >
                         <FontAwesomeIcon icon={faRightFromBracket} className="max-h-4" /> Sign out
                     </button>

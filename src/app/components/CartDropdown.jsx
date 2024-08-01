@@ -69,9 +69,8 @@ export default function CartDropdown(props) {
                                     </ul>
                                     <div className="text-center">
                                         <p className="mt-2">Total: ${total.toFixed(2)}</p>
-                                        {cart.length > 5 ?
-                                            (<button onClick={clearCart} className="inline-block text-red-500 bg-white border border-red-500 px-2 py-1 text-sm rounded-full hover:bg-red-500 hover:text-white transition-all hover:shadow">Clear Cart</button>) :
-                                            (<></>)}
+
+                                        <button onClick={clearCart} className="inline-block text-red-500 bg-white border border-red-500 px-2 py-1 text-sm rounded-full hover:bg-red-500 hover:text-white transition-all hover:shadow">Clear Cart</button>
                                     </div>
                                 </>
                             ) : (
@@ -137,7 +136,7 @@ export default function CartDropdown(props) {
                                 {cart.length > 0 && (
                                     <div className="p-4 border-t">
                                         <p className="mb-2">Total: ${total.toFixed(2)}</p>
-                                        <Link href={!isAuthenticated ? "/visitor/cart" : "/account/cart"}>
+                                        <Link href={!isAuthenticated ? "/visitor/cart" : "/account/cart"} onClick={() => setCartOpen(false)}>
                                             <p className="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-all hover:shadow w-full text-center">Go to Checkout</p>
                                         </Link>
                                     </div>
