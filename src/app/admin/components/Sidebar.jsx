@@ -29,7 +29,7 @@ const Sidebar = () => {
 
     return (
         <div className="bg-gray-800 text-white h-screen w-64 fixed left-0 top-0 overflow-y-auto z-10">
-            <h1 className="text-2xl font-semibold p-6">Cico Shop Admin</h1>
+            <h1 className="text-xl font-semibold p-6 pt-4">Cico Shop Admin</h1>
             <nav>
                 <ul className="space-y-2 px-4">
                     {collections.map((collection) => (
