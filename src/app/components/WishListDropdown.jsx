@@ -177,10 +177,10 @@ export default function WishlistDropdown(props) {
                 </div>
             }
             {toastConfig.show &&
-            createPortal(<div style={{zIndex: 9999}}className="fixed inset-0 z-[9999] flex items-center justify-center"><Toast
+            createPortal(<Toast
                 message={toastConfig.message}
                 isLoading={toastConfig.isLoading}
-                duration={2000} /></div>,
+                duration={2000} />,
                 document.body)}
         </>
     );

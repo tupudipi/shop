@@ -19,7 +19,7 @@ export default function Toast({ message, isLoading, duration = 2000 }) {
     if (!isVisible) return null;
 
     return (
-        <div className={`fixed bottom-5 right-5 px-4 py-2 rounded shadow-lg transition-all duration-500 ease-in-out transform ${isVisible ? 'translate-y-0' : 'translate-y-full'} ${isLoading ? 'bg-yellow-500' : 'bg-green-500'}`}>
+        <div className={`z-[9999] fixed bottom-5 right-5 px-4 py-2 rounded shadow-lg transition-all duration-500 ease-in-out transform ${isVisible ? 'translate-y-0' : 'translate-y-full'} ${isLoading ? 'bg-yellow-500' : 'bg-green-500'}`}>
             <div className="flex items-center">
                 {isLoading ? (
                     <>

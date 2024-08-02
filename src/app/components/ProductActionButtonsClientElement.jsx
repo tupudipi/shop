@@ -6,7 +6,7 @@ import { WishlistContext } from '@/context/WishlistContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart as faHeartSolid } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
-import Toast from './Toast';  // Import the Toast component
+import Toast from './Toast';  
 
 const ProductActionButtonsClientElement = ({ product }) => {
   const { addToCart } = useContext(CartContext);
