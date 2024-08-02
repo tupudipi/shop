@@ -28,7 +28,7 @@ const ProductDetails = ({ description, slug }) => {
 
   return (
     <div>
-      <div className="sticky top-0 z-10">
+      <div className="sticky top-16 z-10">
         <div id='top-bar' className={`relative flex bg-blue-600 p-2 ${styles.topBar}`}>
           <a
             href="#description"

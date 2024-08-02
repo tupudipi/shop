@@ -29,7 +29,6 @@ export default function WishlistDropdown(props) {
 
     const moveToCart = () => {
         setToastConfig({ show: true, message: 'Moving items...', isLoading: true });
-        console.log("Toast Config after setting moving items: ", toastConfig);
 
         const tempCart = [...cart];
         if (session && status === 'authenticated') {
@@ -55,12 +54,10 @@ export default function WishlistDropdown(props) {
         localStorage.setItem('cart', JSON.stringify(tempCart));
 
         setToastConfig({ show: true, message: 'Items moved successfully!', isLoading: false });
-        console.log("Toast Config after setting success message: ", toastConfig);
         setWishlistOpen(false);
 
         setTimeout(() => {
             setToastConfig({ show: false, message: '', isLoading: false });
-            console.log("Toast Config after hiding toast: ", toastConfig);
         }, 2000);
     };
 

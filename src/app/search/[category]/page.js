@@ -32,8 +32,10 @@ export default async function Page({ params }) {
   const products = await fetchProductsWithReviewCount(categoryId);
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <ProductList initialProducts={products} />
-    </Suspense>
+    <div className="h-full overflow-y-auto">
+      <Suspense fallback={<div>Loading...</div>}>
+        <ProductList initialProducts={products} />
+      </Suspense>
+    </div>
   );
 }
