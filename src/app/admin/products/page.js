@@ -317,8 +317,8 @@ const ProductsAdminPage = () => {
           </select>
         </div>
       </div>
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200 text-sm">
+      <div className='overflow-x-auto'>
+        <table className="min-w-full divide-y divide-gray-200 text-sm overflow-x-auto">
           <thead className='bg-gray-50'>
             <tr>
               {productKeys.map(key => (

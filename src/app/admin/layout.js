@@ -21,7 +21,7 @@ export default async function AdminLayout({ children }) {
         return redirect('/');
     }
     return (
-        <div className="flex h-screen">
+        <div className="flex h-screen w-screen">
             <Sidebar />
             <div className="flex-1 flex flex-col ml-64"> 
                 <Navbar />
