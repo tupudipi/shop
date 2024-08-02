@@ -1,12 +1,12 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react';
-import { collection, getDocs, doc, updateDoc } from 'firebase/firestore';
-import { db } from "@/firebaseInit";
+import { collection, getDocs, doc, updateDoc, setDoc, deleteDoc, query, where } from 'firebase/firestore'; import { db } from "@/firebaseInit";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSortUp, faSortDown, faSort, faSearch } from '@fortawesome/free-solid-svg-icons';
 import Toast from '@/app/components/Toast';
 import Pagination from '../components/Pagination';
+import ConfirmationModal from '@/app/components/ConfirmationModal';
 
 const CategoriesAdminPage = () => {
   const [categories, setCategories] = useState([]);
@@ -21,6 +21,84 @@ const CategoriesAdminPage = () => {
   const [editingCategoryId, setEditingCategoryId] = useState(null);
   const [newCategoryName, setNewCategoryName] = useState('');
   const inputRef = useRef(null);
+  const [isAddingCategory, setIsAddingCategory] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState(null);
+
+  const handleDeleteCategory = async () => {
+    if (!categoryToDelete) return;
+    setIsLoading(true);
+    setToastMessage('Checking category usage...');
+    try {
+      console.log(`Category to delete: ${categoryToDelete.id}`);
+      const productsRef = collection(db, 'Products');
+      const q = query(productsRef, where("category_id", "==", Number(categoryToDelete.id)));
+      const querySnapshot = await getDocs(q);
+
+      console.log(`Query snapshot size: ${querySnapshot.size}`);
+      querySnapshot.forEach(doc => console.log(doc.data()));
+
+      if (!querySnapshot.empty) {
+        setIsLoading(false);
+        setToastMessage(`Error: Cannot delete category. ${querySnapshot.size} product(s) are using this category.`);
+        setIsDeleteModalOpen(false);
+        setCategoryToDelete(null);
+        return;
+      }
+
+      setToastMessage('Deleting category...');
+      await deleteDoc(doc(db, 'Categories', categoryToDelete.id));
+
+      const updatedCategories = categories.filter(cat => cat.id !== categoryToDelete.id);
+      setCategories(updatedCategories);
+      setFilteredCategories(updatedCategories);
+
+      setIsLoading(false);
+      setToastMessage('Category deleted successfully!');
+    } catch (error) {
+      console.error("Error deleting category: ", error);
+      setIsLoading(false);
+      setToastMessage('Error deleting category. Please try again.');
+    }
+    setIsDeleteModalOpen(false);
+    setCategoryToDelete(null);
+  };
+
+  const handleAddCategory = async () => {
+    if (!newCategoryName.trim()) return;
+    setIsLoading(true);
+    setToastMessage('Adding new category...');
+    try {
+      const categoriesCollection = collection(db, 'Categories');
+      const querySnapshot = await getDocs(categoriesCollection);
+      let highestId = 0;
+      querySnapshot.forEach((doc) => {
+        const id = parseInt(doc.id);
+        if (!isNaN(id) && id > highestId) {
+          highestId = id;
+        }
+      });
+
+      const newId = (highestId + 1).toString();
+
+      const newDocRef = doc(db, 'Categories', newId);
+      await setDoc(newDocRef, {
+        category_name: newCategoryName.trim()
+      });
+
+      const newCategory = { id: newId, category_name: newCategoryName.trim() };
+      setCategories([...categories, newCategory]);
+      setFilteredCategories([...filteredCategories, newCategory]);
+      setNewCategoryName('');
+      setIsAddingCategory(false);
+      setIsLoading(false);
+      setToastMessage('New category added successfully!');
+    } catch (error) {
+      console.error("Error adding document: ", error);
+      setIsLoading(false);
+      setToastMessage('Error adding category. Please try again.');
+    }
+  };
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -224,7 +302,7 @@ const CategoriesAdminPage = () => {
             {currentCategories.map((category, index) => (
               <tr
                 key={category.id}
-                className={`cursor-pointer ${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'} hover:bg-gray-200`}
+                className={`${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'} hover:bg-gray-200`}
               >
                 <td className="px-4 py-4 whitespace-nowrap">{category.id}</td>
                 <td className="px-4 py-4 whitespace-nowrap">
@@ -237,7 +315,7 @@ const CategoriesAdminPage = () => {
                       ref={inputRef}
                     />
                   ) : (
-                    <div className="px-2 py-1 w-full">{category.category_name}</div>
+                    category.category_name
                   )}
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
@@ -250,23 +328,75 @@ const CategoriesAdminPage = () => {
                         Save
                       </button>
                       <button
-                        onClick={() => setEditingCategoryId(null)}
-                        className="text-red-500 hover:text-red-700 font-norma"
+                        onClick={() => { setEditingCategoryId(null), setNewCategoryName('') }}
+                        className="text-gray-700 hover:text-gray-900 font-normal"
                       >
                         Cancel
                       </button>
                     </div>
                   ) : (
-                    <button
-                      onClick={() => handleEditClick(category)}
-                      className="text-blue-500 hover:text-blue-700 font-norma"
-                    >
-                      Edit
-                    </button>
+                    <div className='flex gap-2'>
+                      <button
+                        onClick={() => handleEditClick(category)}
+                        className="text-blue-500 hover:text-blue-700 font-normal"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => {
+                          setCategoryToDelete(category);
+                          setIsDeleteModalOpen(true);
+                        }}
+                        className="text-red-500 hover:text-red-700 font-normal"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   )}
                 </td>
               </tr>
             ))}
+            {isAddingCategory ? (
+              <tr>
+                <td className="px-4 py-4 whitespace-nowrap">New</td>
+                <td className="px-4 py-4 whitespace-nowrap">
+                  <input
+                    type="text"
+                    value={newCategoryName}
+                    onChange={(e) => setNewCategoryName(e.target.value)}
+                    className="border rounded px-2 py-1 bg-white w-full"
+                    placeholder="Enter new category name"
+                  />
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap">
+                  <div className='flex gap-2'>
+                    <button
+                      onClick={handleAddCategory}
+                      className="text-green-600 hover:text-green-800 font-normal"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={() => setIsAddingCategory(false)}
+                      className="text-gray-700 hover:text-gray-900 font-normal"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ) : (
+              <tr>
+                <td colSpan="3" className="px-4 py-4">
+                  <button
+                    onClick={() => setIsAddingCategory(true)}
+                    className="text-blue-500 hover:text-blue-700 font-normal"
+                  >
+                    Add New Category
+                  </button>
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -280,9 +410,17 @@ const CategoriesAdminPage = () => {
       <Toast
         message={toastMessage}
         isLoading={isLoading}
-        duration={3000}
+        duration={2000}
+        isError={toastMessage.startsWith('Error')}
+      />
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteCategory}
+        message={`Are you sure you want to delete the category "${categoryToDelete?.category_name}"? This action cannot be undone. The category will only be deleted if no products are currently using it.`}
       />
     </div>
+
   );
 }
 
