@@ -27,6 +27,8 @@ const ProductsAdminPage = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
   const [categories, setCategories] = useState([]);
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 0 });
+  const [priceFilter, setPriceFilter] = useState({ min: 0, max: 0 });
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -121,8 +123,14 @@ const ProductsAdminPage = () => {
       const fetchedProducts = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setProducts(fetchedProducts);
       setFilteredProducts(fetchedProducts);
+  
+      const prices = fetchedProducts.map(product => product.price);
+      const minPrice = Math.min(...prices);
+      const maxPrice = Math.max(...prices);
+      setPriceRange({ min: minPrice, max: maxPrice });
+      setFilterConfig(prev => ({ ...prev, price: maxPrice })); 
     };
-
+  
     fetchProducts();
   }, []);
 
@@ -138,12 +146,16 @@ const ProductsAdminPage = () => {
     for (const key in filterConfig) {
       if (filterConfig[key]) {
         if (key === 'category') {
-          filtered = filtered.filter(product =>
-            filterConfig[key].includes(product.category_id)
+          filtered = filtered.filter(product => 
+            product.category_id === Number(filterConfig[key])
+          );
+        } else if (key === 'price') {
+          filtered = filtered.filter(product => 
+            product.price <= Number(filterConfig[key])
           );
         } else {
           filtered = filtered.filter(product =>
-            product[key].toLowerCase().includes(filterConfig[key].toLowerCase())
+            String(product[key]).toLowerCase().includes(filterConfig[key].toLowerCase())
           );
         }
       }
@@ -161,9 +173,9 @@ const ProductsAdminPage = () => {
           }
         } else {
           if (sortConfig.direction === 'ascending') {
-            return a[sortConfig.key].localeCompare(b[sortConfig.key]);
+            return String(a[sortConfig.key]).localeCompare(String(b[sortConfig.key]));
           } else if (sortConfig.direction === 'descending') {
-            return b[sortConfig.key].localeCompare(a[sortConfig.key]);
+            return String(b[sortConfig.key]).localeCompare(String(a[sortConfig.key]));
           }
         }
         return 0;
@@ -172,6 +184,11 @@ const ProductsAdminPage = () => {
   
     setFilteredProducts(filtered);
   }, [products, filterConfig, sortConfig, categories]);
+
+  const handleCancelEdit = () => {
+    setEditingProductId(null);
+    setNewProductData({ name: '', description: '', image: '', category_id: '', price: 0 });
+  };
 
   const handleSort = (key) => {
     let direction = 'ascending';
@@ -189,18 +206,47 @@ const ProductsAdminPage = () => {
 
   const renderFilterRow = () => {
     if (!showFilterRow) return null;
-
+  
     return (
       <tr>
         {productKeys.map((key) => (
           <th key={key}>
-            <input
-              type="text"
-              placeholder={`Filter by ${key}`}
-              value={filterConfig[key] || ''}
-              onChange={(e) => handleFilterChange(key, e.target.value)}
-              className="border rounded px-2 py-1"
-            />
+            {key === 'category' ? (
+              <select
+                value={filterConfig[key] || ''}
+                onChange={(e) => handleFilterChange(key, e.target.value)}
+                className="border rounded px-2 py-1"
+              >
+                <option value="">All Categories</option>
+                {categories.map(category => (
+                  <option key={category.id} value={category.id}>
+                    {category.category_name || 'Unknown'}
+                  </option>
+                ))}
+              </select>
+            ) : key === 'price' ? (
+              <div className="flex flex-col items-center">
+                <input
+                  type="range"
+                  min={priceRange.min}
+                  max={priceRange.max}
+                  value={filterConfig[key] || priceRange.max}
+                  onChange={(e) => handleFilterChange(key, e.target.value)}
+                  className="w-full"
+                />
+                <span className="text-xs mt-1">
+                  Max: ${Number(filterConfig[key] || priceRange.max).toFixed(2)}
+                </span>
+              </div>
+            ) : (
+              <input
+                type="text"
+                placeholder={`Filter by ${key}`}
+                value={filterConfig[key] || ''}
+                onChange={(e) => handleFilterChange(key, e.target.value)}
+                className="border rounded px-2 py-1"
+              />
+            )}
           </th>
         ))}
       </tr>
@@ -208,19 +254,12 @@ const ProductsAdminPage = () => {
   };
 
   const handleFilterChange = (key, value) => {
-    if (key === 'category') {
-      const filteredCategoryIds = categories
-        .filter(category => category.category_name.toLowerCase().includes(value.toLowerCase()))
-        .map(category => category.id);
-      setFilterConfig(prev => ({ ...prev, [key]: filteredCategoryIds }));
-    } else {
-      setFilterConfig(prev => ({ ...prev, [key]: value }));
-    }
+    setFilterConfig(prev => ({ ...prev, [key]: value }));
   };
 
   const clearFiltersAndSorting = () => {
     setSortConfig({ key: '', direction: '' });
-    setFilterConfig({});
+    setFilterConfig(prev => ({ ...prev, price: priceRange.max }));
     setFilteredProducts(products);
   };
 
@@ -411,29 +450,39 @@ const ProductsAdminPage = () => {
                 </td>
                 <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                   {editingProductId === product.id ? (
-                    <button
-                      onClick={() => handleSaveClick(product)}
-                      className="text-blue-500 hover:text-blue-700"
-                    >
-                      Save
-                    </button>
+                    <div className='flex gap-2'>
+                      <button
+                        onClick={() => handleSaveClick(product)}
+                        className="text-blue-500 hover:text-blue-700"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={handleCancelEdit}
+                        className="text-gray-700 hover:text-gray-900"
+                      >
+                        Cancel
+                      </button>
+                    </div>
                   ) : (
-                    <button
-                      onClick={() => handleEditClick(product)}
-                      className="text-blue-500 hover:text-blue-700"
-                    >
-                      Edit
-                    </button>
+                    <div className='flex gap-2'>
+                      <button
+                        onClick={() => handleEditClick(product)}
+                        className="text-blue-500 hover:text-blue-700"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => {
+                          setIsDeleteModalOpen(true);
+                          setProductToDelete(product);
+                        }}
+                        className="text-red-500 hover:text-red-700 ml-2"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   )}
-                  <button
-                    onClick={() => {
-                      setIsDeleteModalOpen(true);
-                      setProductToDelete(product);
-                    }}
-                    className="text-red-500 hover:text-red-700 ml-2"
-                  >
-                    Delete
-                  </button>
                 </td>
               </tr>
             ))}
