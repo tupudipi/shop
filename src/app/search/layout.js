@@ -27,7 +27,7 @@ function LayoutContent({ children }) {
         <div className="md:w-1/5 p-4 py-1 md:overflow-y-auto">
           <FiltersClient />
         </div>
-        <div className="flex-grow flex flex-col">
+        <div className="flex-grow flex flex-col overflow-y-auto">
           <div id="sorting" className="p-4 py-1 bg-slate-100 z-10">
             <div className="flex flex-col md:flex-row md:justify-around">
               <div className="flex flex-col md:flex-row md:items-center mb-2 md:mb-0">
