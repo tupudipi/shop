@@ -20,15 +20,16 @@ function LayoutContent({ children }) {
   const handleOrderChange = (e) => {
     updateSortOrder(e.target.value);
   }
+
   return (
     <div className="flex flex-col h-screen">
       <Navbar />
-      <div className="flex flex-col md:flex-row flex-grow overflow-hidden">
+      <div className="flex flex-col md:flex-row flex-grow overflow-y-auto md:overflow-hidden">
         <div className="md:w-1/5 p-4 py-1 md:overflow-y-auto">
           <FiltersClient />
         </div>
-        <div className="flex-grow flex flex-col overflow-y-auto">
-          <div id="sorting" className="p-4 py-1 bg-slate-100 z-10">
+        <div className="flex-grow flex flex-col md:overflow-y-auto">
+          <div id="sorting" className="p-4 py-1 bg-slate-100 z-10 md:sticky md:top-0">
             <div className="flex flex-col md:flex-row md:justify-around">
               <div className="flex flex-col md:flex-row md:items-center mb-2 md:mb-0">
                 <label htmlFor="sort" className="mr-2 mb-1 md:mb-0">Sort by:</label>
