@@ -22,7 +22,7 @@ export default async function SearchPage() {
   const products = await fetchAllProductsWithReviewCount();
 
   return (
-    <div className="h-full overflow-y-auto">
+    <div className="h-full overflow-y-hidden md:overflow-y-auto">
       <Suspense fallback={<div>Loading...</div>}>
         <ProductList initialProducts={products} />
       </Suspense>
