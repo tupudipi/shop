@@ -10,7 +10,7 @@ const ProductCard = ({ product, isCart }) => {
 
   return (
     <div className="flex flex-col justify-center bg-white rounded-lg shadow hover:shadow-lg transition-shadow w-full max-w-[240px] max-h-[444px]">
-      <Link href={`/products/${product.slug}`} className="m-4 md:m-0 aspect-square relative overflow-hidden max-w-36 md:max-w-full">
+      <Link href={`/products/${product.slug}`} className="m-4 md:m-0 aspect-square relative overflow-hidden">
         <Image
           src={product.image}
           alt={product.name}
