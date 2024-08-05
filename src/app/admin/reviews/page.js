@@ -87,8 +87,7 @@ const ReviewsAdminPage = () => {
       const querySnapshot = await getDocs(reviewsCollection);
       const fetchedReviews = querySnapshot.docs.map(doc => ({
         id: doc.id,
-        ...doc.data(),
-        date: doc.data().date ? doc.data().date.toDate().toLocaleString() : 'N/A'
+        ...doc.data()
       }));
       setReviews(fetchedReviews);
       setFilteredReviews(fetchedReviews);
@@ -114,6 +113,14 @@ const ReviewsAdminPage = () => {
           return sortConfig.direction === 'ascending'
             ? a.grade - b.grade
             : b.grade - a.grade;
+        }
+        if (sortConfig.key === 'date') {
+          // Convert date strings to Date objects for comparison
+          const dateA = new Date(a.date.split('/').reverse().join('-'));
+          const dateB = new Date(b.date.split('/').reverse().join('-'));
+          return sortConfig.direction === 'ascending'
+            ? dateA - dateB
+            : dateB - dateA;
         }
         if (sortConfig.direction === 'ascending') {
           return String(a[sortConfig.key]).localeCompare(String(b[sortConfig.key]));
