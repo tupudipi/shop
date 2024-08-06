@@ -17,7 +17,7 @@ const AddProductModal = ({ isOpen, onClose, onAddProduct, categories }) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setNewProduct({ ...newProduct, [name]: value });
+        setNewProduct((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleDrag = (e) => {
@@ -42,7 +42,7 @@ const AddProductModal = ({ isOpen, onClose, onAddProduct, categories }) => {
     const handleFiles = async (files) => {
         if (files.length > 0) {
             const file = files[0];
-            const storageRef = ref(storage, `product_images/${file.name}`);
+            const storageRef = ref(storage, `${file.name}`);
             await uploadBytes(storageRef, file);
             const downloadURL = await getDownloadURL(storageRef);
             setNewProduct({ ...newProduct, image: downloadURL });
@@ -56,6 +56,14 @@ const AddProductModal = ({ isOpen, onClose, onAddProduct, categories }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         onAddProduct(newProduct);
+        setNewProduct({
+            name: '',
+            description: '',
+            image: '',
+            category_id: '',
+            price: 0,
+            stock: 0,
+        });
         onClose();
     };
 

@@ -31,7 +31,7 @@ const DragAndDropImageUpload = ({ image, setImage }) => {
     const handleFiles = async (files) => {
         if (files.length > 0) {
             const file = files[0];
-            const storageRef = ref(storage, `product_images/${file.name}`);
+            const storageRef = ref(storage, `${file.name}`);
             await uploadBytes(storageRef, file);
             const downloadURL = await getDownloadURL(storageRef);
             setImage(downloadURL);

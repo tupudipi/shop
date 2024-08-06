@@ -41,10 +41,6 @@ const ProductsAdminPage = () => {
     fetchCategories();
   }, []);
 
-  useEffect(() => {
-    console.log(categories);
-  }, [categories]);
-
   const handleAddProduct = async (newProductData) => {
     setIsLoading(true);
     setToastMessage('Adding new product...');
@@ -59,7 +55,7 @@ const ProductsAdminPage = () => {
         reviewCount: 0,
         reviewValue: 0,
         slug,
-        stock: 0
+        stock: Number(newProductData.stock),
       });
 
       const newProduct = { id: slug, ...newProductData, category_id: Number(newProductData.category_id), price: Number(newProductData.price), reviewCount: 0, reviewValue: 0, slug, stock: 0 };
@@ -72,6 +68,23 @@ const ProductsAdminPage = () => {
       setIsLoading(false);
       setToastMessage('Error adding product. Please try again.');
     }
+    setIsAddModalOpen(false);
+    
+    const fetchProducts = async () => {
+      const productsCollection = collection(db, 'Products');
+      const querySnapshot = await getDocs(productsCollection);
+      const fetchedProducts = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setProducts(fetchedProducts);
+      setFilteredProducts(fetchedProducts);
+
+      const prices = fetchedProducts.map(product => product.price);
+      const minPrice = Math.min(...prices);
+      const maxPrice = Math.max(...prices);
+      setPriceRange({ min: minPrice, max: maxPrice });
+      setFilterConfig(prev => ({ ...prev, price: maxPrice }));
+    };
+
+    fetchProducts();
   };
 
   const handleDeleteProduct = async () => {
