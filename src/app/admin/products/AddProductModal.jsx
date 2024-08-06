@@ -153,7 +153,7 @@ const AddProductModal = ({ isOpen, onClose, onAddProduct, categories }) => {
                     {newProduct.image && (
                         <Image src={newProduct.image} width={128} height={128} alt="Preview" className="w-full object-cover mb-2" />
                     )}
-                    <div className="flex justify-end">
+                    <div className="flex justify-end gap-2">
                         <button type="button" onClick={() => {
                             onClose(); setNewProduct({
                                 name: '',
@@ -163,10 +163,10 @@ const AddProductModal = ({ isOpen, onClose, onAddProduct, categories }) => {
                                 price: 0,
                                 stock: 0,
                             })
-                        }} className="mr-2 px-4 py-2 bg-gray-200 rounded">
+                        }} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors">
                             Cancel
                         </button>
-                        <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">
+                        <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
                             Add Product
                         </button>
                     </div>

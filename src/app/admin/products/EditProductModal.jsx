@@ -92,12 +92,8 @@ const EditProductModal = ({ isOpen, onClose, product, categories, onSave }) => {
                     </div>
                 </div>
                 <div className="flex justify-end gap-2">
-                    <button onClick={handleSaveClick} className="px-4 py-2 bg-blue-500 text-white rounded">
-                        Save
-                    </button>
-                    <button onClick={onClose} className="px-4 py-2 bg-gray-500 text-white rounded">
-                        Cancel
-                    </button>
+                <button onClick={onClose} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors">Cancel</button>
+                <button onClick={handleSaveClick} className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">Save</button>
                 </div>
             </div>
         </div>

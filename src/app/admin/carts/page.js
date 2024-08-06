@@ -6,6 +6,7 @@ import { db } from "@/firebaseInit";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSortUp, faSortDown, faSort, faSearch, faEye } from '@fortawesome/free-solid-svg-icons';
 import Pagination from '../components/Pagination';
+import Image from 'next/image';
 
 const CartsAdminPage = () => {
   const [carts, setCarts] = useState({});
@@ -264,7 +265,7 @@ const CartsAdminPage = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10">
-                            <img className="h-10 w-10 rounded-full object-cover" src={item.image} alt={item.name} />
+                            <Image className="rounded-full object-cover" src={item.image} alt={item.name} width={40} height={40}/>
                           </div>
                           <div className="ml-4">
                             <div className="text-sm font-medium text-gray-900">{item.name}</div>

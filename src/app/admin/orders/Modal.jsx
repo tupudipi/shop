@@ -53,11 +53,11 @@ export default function Modal({ isOpen, onClose, order, onSave }) {
     ];
 
     return (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center overflow-auto" onClick={handleBackgroundClick}>
-            <div className="bg-white p-6 rounded-lg shadow-xl max-w-2xl w-full max-h-full overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex justify-center items-center" onClick={handleBackgroundClick}>
+          <div className="bg-white p-6 rounded-lg shadow-xl max-w-2xl w-full" onClick={(e) => e.stopPropagation()}>
                 <h2 className="text-2xl font-semibold mb-4">Order Details</h2>
                 {order && (
-                    <>
+                    <div className="mt-2 max-h-96 overflow-y-auto">
                         <div className="mb-4">
                             <ul className="space-y-2">
                                 {order.products.map((product, index) => (
@@ -105,7 +105,7 @@ export default function Modal({ isOpen, onClose, order, onSave }) {
                                 />
                             </div>
                         </form>
-                    </>
+                    </div>
                 )}
                 <div className="mt-6 flex justify-end space-x-3">
                     <button onClick={onClose} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors">Cancel</button>

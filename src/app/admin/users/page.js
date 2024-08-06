@@ -57,8 +57,8 @@ const UsersAdminPage = () => {
         if (sortConfig.key === 'createdAt') {
           const dateA = new Date(a.createdAt);
           const dateB = new Date(b.createdAt);
-          return sortConfig.direction === 'ascending' 
-            ? dateA - dateB 
+          return sortConfig.direction === 'ascending'
+            ? dateA - dateB
             : dateB - dateA;
         }
         if (sortConfig.direction === 'ascending') {
@@ -320,16 +320,21 @@ const UsersAdminPage = () => {
               <option value="user">User</option>
               <option value="admin">Admin</option>
             </select>
-            <div className="flex justify-end">
+            <div className="flex justify-end gap-2">
               <button
-                onClick={() => setIsUpdateRoleModalOpen(false)}
-                className="px-4 py-2 bg-gray-300 text-gray-800 rounded mr-2"
+                onClick={() => {
+                  setIsUpdateRoleModalOpen(false);
+                  setUserToUpdateRole(null);
+                  setNewRole('');
+                }}
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleUpdateRole}
-                className="px-4 py-2 bg-blue-500 text-white rounded"
+                className={`px-4 py-2 rounded-md transition-colors ${newRole ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-gray-400 text-gray-700 cursor-not-allowed'
+                  }`}
                 disabled={!newRole}
               >
                 Update Role
