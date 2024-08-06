@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { collection, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, updateDoc, deleteDoc, writeBatch, getDoc, query} from 'firebase/firestore';
 import { db } from "@/firebaseInit";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSortUp, faSortDown, faSort, faSearch } from '@fortawesome/free-solid-svg-icons';
@@ -24,25 +24,56 @@ const ReviewsAdminPage = () => {
 
   const handleDeleteReview = async () => {
     if (!reviewToDelete) return;
+  
+    const { id: reviewId, product_id, grade: reviewRating } = reviewToDelete;
     setIsLoading(true);
     setToastMessage('Deleting review...');
+  
+    const batch = writeBatch(db);
+  
     try {
-      await deleteDoc(doc(db, 'Reviews', reviewToDelete.id));
-
+      const reviewRef = doc(db, 'Reviews', reviewId);
+      batch.delete(reviewRef);
+  
+      const repliesRef = collection(db, 'Reviews', reviewId, 'replies');
+      const repliesSnapshot = await getDocs(query(repliesRef));
+      repliesSnapshot.forEach((replyDoc) => {
+        batch.delete(doc(repliesRef, replyDoc.id));
+      });
+  
+      const productRef = doc(db, 'Products', product_id);
+      const productDoc = await getDoc(productRef);
+  
+      if (productDoc.exists()) {
+        const productData = productDoc.data();
+        const newReviewCount = (productData.reviewCount || 0) - 1;
+        const newReviewValue = newReviewCount > 0 ? ((productData.reviewValue || 0) * (productData.reviewCount || 0) - reviewRating) / newReviewCount : 0;
+  
+        batch.set(productRef, {
+          reviewCount: newReviewCount,
+          reviewValue: newReviewValue
+        }, { merge: true });
+      } else {
+        console.error("Product does not exist");
+      }
+  
+      await batch.commit();
+  
       const updatedReviews = reviews.filter(rev => rev.id !== reviewToDelete.id);
       setReviews(updatedReviews);
       setFilteredReviews(updatedReviews);
-
+  
       setIsLoading(false);
       setToastMessage('Review deleted successfully!');
     } catch (error) {
-      console.error("Error deleting review: ", error);
+      console.error("Error deleting review and replies: ", error);
       setIsLoading(false);
       setToastMessage('Error deleting review. Please try again.');
     }
+  
     setIsDeleteModalOpen(false);
     setReviewToDelete(null);
-  };
+  };  
 
   const handleFlagReview = async (id) => {
     setIsLoading(true);

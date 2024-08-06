@@ -9,6 +9,8 @@ import Toast from '@/app/components/Toast';
 import Pagination from '../components/Pagination';
 import ConfirmationModal from '@/app/components/ConfirmationModal';
 import Image from 'next/image';
+import AddProductModal from './AddProductModal';
+import EditProductModal from './EditProductModal';
 
 const ProductsAdminPage = () => {
   const [products, setProducts] = useState([]);
@@ -20,15 +22,13 @@ const ProductsAdminPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [editingProductId, setEditingProductId] = useState(null);
-  const [newProductData, setNewProductData] = useState({ name: '', description: '', image: '', category_id: '', price: 0 });
-  const inputRef = useRef(null);
-  const [isAddingProduct, setIsAddingProduct] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
   const [categories, setCategories] = useState([]);
   const [priceRange, setPriceRange] = useState({ min: 0, max: 0 });
-  const [priceFilter, setPriceFilter] = useState({ min: 0, max: 0 });
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -44,6 +44,35 @@ const ProductsAdminPage = () => {
   useEffect(() => {
     console.log(categories);
   }, [categories]);
+
+  const handleAddProduct = async (newProductData) => {
+    setIsLoading(true);
+    setToastMessage('Adding new product...');
+    try {
+      const slug = newProductData.name.trim().toLowerCase().replace(/ /g, '-');
+      const newDocRef = doc(db, 'Products', slug);
+
+      await setDoc(newDocRef, {
+        ...newProductData,
+        category_id: Number(newProductData.category_id),
+        price: Number(newProductData.price),
+        reviewCount: 0,
+        reviewValue: 0,
+        slug,
+        stock: 0
+      });
+
+      const newProduct = { id: slug, ...newProductData, category_id: Number(newProductData.category_id), price: Number(newProductData.price), reviewCount: 0, reviewValue: 0, slug, stock: 0 };
+      setProducts([...products, newProduct]);
+      setFilteredProducts([...filteredProducts, newProduct]);
+      setIsLoading(false);
+      setToastMessage('New product added successfully!');
+    } catch (error) {
+      console.error("Error adding product: ", error);
+      setIsLoading(false);
+      setToastMessage('Error adding product. Please try again.');
+    }
+  };
 
   const handleDeleteProduct = async () => {
     if (!productToDelete) return;
@@ -67,41 +96,6 @@ const ProductsAdminPage = () => {
     setProductToDelete(null);
   };
 
-  const handleAddProduct = async () => {
-    const { name, description, image, category_id, price } = newProductData;
-    if (!name.trim() || !description.trim() || !image.trim() || !category_id.trim() || !price) return;
-    setIsLoading(true);
-    setToastMessage('Adding new product...');
-    try {
-      const slug = name.trim().toLowerCase().replace(/ /g, '-');
-      const newDocRef = doc(db, 'Products', slug);
-
-      await setDoc(newDocRef, {
-        category_id: Number(category_id),
-        description: description.trim(),
-        image: image.trim(),
-        name: name.trim(),
-        price: Number(price),
-        reviewCount: 0,
-        reviewValue: 0,
-        slug,
-        stock: 0
-      });
-
-      const newProduct = { id: slug, category_id: Number(category_id), description: description.trim(), image: image.trim(), name: name.trim(), price: Number(price), reviewCount: 0, reviewValue: 0, slug, stock: 0 };
-      setProducts([...products, newProduct]);
-      setFilteredProducts([...filteredProducts, newProduct]);
-      setNewProductData({ name: '', description: '', image: '', category_id: '', price: 0 });
-      setIsAddingProduct(false);
-      setIsLoading(false);
-      setToastMessage('New product added successfully!');
-    } catch (error) {
-      console.error("Error adding product: ", error);
-      setIsLoading(false);
-      setToastMessage('Error adding product. Please try again.');
-    }
-  };
-
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
@@ -123,34 +117,28 @@ const ProductsAdminPage = () => {
       const fetchedProducts = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setProducts(fetchedProducts);
       setFilteredProducts(fetchedProducts);
-  
+
       const prices = fetchedProducts.map(product => product.price);
       const minPrice = Math.min(...prices);
       const maxPrice = Math.max(...prices);
       setPriceRange({ min: minPrice, max: maxPrice });
-      setFilterConfig(prev => ({ ...prev, price: maxPrice })); 
+      setFilterConfig(prev => ({ ...prev, price: maxPrice }));
     };
-  
+
     fetchProducts();
   }, []);
 
   useEffect(() => {
-    if (editingProductId !== null) {
-      inputRef.current?.focus();
-    }
-  }, [editingProductId]);
-
-  useEffect(() => {
     let filtered = [...products];
-  
+
     for (const key in filterConfig) {
       if (filterConfig[key]) {
         if (key === 'category') {
-          filtered = filtered.filter(product => 
+          filtered = filtered.filter(product =>
             product.category_id === Number(filterConfig[key])
           );
         } else if (key === 'price') {
-          filtered = filtered.filter(product => 
+          filtered = filtered.filter(product =>
             product.price <= Number(filterConfig[key])
           );
         } else {
@@ -160,34 +148,45 @@ const ProductsAdminPage = () => {
         }
       }
     }
-  
+
     if (sortConfig.key) {
       filtered.sort((a, b) => {
         if (sortConfig.key === 'category') {
           const categoryA = categories.find(category => category.id === a.category_id)?.category_name || '';
           const categoryB = categories.find(category => category.id === b.category_id)?.category_name || '';
-          if (sortConfig.direction === 'ascending') {
-            return categoryA.localeCompare(categoryB);
-          } else if (sortConfig.direction === 'descending') {
-            return categoryB.localeCompare(categoryA);
-          }
+          return sortConfig.direction === 'ascending'
+            ? categoryA.localeCompare(categoryB)
+            : categoryB.localeCompare(categoryA);
         } else {
-          if (sortConfig.direction === 'ascending') {
-            return String(a[sortConfig.key]).localeCompare(String(b[sortConfig.key]));
-          } else if (sortConfig.direction === 'descending') {
-            return String(b[sortConfig.key]).localeCompare(String(a[sortConfig.key]));
+          let valueA = a[sortConfig.key];
+          let valueB = b[sortConfig.key];
+
+          // Check if the values are numeric
+          if (!isNaN(Number(valueA)) && !isNaN(Number(valueB))) {
+            valueA = Number(valueA);
+            valueB = Number(valueB);
+          } else {
+            valueA = String(valueA).toLowerCase();
+            valueB = String(valueB).toLowerCase();
           }
+
+          if (valueA < valueB) {
+            return sortConfig.direction === 'ascending' ? -1 : 1;
+          }
+          if (valueA > valueB) {
+            return sortConfig.direction === 'ascending' ? 1 : -1;
+          }
+          return 0;
         }
-        return 0;
       });
     }
-  
+
     setFilteredProducts(filtered);
   }, [products, filterConfig, sortConfig, categories]);
 
   const handleCancelEdit = () => {
-    setEditingProductId(null);
-    setNewProductData({ name: '', description: '', image: '', category_id: '', price: 0 });
+    setEditingProduct(null);
+    setIsEditModalOpen(null);
   };
 
   const handleSort = (key) => {
@@ -206,7 +205,7 @@ const ProductsAdminPage = () => {
 
   const renderFilterRow = () => {
     if (!showFilterRow) return null;
-  
+
     return (
       <tr>
         {productKeys.map((key) => (
@@ -300,7 +299,6 @@ const ProductsAdminPage = () => {
 
       setIsLoading(false);
       setToastMessage('Product updated successfully!');
-      setEditingProductId(null);
     } catch (error) {
       console.error("Error updating product: ", error);
       setIsLoading(false);
@@ -309,28 +307,23 @@ const ProductsAdminPage = () => {
   };
 
   const handleEditClick = (product) => {
-    setEditingProductId(product.id);
-    setNewProductData({
-      name: product.name,
-      description: product.description,
-      image: product.image,
-      category_id: product.category_id.toString(),
-      price: product.price
-    });
+    setEditingProduct(product);
+    setIsEditModalOpen(true);
   };
 
   const handleSaveClick = (product) => {
     const updatedData = {
-      name: newProductData.name,
-      description: newProductData.description,
-      image: newProductData.image,
-      category_id: Number(newProductData.category_id),
-      price: Number(newProductData.price)
+      name: product.name,
+      description: product.description,
+      image: product.image,
+      category_id: Number(product.category_id),
+      price: Number(product.price),
+      stock: Number(product.stock)
     };
     handleProductChange(product.id, updatedData);
   };
 
-  const productKeys = ['id', 'name', 'description', 'image', 'category', 'price'];
+  const productKeys = ['id', 'name', 'description', 'image', 'category', 'price', 'stock'];
 
   return (
     <div className="max-w-full overflow-hidden px-4">
@@ -357,7 +350,7 @@ const ProductsAdminPage = () => {
         </div>
       </div>
       <div className='overflow-x-auto'>
-        <table className="min-w-full divide-y divide-gray-200 text-sm overflow-x-auto">
+        <table className="divide-y divide-gray-200 text-sm overflow-x-auto">
           <thead className='bg-gray-50'>
             <tr>
               {productKeys.map(key => (
@@ -377,115 +370,51 @@ const ProductsAdminPage = () => {
             {showFilterRow && renderFilterRow()}
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {currentProducts.map((product) => (
-              <tr key={product.id}>
+            {currentProducts.map((product, index) => (
+              <tr key={product.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                 <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{product.id}</td>
+                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{product.name}</td>
+                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{product.description}</td>
                 <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                  {editingProductId === product.id ? (
-                    <input
-                      ref={inputRef}
-                      type="text"
-                      value={newProductData.name}
-                      onChange={(e) => setNewProductData({ ...newProductData, name: e.target.value })}
-                      className="border rounded px-2 py-1"
-                    />
-                  ) : (
-                    product.name
-                  )}
+                  <Image width={40} height={40} src={product.image} alt={product.name} className="h-10 w-10 object-cover" />
                 </td>
                 <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                  {editingProductId === product.id ? (
-                    <input
-                      type="text"
-                      value={newProductData.description}
-                      onChange={(e) => setNewProductData({ ...newProductData, description: e.target.value })}
-                      className="border rounded px-2 py-1"
-                    />
-                  ) : (
-                    product.description
-                  )}
+                  {categories.find((category) => Number(category.id) === Number(product.category_id))?.category_name ||
+                    'Unknown'}
                 </td>
+                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">${product.price.toFixed(2)}</td>
+                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{product.stock}</td>
                 <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                  {editingProductId === product.id ? (
-                    <input
-                      type="text"
-                      value={newProductData.image}
-                      onChange={(e) => setNewProductData({ ...newProductData, image: e.target.value })}
-                      className="border rounded px-2 py-1"
-                    />
-                  ) : (
-                    <Image width={40} height={40} src={product.image} alt={product.name} className="h-10 w-10 object-cover" />
-                  )}
-                </td>
-                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                  {editingProductId === product.id ? (
-                    <select
-                      id="category"
-                      value={newProductData.category_id}
-                      onChange={(e) => setNewProductData({ ...newProductData, category_id: e.target.value })}
-                      className="border rounded px-2 py-1"
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleEditClick(product)}
+                      className="text-blue-500 hover:text-blue-700"
                     >
-                      <option value="">Select Category</option>
-                      {categories.map(category => (
-                        <option key={category.id} value={category.id}>
-                          {category.category_name || 'Unknown'}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    categories.find(category => Number(category.id) === Number(product.category_id))?.category_name || 'Unknown'
-                  )}
-                </td>
-                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                  {editingProductId === product.id ? (
-                    <input
-                      type="number"
-                      value={newProductData.price}
-                      onChange={(e) => setNewProductData({ ...newProductData, price: e.target.value })}
-                      className="border rounded px-2 py-1"
-                    />
-                  ) : (
-                    `$${product.price.toFixed(2)}`
-                  )}
-                </td>
-                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                  {editingProductId === product.id ? (
-                    <div className='flex gap-2'>
-                      <button
-                        onClick={() => handleSaveClick(product)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
-                        Save
-                      </button>
-                      <button
-                        onClick={handleCancelEdit}
-                        className="text-gray-700 hover:text-gray-900"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  ) : (
-                    <div className='flex gap-2'>
-                      <button
-                        onClick={() => handleEditClick(product)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => {
-                          setIsDeleteModalOpen(true);
-                          setProductToDelete(product);
-                        }}
-                        className="text-red-500 hover:text-red-700 ml-2"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  )}
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsDeleteModalOpen(true);
+                        setProductToDelete(product);
+                      }}
+                      className="text-red-500 hover:text-red-700 ml-2"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
+            <tr>
+              <td colSpan={productKeys.length + 1} className="px-4 py-3 text-center">
+                <button
+                  onClick={() => setIsAddModalOpen(true)}
+                  className="text-blue-500 hover:text-blue-700"
+                >
+                  Add New Product
+                </button>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -495,11 +424,25 @@ const ProductsAdminPage = () => {
       <Toast message={toastMessage} isLoading={isLoading} />
       {isDeleteModalOpen && (
         <ConfirmationModal
+          isOpen={isDeleteModalOpen}
           message={`Are you sure you want to delete product "${productToDelete.name}"?`}
           onConfirm={handleDeleteProduct}
-          onCancel={() => setIsDeleteModalOpen(false)}
+          onClose={() => { setIsDeleteModalOpen(false); setProductToDelete(null); }}
         />
       )}
+      <AddProductModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onAddProduct={handleAddProduct}
+        categories={categories}
+      />
+      <EditProductModal
+        isOpen={isEditModalOpen}
+        onClose={handleCancelEdit}
+        product={editingProduct}
+        categories={categories}
+        onSave={handleSaveClick}
+      />
     </div>
   );
 }
