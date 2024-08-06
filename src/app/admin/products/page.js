@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react';
-import { collection, getDocs, doc, updateDoc, setDoc, deleteDoc, query, where } from 'firebase/firestore';
+import { useState, useEffect, useCallback } from 'react';
+import { collection, getDocs, doc, updateDoc, setDoc, deleteDoc } from 'firebase/firestore';
 import { db } from "@/firebaseInit";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSortUp, faSortDown, faSort, faSearch } from '@fortawesome/free-solid-svg-icons';
@@ -11,6 +11,60 @@ import ConfirmationModal from '@/app/components/ConfirmationModal';
 import Image from 'next/image';
 import AddProductModal from './AddProductModal';
 import EditProductModal from './EditProductModal';
+
+const DualRangeSlider = ({ min, max, value, onChange }) => {
+  const [activeThumb, setActiveThumb] = useState(null);
+
+  const handleMouseDown = useCallback((thumb) => {
+    setActiveThumb(thumb);
+  }, []);
+
+  const handleMouseUp = useCallback(() => {
+    setActiveThumb(null);
+  }, []);
+
+  const handleMouseMove = useCallback((e) => {
+    if (!activeThumb) return;
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const percent = (e.clientX - rect.left) / rect.width;
+    const newValue = Math.round(percent * (max - min) + min);
+
+    if (activeThumb === 'min') {
+      onChange({ ...value, min: Math.min(newValue, value.max - 1) });
+    } else {
+      onChange({ ...value, max: Math.max(newValue, value.min + 1) });
+    }
+  }, [activeThumb, min, max, value, onChange]);
+
+  return (
+    <div
+      className="relative w-full h-6"
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
+    >
+      <div className="absolute top-1/2 left-0 right-0 h-1 bg-gray-300 transform -translate-y-1/2"></div>
+      <div
+        className="absolute top-1/2 left-0 right-0 h-1 bg-blue-500 transform -translate-y-1/2"
+        style={{
+          left: `${((value.min - min) / (max - min)) * 100}%`,
+          right: `${100 - ((value.max - min) / (max - min)) * 100}%`,
+        }}
+      ></div>
+      <div
+        className="absolute top-1/2 w-4 h-4 bg-blue-500 rounded-full transform -translate-y-1/2 -translate-x-1/2 cursor-pointer"
+        style={{ left: `${((value.min - min) / (max - min)) * 100}%` }}
+        onMouseDown={() => handleMouseDown('min')}
+      ></div>
+      <div
+        className="absolute top-1/2 w-4 h-4 bg-blue-500 rounded-full transform -translate-y-1/2 -translate-x-1/2 cursor-pointer"
+        style={{ left: `${((value.max - min) / (max - min)) * 100}%` }}
+        onMouseDown={() => handleMouseDown('max')}
+      ></div>
+    </div>
+  );
+};
 
 const ProductsAdminPage = () => {
   const [products, setProducts] = useState([]);
@@ -29,6 +83,17 @@ const ProductsAdminPage = () => {
   const [categories, setCategories] = useState([]);
   const [priceRange, setPriceRange] = useState({ min: 0, max: 0 });
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [priceFilter, setPriceFilter] = useState({ min: 0, max: 0 });
+  const [debouncedPriceFilter, setDebouncedPriceFilter] = useState({ min: 0, max: 0 });
+  const [isPriceFilterChanged, setIsPriceFilterChanged] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedPriceFilter(priceFilter);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [priceFilter]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -69,7 +134,7 @@ const ProductsAdminPage = () => {
       setToastMessage('Error adding product. Please try again.');
     }
     setIsAddModalOpen(false);
-    
+
     const fetchProducts = async () => {
       const productsCollection = collection(db, 'Products');
       const querySnapshot = await getDocs(productsCollection);
@@ -135,7 +200,8 @@ const ProductsAdminPage = () => {
       const minPrice = Math.min(...prices);
       const maxPrice = Math.max(...prices);
       setPriceRange({ min: minPrice, max: maxPrice });
-      setFilterConfig(prev => ({ ...prev, price: maxPrice }));
+      setPriceFilter({ min: minPrice, max: maxPrice });
+      setDebouncedPriceFilter({ min: minPrice, max: maxPrice });
     };
 
     fetchProducts();
@@ -150,17 +216,24 @@ const ProductsAdminPage = () => {
           filtered = filtered.filter(product =>
             product.category_id === Number(filterConfig[key])
           );
-        } else if (key === 'price') {
-          filtered = filtered.filter(product =>
-            product.price <= Number(filterConfig[key])
-          );
-        } else {
+        } else if (key === 'stock') {
+          const stockValue = Number(filterConfig[key]);
+          filtered = filtered.filter(product => {
+            if (stockValue === 0) return product.stock === 0;
+            if (stockValue === 1) return product.stock > 0;
+            return product.stock >= stockValue;
+          });
+        } else if (key !== 'price') {
           filtered = filtered.filter(product =>
             String(product[key]).toLowerCase().includes(filterConfig[key].toLowerCase())
           );
         }
       }
     }
+
+    filtered = filtered.filter(product =>
+      product.price >= debouncedPriceFilter.min && product.price <= debouncedPriceFilter.max
+    );
 
     if (sortConfig.key) {
       filtered.sort((a, b) => {
@@ -195,7 +268,7 @@ const ProductsAdminPage = () => {
     }
 
     setFilteredProducts(filtered);
-  }, [products, filterConfig, sortConfig, categories]);
+  }, [products, filterConfig, sortConfig, categories, debouncedPriceFilter]);
 
   const handleCancelEdit = () => {
     setEditingProduct(null);
@@ -227,7 +300,7 @@ const ProductsAdminPage = () => {
               <select
                 value={filterConfig[key] || ''}
                 onChange={(e) => handleFilterChange(key, e.target.value)}
-                className="border rounded px-2 py-1"
+                className="border rounded px-2 py-1 mx-2"
               >
                 <option value="">All Categories</option>
                 {categories.map(category => (
@@ -237,26 +310,37 @@ const ProductsAdminPage = () => {
                 ))}
               </select>
             ) : key === 'price' ? (
-              <div className="flex flex-col items-center">
-                <input
-                  type="range"
+              <div className="flex flex-col items-center w-full">
+                <DualRangeSlider
                   min={priceRange.min}
                   max={priceRange.max}
-                  value={filterConfig[key] || priceRange.max}
-                  onChange={(e) => handleFilterChange(key, e.target.value)}
-                  className="w-full"
+                  value={priceFilter}
+                  onChange={handlePriceFilterChange}
                 />
                 <span className="text-xs mt-1">
-                  Max: ${Number(filterConfig[key] || priceRange.max).toFixed(2)}
+                  ${priceFilter.min.toFixed(2)} - ${priceFilter.max.toFixed(2)}
                 </span>
               </div>
+            ) : key === 'stock' ? (
+              <select
+                value={filterConfig[key] || ''}
+                onChange={(e) => handleFilterChange(key, e.target.value)}
+                className="border rounded px-2 py-1 mx-2"
+              >
+                <option value="">All Stock</option>
+                <option value="0">Out of Stock</option>
+                <option value="1">In Stock</option>
+                <option value="10">10+</option>
+                <option value="50">50+</option>
+                <option value="100">100+</option>
+              </select>
             ) : (
               <input
                 type="text"
                 placeholder={`Filter by ${key}`}
                 value={filterConfig[key] || ''}
                 onChange={(e) => handleFilterChange(key, e.target.value)}
-                className="border rounded px-2 py-1"
+                className="border rounded px-2 py-1 w-full mx-2"
               />
             )}
           </th>
@@ -271,7 +355,10 @@ const ProductsAdminPage = () => {
 
   const clearFiltersAndSorting = () => {
     setSortConfig({ key: '', direction: '' });
-    setFilterConfig(prev => ({ ...prev, price: priceRange.max }));
+    setFilterConfig({});
+    setPriceFilter({ min: priceRange.min, max: priceRange.max });
+    setDebouncedPriceFilter({ min: priceRange.min, max: priceRange.max });
+    setIsPriceFilterChanged(false);
     setFilteredProducts(products);
   };
 
@@ -295,6 +382,13 @@ const ProductsAdminPage = () => {
   const renderSearchIcon = (key) => {
     const isFiltered = filterConfig[key] && filterConfig[key].length > 0;
     return <FontAwesomeIcon icon={faSearch} className={isFiltered ? 'text-blue-500' : ''} />;
+  };
+
+  const handlePriceFilterChange = (newPriceFilter) => {
+    setPriceFilter(newPriceFilter);
+    setIsPriceFilterChanged(
+      newPriceFilter.min !== priceRange.min || newPriceFilter.max !== priceRange.max
+    );
   };
 
   const handleProductChange = async (id, updatedData) => {
@@ -342,9 +436,14 @@ const ProductsAdminPage = () => {
     <div className="max-w-full overflow-hidden px-4">
       <div className="flex flex-col sm:flex-row justify-between items-center mb-4 space-y-2 sm:space-y-0">
         <button
-          className={`border ${Object.keys(filterConfig).length === 0 && sortConfig.key === '' ? 'border-gray-300 text-gray-300 cursor-not-allowed' : 'border-red-500 text-red-500 hover:bg-red-500 hover:text-white'} px-4 py-1 rounded-lg transition-all`}
+          className={`border ${Object.keys(filterConfig).length === 0 &&
+            sortConfig.key === '' &&
+            !isPriceFilterChanged
+            ? 'border-gray-300 text-gray-300 cursor-not-allowed'
+            : 'border-red-500 text-red-500 hover:bg-red-500 hover:text-white'
+            } px-4 py-1 rounded-lg transition-all`}
           onClick={clearFiltersAndSorting}
-          disabled={Object.keys(filterConfig).length === 0 && sortConfig.key === ''}
+          disabled={Object.keys(filterConfig).length === 0 && sortConfig.key === '' && !isPriceFilterChanged}
         >
           Clear Filters & Sorting
         </button>
