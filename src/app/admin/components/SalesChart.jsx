@@ -23,59 +23,59 @@ const SalesChart = () => {
         setLoading(true);
         setError(null);
         try {
-          const ordersRef = collection(db, 'Orders');
-          let startDate, endDate, interval;
-      
-          switch (timeFrame) {
-            case 'this week':
-              startDate = startOfWeek(new Date());
-              endDate = endOfWeek(new Date());
-              interval = 'day';
-              break;
-            case 'this month':
-              startDate = startOfMonth(new Date());
-              endDate = endOfMonth(new Date());
-              interval = 'day';
-              break;
-            case 'this year':
-              startDate = startOfYear(new Date());
-              endDate = endOfYear(new Date());
-              interval = 'month';
-              break;
-            default:
-              startDate = startOfMonth(new Date());
-              endDate = endOfMonth(new Date());
-              interval = 'day';
-          }
-          
-          const q = query(ordersRef, where('createdAt', '>=', startDate), where('createdAt', '<=', endDate));
-          const querySnapshot = await getDocs(q);
-      
-          const ordersByDate = {};
-          querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            const date = format(data.createdAt.toDate(), interval === 'day' ? 'yyyy-MM-dd' : 'yyyy-MM');
-            
-            if (!ordersByDate[date]) {
-              ordersByDate[date] = { count: 0, total: 0 };
+            const ordersRef = collection(db, 'Orders');
+            let startDate, endDate, interval;
+
+            switch (timeFrame) {
+                case 'this week':
+                    startDate = startOfWeek(new Date());
+                    endDate = endOfWeek(new Date());
+                    interval = 'day';
+                    break;
+                case 'this month':
+                    startDate = startOfMonth(new Date());
+                    endDate = endOfMonth(new Date());
+                    interval = 'day';
+                    break;
+                case 'this year':
+                    startDate = startOfYear(new Date());
+                    endDate = endOfYear(new Date());
+                    interval = 'month';
+                    break;
+                default:
+                    startDate = startOfMonth(new Date());
+                    endDate = endOfMonth(new Date());
+                    interval = 'day';
             }
-            ordersByDate[date].count += 1;
-            ordersByDate[date].total += data.total;
-          });
-      
-          const labels = Object.keys(ordersByDate).sort();
-          const orderCounts = labels.map(date => ordersByDate[date].count);
-          const totalValues = labels.map(date => ordersByDate[date].total);
-          const averageValues = labels.map(date => ordersByDate[date].total / ordersByDate[date].count || 0);
-      
-          setOrderData({ labels, orderCounts, averageValues, totalValues });
+
+            const q = query(ordersRef, where('createdAt', '>=', startDate), where('createdAt', '<=', endDate));
+            const querySnapshot = await getDocs(q);
+
+            const ordersByDate = {};
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                const date = format(data.createdAt.toDate(), interval === 'day' ? 'yyyy-MM-dd' : 'yyyy-MM');
+
+                if (!ordersByDate[date]) {
+                    ordersByDate[date] = { count: 0, total: 0 };
+                }
+                ordersByDate[date].count += 1;
+                ordersByDate[date].total += data.total;
+            });
+
+            const labels = Object.keys(ordersByDate).sort();
+            const orderCounts = labels.map(date => ordersByDate[date].count);
+            const totalValues = labels.map(date => ordersByDate[date].total);
+            const averageValues = labels.map(date => ordersByDate[date].total / ordersByDate[date].count || 0);
+
+            setOrderData({ labels, orderCounts, averageValues, totalValues });
         } catch (error) {
-          setError('Failed to fetch order data');
-          console.error('Error fetching order data:', error);
+            setError('Failed to fetch order data');
+            console.error('Error fetching order data:', error);
         } finally {
-          setLoading(false);
+            setLoading(false);
         }
-      };
+    };
 
     const createChartOptions = (title) => ({
         responsive: true,
@@ -85,9 +85,22 @@ const SalesChart = () => {
             title: { display: true, text: title, font: { size: 16 } },
         },
         scales: {
-            y: { beginAtZero: true },
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function (value, index, values) {
+                        if (value >= 1000000) {
+                            return (value / 1000000).toFixed(1) + 'M';
+                        } else if (value >= 1000) {
+                            return (value / 1000).toFixed(1) + 'K';
+                        } else {
+                            return value;
+                        }
+                    }
+                }
+            },
         },
-    });
+});
 
     const orderCountData = {
         labels: orderData.labels,
@@ -132,8 +145,8 @@ const SalesChart = () => {
                             key={period}
                             onClick={() => setTimeFrame(period)}
                             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${timeFrame === period
-                                    ? 'bg-blue-600 text-white'
-                                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                ? 'bg-blue-600 text-white'
+                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                                 }`}
                         >
                             {period.charAt(0).toUpperCase() + period.slice(1)}
@@ -156,7 +169,7 @@ const SalesChart = () => {
                         <Bar options={createChartOptions('Average Order Value')} data={averageValueData} />
                     </div>
                     <div className="h-64">
-                        <Bar options={createChartOptions('Total Order Value')} data={totalValueData} />
+                        <Bar options={createChartOptions('Total Sales')} data={totalValueData} />
                     </div>
                 </div>
             )}
