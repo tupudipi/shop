@@ -1,24 +1,24 @@
-import Navbar from "./components/Navbar";
-import CategoryShow from "./components/CategoryShow";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/pages/api/auth/[...nextauth]";
+// pages/index.js
+import HeroSection from './components/HeroSection';
+import FeaturedCategories from './components/FeaturedCategories';
+import BestSellers from './components/BestSellers';
+import Navbar from './components/Navbar';
 
-export default async function Home() {
-  const session = await getServerSession(authOptions);
-
+export default function Home() {
   return (
     <>
-    <Navbar />
-      <main className="flex min-h-screen flex-col items-center justify-between">
-        <h1 className="text-4xl font-bold">Hello, World!</h1>
-        <CategoryShow page="home" categoryID={1}/>
-        <CategoryShow page="home" categoryID={2}/>
-        <CategoryShow page="home" categoryID={3}/>
-        <CategoryShow page="home" categoryID={4}/>
-        <CategoryShow page="home" categoryID={5}/>
-        <CategoryShow page="home" categoryID={6}/>
+      <Navbar />
+      <HeroSection />
+      <main className="flex flex-col items-center">
+        <section className="w-full py-8">
+          <h2 className="text-3xl font-bold text-center mb-6">Featured Categories</h2>
+          <FeaturedCategories />
+        </section>
+        <section className="w-full py-8">
+          <h2 className="text-3xl font-bold text-center mb-6">Best Sellers</h2>
+          <BestSellers />
+        </section>
       </main>
     </>
-
   );
 }
