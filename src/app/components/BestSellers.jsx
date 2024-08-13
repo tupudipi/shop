@@ -1,27 +1,82 @@
 'use client'
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { collection, query, where, getDocs, Timestamp } from 'firebase/firestore';
 import { db } from "@/firebaseInit";
-import ProductCard from './ProductCard'; 
+import ProductCard from './ProductCard';
+import ProductLoading from './ProductLoading';
+
+const debounce = (func, delay) => {
+    let debounceTimer;
+    return function () {
+        const context = this;
+        const args = arguments;
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => func.apply(context, args), delay);
+    };
+};
 
 export default function BestSellers() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+  const scrollContainer = useRef(null);
+
+  const handleResize = debounce(() => {
+    setIsSmallScreen(window.innerWidth < 1280);
+  }, 250);
+
+  useEffect(() => {
+    setIsSmallScreen(window.innerWidth < 1280);
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [handleResize]);
+
+  useEffect(() => {
+    const handleWheel = (event) => {
+      if (isSmallScreen) {
+        event.preventDefault();
+        if (scrollContainer.current) {
+          scrollContainer.current.scrollLeft += event.deltaY;
+        }
+      }
+    };
+
+    const container = scrollContainer.current;
+    if (isSmallScreen && container) {
+      container.addEventListener('wheel', handleWheel, { passive: false });
+    }
+
+    return () => {
+      if (isSmallScreen && container) {
+        container.removeEventListener('wheel', handleWheel);
+      }
+    };
+  }, [isSmallScreen]);
 
   useEffect(() => {
     const fetchBestSellers = async () => {
       try {
+        let ordersQuery;
+        let ordersSnapshot;
+        let productSales = {};
+
+        // First, try to fetch data from the last month
         const lastMonth = new Date();
         lastMonth.setMonth(lastMonth.getMonth() - 1);
-
-        const ordersQuery = query(
+        ordersQuery = query(
           collection(db, 'Orders'),
           where('created_at', '>=', Timestamp.fromDate(lastMonth))
         );
+        ordersSnapshot = await getDocs(ordersQuery);
 
-        const ordersSnapshot = await getDocs(ordersQuery);
-        const productSales = {};
+        // If no results, fetch all-time data
+        if (ordersSnapshot.empty) {
+          ordersQuery = query(collection(db, 'Orders'));
+          ordersSnapshot = await getDocs(ordersQuery);
+        }
 
         ordersSnapshot.forEach((orderDoc) => {
           const orderData = orderDoc.data();
@@ -37,17 +92,15 @@ export default function BestSellers() {
           .map(([slug]) => slug);
 
         if (sortedProductSlugs.length === 0) {
-          throw new Error("No best-selling products found in the last month.");
+          throw new Error("No best-selling products found.");
         }
 
         const productsQuery = query(
           collection(db, 'Products'),
           where('slug', 'in', sortedProductSlugs)
         );
-
         const productsSnapshot = await getDocs(productsQuery);
         const fetchedProducts = [];
-
         productsSnapshot.forEach((doc) => {
           fetchedProducts.push({ id: doc.id, ...doc.data() });
         });
@@ -64,19 +117,27 @@ export default function BestSellers() {
     fetchBestSellers();
   }, []);
 
-  if (loading) {
-    return <p className="text-center py-8">Loading best-sellers...</p>;
-  }
-
   if (error) {
     return <p className="text-center py-8 text-red-500">{error}</p>;
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-4">
-      {products.map((product) => (
-        <ProductCard key={product.slug} product={product} />
-      ))}
+    <div className="my-6 flex w-full items-center">
+      <div
+        ref={scrollContainer}
+        className="flex gap-3 md:gap-6 max-w-[22rem] md:max-w-3xl overflow-x-auto pb-6 lg:max-w-5xl xl:max-w-7xl mb-2 self-center mx-auto"
+        style={{ scrollBehavior: 'smooth' }}
+      >
+        {loading ? (
+          <><ProductLoading /> <ProductLoading /> <ProductLoading /></>
+        ) : (
+          <>
+            {products.map((product) => (
+              <ProductCard key={product.slug} product={product} />
+            ))}
+          </>
+        )}
+      </div>
     </div>
   );
 }
