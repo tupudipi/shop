@@ -16,7 +16,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${inter.className}`}>
-        <div id="modal-root" className="bg-slate-100 z-[5000] mb-[596px] md:mb-96">
+        <div id="modal-root" className="bg-slate-100 z-[5000] mb-[596px] md:mb-96 min-h-screen">
           <SessionProvider>
             <WishlistProvider>
               <CartProvider>
