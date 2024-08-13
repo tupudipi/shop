@@ -50,7 +50,7 @@ export default function LoginButton() {
             ) : (
                 <button
                     onClick={openLoginModal}
-                    className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700 transition-colors"
+                    className="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-800 transition-colors"
                 >
                     <FontAwesomeIcon icon={faRightToBracket} className="max-h-4" /> Sign in / Sign Up
                 </button>

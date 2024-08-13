@@ -3,6 +3,7 @@ import "./globals.css";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { CartProvider } from "@/context/CartContext";
 import SessionProvider from "@/context/SessionProvider";
+import Footer from "./components/Footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -14,8 +15,8 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} bg-slate-100`}>
-        <div id="modal-root">
+      <body className={`${inter.className}`}>
+        <div id="modal-root" className="bg-slate-100 z-[5000] mb-[596px] md:mb-96">
           <SessionProvider>
             <WishlistProvider>
               <CartProvider>
@@ -24,6 +25,7 @@ export default function RootLayout({ children }) {
             </WishlistProvider>
           </SessionProvider>
         </div>
+        <Footer />
       </body>
     </html>
   );

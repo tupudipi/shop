@@ -60,7 +60,7 @@ function LayoutContent({ children }) {
               </div>
             </div>
           </div>
-          <div className="flex-grow overflow-y-auto p-4 pt-1 pb-0">
+          <div className="flex-grow overflow-y-auto p-4 pt-1">
             {children}
           </div>
         </div>
