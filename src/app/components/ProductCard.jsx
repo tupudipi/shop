@@ -41,6 +41,11 @@ const ProductCard = ({ product, isCart }) => {
             {reviewValue}<span className="text-gray-500">({reviewCount})</span>
           </p>
         </div>
+        <div>
+          <p className={`text-green-700 ${(product.stock > 0 && product.stock > 10) ? 'block' : 'hidden'}`}>In stock</p>
+          <p className={`text-red-700 ${product.stock === 0 ? 'block' : 'hidden'}`}>Out of stock</p>
+          <p className={`text-yellow-500 ${product.stock > 0 && product.stock <= 10 ? 'block' : 'hidden'}`}>Only {product.stock} left!</p>
+        </div>
         <p className="font-medium text-lg mt-auto text-start">${product.price.toFixed(2)}</p>
         {isCart ? (
           <ProductCardQuantityClientElement product={product} />

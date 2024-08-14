@@ -14,6 +14,7 @@ const ProductActionButtonsClientElement = ({ product }) => {
   const [toastConfig, setToastConfig] = useState({ show: false, message: '', isLoading: false });
 
   const isFav = wishlist.some(item => item.slug === product.slug);
+  const isOutOfStock = product.stock === 0;
 
   const handleAddToCart = () => {
     addToCart(product);
@@ -35,8 +36,9 @@ const ProductActionButtonsClientElement = ({ product }) => {
   return (
     <div className="flex flex-col gap-2 justify-end">
       <button
-        className="bg-blue-500 text-white px-4 py-1 rounded-lg hover:bg-blue-700 transition-colors"
+        className={`px-4 py-1 rounded-lg transition-colors ${isOutOfStock ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-700'}`}
         onClick={handleAddToCart}
+        disabled={isOutOfStock}
       >
         Add to Cart
       </button>
