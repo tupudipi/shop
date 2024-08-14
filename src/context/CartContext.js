@@ -39,38 +39,51 @@ export const CartProvider = ({ children }) => {
             if (!querySnapshot.empty) {
                 const existingDoc = querySnapshot.docs[0];
                 const existingProduct = existingDoc.data();
-                const updatedProduct = { 
-                    ...existingProduct, 
-                    quantity: (existingProduct.quantity || 1) + (product.quantity || 1) 
+                const newQuantity = Math.min((existingProduct.quantity || 1) + (product.quantity || 1), product.stock);
+                const updatedProduct = {
+                    ...existingProduct,
+                    quantity: newQuantity
                 };
                 const docRef = doc(db, 'Carts', existingDoc.id);
                 await updateDoc(docRef, updatedProduct);
             } else {
-                await addDoc(collection(db, 'Carts'), {
-                    ...product,
-                    user_id: session.user.email,
-                    quantity: product.quantity || 1
-                });
+                if (product.stock > 0) {
+                    await addDoc(collection(db, 'Carts'), {
+                        ...product,
+                        user_id: session.user.email,
+                        quantity: Math.min(product.quantity || 1, product.stock)
+                    });
+                }
             }
         } else {
             const updatedCart = [...cart];
             const existingProductIndex = updatedCart.findIndex(item => item.slug === product.slug);
             
             if (existingProductIndex !== -1) {
+                const newQuantity = Math.min(
+                    (updatedCart[existingProductIndex].quantity || 1) + (product.quantity || 1),
+                    product.stock
+                );
                 updatedCart[existingProductIndex] = {
                     ...updatedCart[existingProductIndex],
-                    quantity: (updatedCart[existingProductIndex].quantity || 1) + (product.quantity || 1)
+                    quantity: newQuantity
                 };
             } else {
-                updatedCart.push({ ...product, quantity: product.quantity || 1 });
+                if (product.stock > 0) {
+                    updatedCart.push({ 
+                        ...product, 
+                        quantity: Math.min(product.quantity || 1, product.stock) 
+                    });
+                }
             }
             
             setCart(updatedCart);
             localStorage.setItem('cart', JSON.stringify(updatedCart));
         }
+    
+        return product.stock > 0;
     };
     
-
     const removeFromCart = async (slug) => {
         if (session) {
             const q = query(collection(db, 'Carts'), where('user_id', '==', session.user.email), where('slug', '==', slug));
