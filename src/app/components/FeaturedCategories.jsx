@@ -19,30 +19,36 @@ export default function FeaturedCategories() {
                 let productSales = {};
                 const categoryNameToIdMap = {};
 
-                console.log("Step 1: Fetching all categories for name-to-ID mapping...");
                 const categoriesSnapshot = await getDocs(collection(db, 'Categories'));
                 categoriesSnapshot.forEach(categoryDoc => {
                     const categoryData = categoryDoc.data();
                     categoryNameToIdMap[categoryData.category_name] = categoryDoc.id;
-                    console.log(`Mapped category name "${categoryData.category_name}" to ID "${categoryDoc.id}"`);
                 });
 
-                console.log("Step 2: Fetching orders from the last month...");
-                const lastMonth = new Date();
-                lastMonth.setMonth(lastMonth.getMonth() - 1);
+
+                const currentDate = new Date();
+                const lastMonth = new Date(
+                    currentDate.getFullYear(),
+                    currentDate.getMonth() - 1,
+                    currentDate.getDate(),
+                    currentDate.getHours(),
+                    currentDate.getMinutes(),
+                    currentDate.getSeconds()
+                );
+                
+                const lastMonthTimestamp = Timestamp.fromDate(lastMonth);
+                
                 ordersQuery = query(
                     collection(db, 'Orders'),
-                    where('created_at', '>=', Timestamp.fromDate(lastMonth))
+                    where('createdAt', '>=', lastMonthTimestamp)
                 );
-                ordersSnapshot = await getDocs(ordersQuery);
-
+                ordersSnapshot = await getDocs(ordersQuery);  
+    
                 if (ordersSnapshot.empty) {
-                    console.log("No orders in the last month, fetching all-time data");
                     ordersQuery = query(collection(db, 'Orders'));
                     ordersSnapshot = await getDocs(ordersQuery);
                 }
 
-                console.log(`Number of orders: ${ordersSnapshot.size}`);
 
                 ordersSnapshot.forEach(orderDoc => {
                     const orderData = orderDoc.data();
@@ -54,21 +60,15 @@ export default function FeaturedCategories() {
                     });
                 });
 
-                console.log("Category sales:", categorySales);
-                console.log("Product sales:", productSales);
-
                 const sortedCategories = Object.entries(categorySales)
                     .sort(([, a], [, b]) => b - a)
                     .slice(0, 4)
                     .map(([category_name]) => category_name);
 
-                console.log("Sorted categories:", sortedCategories);
-
                 if (sortedCategories.length === 0) {
                     throw new Error("No categories found with sales.");
                 }
 
-                console.log("Step 3: Fetching products for each category...");
                 const fetchedCategories = [];
                 for (let categoryName of sortedCategories) {
                     const categoryId = categoryNameToIdMap[categoryName];
@@ -77,14 +77,11 @@ export default function FeaturedCategories() {
                         continue;
                     }
 
-                    console.log(`Fetching products for category "${categoryName}" with ID "${categoryId}"`);
                     const productsQuery = query(
                         collection(db, 'Products'),
                         where('category_id', '==', Number(categoryId))
                     );
                     const productsSnapshot = await getDocs(productsQuery);
-
-                    console.log(`Number of products found for category "${categoryName}": ${productsSnapshot.size}`);
 
                     let bestSellingProduct = null;
                     let maxSales = 0;
@@ -92,7 +89,6 @@ export default function FeaturedCategories() {
                     productsSnapshot.forEach(productDoc => {
                         const productData = productDoc.data();
                         const sales = productSales[productData.slug] || 0;
-                        console.log(`Product: ${productData.slug}, Sales: ${sales}`);
                         if (sales > maxSales) {
                             maxSales = sales;
                             bestSellingProduct = productData;
@@ -100,14 +96,12 @@ export default function FeaturedCategories() {
                     });
 
                     if (bestSellingProduct) {
-                        console.log(`Best selling product for category "${categoryName}": ${bestSellingProduct.slug}`);
                         fetchedCategories.push({
                             id: categoryId,
                             category_name: categoryName,
                             bestSellingProductImage: bestSellingProduct.image,
                         });
                     } else {
-                        console.log(`No best selling product found for category "${categoryName}"`);
                         fetchedCategories.push({
                             id: categoryId,
                             category_name: categoryName,
@@ -115,8 +109,6 @@ export default function FeaturedCategories() {
                         });
                     }
                 }
-
-                console.log("Fetched categories:", fetchedCategories);
 
                 setCategories(fetchedCategories);
                 setLoading(false);
@@ -141,12 +133,12 @@ export default function FeaturedCategories() {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-4">
             {categories.map((category) => (
-                <Link href={`/category/${category.id}`} key={category.id} className="block text-center group hover:shadow-md transition-all">
+                <Link href={`/search/${category.category_name}`} key={category.category_name} className="block text-center group hover:shadow-lg transition-all rounded-lg">
                     <div className="w-full h-48 bg-gray-200 flex items-center justify-center relative rounded-lg">
                         {category.bestSellingProductImage ? (
-                            <Image 
-                                src={category.bestSellingProductImage} 
-                                alt={category.category_name} 
+                            <Image
+                                src={category.bestSellingProductImage}
+                                alt={category.category_name}
                                 className="absolute inset-0 w-full h-full object-cover rounded-lg"
                                 width={400}
                                 height={400}
