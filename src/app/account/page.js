@@ -100,7 +100,7 @@ export default async function accountPage() {
         <div className="bg-white shadow-lg rounded-lg p-6">
           <h2 className="text-2xl font-medium mb-4">Order Summary</h2>
           <p className="flex items-center mb-2">
-            <FontAwesomeIcon icon={faShoppingBag} className="mr-2" /> Total Orders: {totalOrders}
+            <FontAwesomeIcon icon={faShoppingBag} className="mr-2" /> Orders: {totalOrders}
           </p>
           <p className="flex items-center mb-2">
             <FontAwesomeIcon icon={faDollarSign} className="mr-2" /> Total Order Value: ${totalOrdersValue}
@@ -113,14 +113,14 @@ export default async function accountPage() {
         <div className="bg-white shadow-lg rounded-lg p-6">
           <h2 className="text-2xl font-medium mb-4">Address Information</h2>
           <p className="flex items-center mb-2">
-            <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" /> Total Addresses: {totalAddresses}
+            <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" /> Addresses: {totalAddresses}
           </p>
         </div>
         
         <div className="bg-white shadow-lg rounded-lg p-6">
           <h2 className="text-2xl font-medium mb-4">Review Summary</h2>
           <p className="flex items-center mb-2">
-            <FontAwesomeIcon icon={faCommentDots} className="mr-2" /> Total Reviews: {totalReviews}
+            <FontAwesomeIcon icon={faCommentDots} className="mr-2" /> Reviews: {totalReviews}
           </p>
           <p className="flex items-center">
             <FontAwesomeIcon icon={faStar} className="mr-2" /> Average Review Grade: {averageReviewGrade}
