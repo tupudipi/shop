@@ -29,36 +29,58 @@ export default function WishlistDropdown(props) {
 
     const moveToCart = () => {
         setToastConfig({ show: true, message: 'Moving items...', isLoading: true });
-
+    
         const tempCart = [...cart];
+        const successfullyAdded = [];
+        const outOfStock = [];
+    
         if (session && status === 'authenticated') {
             for (const item of wishlist) {
-                addToCart(item);
+                if (item.stock > 0) {
+                    addToCart(item);
+                    successfullyAdded.push(item.name);
+                } else {
+                    outOfStock.push(item.name);
+                }
             }
         } else {
             for (const item of wishlist) {
-                const existingProductIndex = tempCart.findIndex(cartItem => cartItem.slug === item.slug);
-
-                if (existingProductIndex !== -1) {
-                    tempCart[existingProductIndex] = {
-                        ...tempCart[existingProductIndex],
-                        quantity: (tempCart[existingProductIndex].quantity || 1) + (item.quantity || 1)
-                    };
+                if (item.stock > 0) {
+                    const existingProductIndex = tempCart.findIndex(cartItem => cartItem.slug === item.slug);
+    
+                    if (existingProductIndex !== -1) {
+                        tempCart[existingProductIndex] = {
+                            ...tempCart[existingProductIndex],
+                            quantity: Math.min((tempCart[existingProductIndex].quantity || 1) + (item.quantity || 1), item.stock)
+                        };
+                    } else {
+                        tempCart.push({ ...item, quantity: Math.min(item.quantity || 1, item.stock) });
+                    }
+                    successfullyAdded.push(item.name);
                 } else {
-                    tempCart.push({ ...item, quantity: item.quantity || 1 });
+                    outOfStock.push(item.name);
                 }
             }
         }
-
+    
         setCart(tempCart);
         localStorage.setItem('cart', JSON.stringify(tempCart));
-
-        setToastConfig({ show: true, message: 'Items moved successfully!', isLoading: false });
+    
+        let message = '';
+        if (successfullyAdded.length > 0) {
+            message += `Added products to cart. `;
+        }
+        if (outOfStock.length > 0) {
+            message += `
+            Some were out of stock: ${outOfStock.join(', ')}.`;
+        }
+    
+        setToastConfig({ show: true, message: message, isLoading: false });
         setWishlistOpen(false);
-
+    
         setTimeout(() => {
             setToastConfig({ show: false, message: '', isLoading: false });
-        }, 2000);
+        }, 3000);
     };
 
     const isAuthenticated = session && status === 'authenticated';
