@@ -188,11 +188,11 @@ export default function PopularCategoriesChart() {
                 </div>
             ) : (
                 <>
-                    <div className="h-64">
+                    <div className="max-h-72 pb-8">
                         <h3 className="text-lg font-semibold text-gray-700 mb-2">By Products Sold</h3>
                         <Pie data={soldData} options={chartOptions} />
                     </div>
-                    <div className="h-64 mt-8">
+                    <div className="max-h-72 mt-8 pb-8">
                         <h3 className="text-lg font-semibold text-gray-700 mb-2">By Products Wishlisted (All Time)</h3>
                         <Pie data={wishlistedData} options={chartOptions} />
                     </div>
