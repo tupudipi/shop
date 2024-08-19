@@ -16,7 +16,7 @@ const AccountSidebar = () => {
     ];
 
     return (
-        <ul className="bg-white p-2 rounded-lg border-2 border-indigo-800/60 min-w-52 self-start w-full md:w-auto">
+        <ul className="bg-white p-2 rounded-lg border-2 border-indigo-800/60 min-w-52 self-start w-full md:w-auto sticky top-16">
             {links.map((link, index) => (
                 <Link key={index} href={link.href}>
                     <li className={`my-1 p-2 hover:bg-indigo-200/75 cursor-pointer rounded-md transition-all hover:shadow 
