@@ -64,46 +64,61 @@ const ProductComments = ({ slug }) => {
       reviewCount: reviewCount,
       reviewValue: newReviewValue
     }, { merge: true });
-    updateReview(reviewData.grade, reviews.length + 1);
+
+    updateReview(newReviewValue, reviews.length + 1);
 
     fetchReviews();
   };
 
   const handleDeleteReview = async (reviewId, product_id, reviewRating) => {
-
     const batch = writeBatch(db);
-
+  
     try {
+      // Delete the review and its replies
       const reviewRef = doc(db, 'Reviews', reviewId);
       batch.delete(reviewRef);
-
+  
       const repliesRef = collection(db, 'Reviews', reviewId, 'replies');
       const repliesSnapshot = await getDocs(query(repliesRef));
       repliesSnapshot.forEach((replyDoc) => {
         batch.delete(doc(repliesRef, replyDoc.id));
       });
-
+  
+      // Fetch all remaining reviews for the product
+      const reviewsRef = collection(db, 'Reviews');
+      const q = query(reviewsRef, where('product_id', '==', product_id));
+      const querySnapshot = await getDocs(q);
+  
+      let totalRating = 0;
+      let reviewCount = 0;
+  
+      querySnapshot.forEach((doc) => {
+        if (doc.id !== reviewId) { // Exclude the review being deleted
+          const review = doc.data();
+          if (!isNaN(review.grade)) {
+            totalRating += review.grade;
+            reviewCount += 1;
+          }
+        }
+      });
+  
+      // Calculate new review value
+      const newReviewValue = reviewCount > 0 ? totalRating / reviewCount : 0;
+  
+      // Update the product document
       const productRef = doc(db, 'Products', product_id);
-      const productDoc = await getDoc(productRef);
-
-      if (productDoc.exists()) {
-        const productData = productDoc.data();
-        const newReviewCount = (productData.reviewCount || 0) - 1;
-        const newReviewValue = newReviewCount > 0 ? ((productData.reviewValue || 0) * (productData.reviewCount || 0) - reviewRating) / newReviewCount : 0;
-        updateReview(newReviewValue, newReviewCount);
-
-        batch.set(productRef, {
-          reviewCount: newReviewCount,
-          reviewValue: newReviewValue
-        }, { merge: true });
-      } else {
-        console.error("Product does not exist");
-      }
-
+      batch.set(productRef, {
+        reviewCount: reviewCount,
+        reviewValue: newReviewValue
+      }, { merge: true });
+  
       await batch.commit();
+  
+      updateReview(newReviewValue, reviewCount);
+  
       fetchReviews();
     } catch (error) {
-      console.error("Error deleting review and replies: ", error);
+      console.error("Error deleting review and updating product: ", error);
     }
   };
 
