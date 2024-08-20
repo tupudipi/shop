@@ -8,7 +8,7 @@ import { collection, getDocs } from 'firebase/firestore';
 import Link from 'next/link';
 import Image from 'next/image';
 
-const Search = () => {
+const Search = ( { closeSidebar } ) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -95,7 +95,7 @@ const Search = () => {
     };
 
     return (
-        <div className="relative" ref={searchRef}>
+        <div className="relative" ref={searchRef} onClick={closeSidebar}>
             <div className="relative">
                 <input
                     className="w-full p-2 px-4 rounded-full pr-10 shadow active:shadow-md"

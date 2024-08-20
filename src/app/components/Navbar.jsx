@@ -25,7 +25,7 @@ async function getCategories() {
 const Sidebar = ({ closeSidebar, sidebarOpen, categories }) => {
     const { data: session } = useSession();
     return (<>
-        <div className={`fixed left-0 top-24 md:top-14 h-screen w-64 bg-slate-100 p-4 flex flex-col z-40 transition-transform duration-200 ease-in-out overflow-y-auto ${sidebarOpen ? 'transform translate-x-0' : 'transform -translate-x-full'}`}>
+        <div className={`fixed left-0 top-[44px] md:top-14 h-screen w-64 bg-slate-100 p-4 flex flex-col z-40 transition-transform duration-200 ease-in-out overflow-y-auto ${sidebarOpen ? 'transform translate-x-0' : 'transform -translate-x-full'}`}>
             {session ? (
                 <div>
                     <Link href='/account' >
@@ -66,7 +66,7 @@ const Sidebar = ({ closeSidebar, sidebarOpen, categories }) => {
                 <CartDropdown sidebar />
             </div>
         </div>
-        <div id="cover" className={`fixed left-0 h-full w-full mt-12 md:mt-6 bg-blue-950/50 z-30 ${sidebarOpen ? 'block' : 'hidden'}`} onClick={closeSidebar}></div>
+        <div id="cover" className={`fixed left-0 top-[44px] md: top-[56px] h-full w-full bg-blue-950/50 z-30 ${sidebarOpen ? 'block' : 'hidden'}`} onClick={closeSidebar}></div>
     </>
     )
 }
@@ -111,7 +111,7 @@ const Navbar = () => {
                         <Link href="/" className="font-bold text-xl">Cico Shop</Link>
                     </div>
                     <div className='flex-1 md:px-4 hidden md:block'>
-                        <Search />
+                        <Search closeSidebar={() => setSidebarOpen(false)}/>
                     </div>
                     <div className="flex justify-end gap-5 items-center">
                         <WishListDrowpdown navbar />
@@ -122,7 +122,7 @@ const Navbar = () => {
                 <div className="mt-2 relative">
                     <Sidebar closeSidebar={() => setSidebarOpen(false)} sidebarOpen={sidebarOpen} categories={categories} />
                     <div className='md:hidden'>
-                        <Search />
+                        <Search closeSidebar={() => setSidebarOpen(false)}/>
                     </div>
                 </div>
             </div>
