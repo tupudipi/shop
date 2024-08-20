@@ -98,7 +98,7 @@ const Navbar = () => {
     }, [sidebarOpen]);
 
     return (
-        <nav className="text-blue-800 bg-slate-100 z-[200] sticky top-0">
+        <nav className="text-blue-800 bg-slate-100 z-[49] sticky top-0">
             <div className="px-4 py-2 mx-auto md:flex md:items-center">
                 <div className="flex justify-between w-full">
                     <div className="flex items-center gap-2">
